@@ -88,7 +88,7 @@ Bölüm 0 şu yığını zorunlu kılıyor: **Firebase Auth + PostgreSQL + pgvec
 | G11 | Release imzası / AAB yok | 0.18 | Dış yapılandırma |
 | G12 | Play Console ürünleri, RTDN (Pub/Sub) yok | 0.13 | Dış yapılandırma |
 | G13 | Gizlilik politikası URL'si, hesap silme web sayfası yok | Play politikası | Dış yapılandırma |
-| G14 | Bu ortamda build doğrulaması yapılamıyor | 0.18 | Ortam |
+| G14 | Bu ortamda build doğrulaması yapılamıyor → çözüm: GitHub Actions CI (`whered-d-put` deseni, bkz. `CLAUDE.md`) | 0.18 | Ortam |
 
 ---
 
