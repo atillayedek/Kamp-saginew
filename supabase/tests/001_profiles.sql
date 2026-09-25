@@ -51,7 +51,11 @@ insert into public.universities (name, city, is_active) values
 create temp table ids as select tests.create_user('d@example.edu.tr') as a;
 grant select on ids to authenticated;
 select tests.act_as((select a from ids));
-select tests.assert_equals((select count(*) from public.universities), 1::bigint, 'active only');
+select tests.assert_equals(
+    (select count(*) from public.universities where name in ('Aktif Üniversitesi', 'Kapalı Üniversitesi')),
+    1::bigint,
+    'active only'
+);
 select tests.expect_error(
     $$insert into public.universities (name, city) values ('Sahte', 'X')$$,
     'new row violates row-level security policy for table "universities"'
