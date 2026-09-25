@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KampüsAğı</string>
+
+    <!-- Actions -->
+    <string name="action_sign_in">Giriş yap</string>
+    <string name="action_sign_out">Çıkış yap</string>
+    <string name="action_create_account">Hesap oluştur</string>
+    <string name="action_have_account">Zaten hesabın var mı? Giriş yap</string>
+    <string name="action_forgot_password">Şifremi unuttum</string>
+    <string name="action_back_to_sign_in">Girişe dön</string>
+    <string name="action_resend_email">E-postayı tekrar gönder</string>
+    <string name="action_send_reset_link">Sıfırlama bağlantısı gönder</string>
+    <string name="action_save_password">Şifreyi kaydet</string>
+    <string name="action_save_profile">Profili kaydet</string>
+    <string name="action_edit_profile">Profili düzenle</string>
+    <string name="action_refresh_status">Durumu yenile</string>
+    <string name="action_retry">Tekrar dene</string>
+    <string name="action_cancel">Vazgeç</string>
+
+    <!-- Fields -->
+    <string name="field_email">E-posta</string>
+    <string name="field_email_hint_student">Üniversite e-posta adresini kullanman önerilir.</string>
+    <string name="field_password">Şifre</string>
+    <string name="field_new_password">Yeni şifre</string>
+    <string name="field_password_confirmation">Şifre (tekrar)</string>
+    <string name="field_full_name">Ad soyad</string>
+    <string name="field_username">Kullanıcı adı</string>
+    <string name="field_username_hint">3–30 karakter; küçük harf, rakam, nokta ve alt çizgi.</string>
+    <string name="field_university">Üniversite</string>
+    <string name="field_department">Bölüm</string>
+    <string name="password_rule">Şifre en az %1$d karakter olmalı.</string>
+    <string name="cd_show_password">Şifreyi göster</string>
+    <string name="cd_hide_password">Şifreyi gizle</string>
+
+    <!-- Input validation -->
+    <string name="input_email_invalid">Geçerli bir e-posta adresi gir.</string>
+    <string name="input_password_required">Şifreni gir.</string>
+    <string name="input_password_too_short">Şifre çok kısa.</string>
+    <string name="input_passwords_do_not_match">Şifreler aynı değil.</string>
+    <string name="input_full_name_invalid">Ad soyad 2–100 karakter olmalı.</string>
+    <string name="input_username_invalid">Kullanıcı adı 3–30 karakter olmalı; yalnızca küçük harf, rakam, nokta ve alt çizgi.</string>
+    <string name="input_university_required">Üniversiteni seç.</string>
+    <string name="input_department_invalid">Bölüm 2–120 karakter olmalı.</string>
+
+    <!-- Errors -->
+    <string name="error_network">İnternet bağlantısı yok ya da sunucuya ulaşılamıyor. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="error_invalid_credentials">E-posta ya da şifre hatalı.</string>
+    <string name="error_email_not_confirmed">E-posta adresin henüz doğrulanmamış. Gelen kutundaki bağlantıya dokun.</string>
+    <string name="error_email_in_use">Bu e-posta ile zaten bir hesap var.</string>
+    <string name="error_weak_password">Bu şifre yeterince güçlü değil. Daha uzun ya da farklı bir şifre dene.</string>
+    <string name="error_same_password">Yeni şifre eskisiyle aynı olamaz.</string>
+    <string name="error_rate_limited">Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.</string>
+    <string name="error_session_expired">Oturumunun süresi doldu. Lütfen tekrar giriş yap.</string>
+    <string name="error_not_configured">Bu sürüm sunucuya bağlı değil.</string>
+    <string name="error_username_taken">Bu kullanıcı adı alınmış.</string>
+    <string name="error_university_not_found">Seçilen üniversite artık listede yok. Listeyi yenileyip tekrar seç.</string>
+    <string name="error_profile_locked">Doğrulama başladığı için profil bilgilerin artık değiştirilemez.</string>
+    <string name="error_invalid_input">Girilen bilgilerden biri geçersiz. Alanları kontrol et.</string>
+    <string name="error_not_found">İstenen kayıt bulunamadı.</string>
+    <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
+    <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
+
+    <!-- Snackbar messages -->
+    <string name="message_email_confirmed">E-posta adresin doğrulandı.</string>
+    <string name="message_link_expired">Bağlantının süresi dolmuş ya da daha önce kullanılmış. Yeni bir bağlantı iste.</string>
+    <string name="message_password_updated">Şifren güncellendi.</string>
+    <string name="message_sign_out_failed">Çıkış yapılamadı. Tekrar dene.</string>
+
+    <!-- Setup -->
+    <string name="setup_required_title">Sunucu bağlantısı yapılandırılmamış</string>
+    <string name="setup_required_body">Bu sürüm sunucu bilgileri olmadan derlendi, bu yüzden giriş ve kayıt çalışmaz. Yayın sürümleri SUPABASE_URL ve SUPABASE_ANON_KEY ile derlenmelidir.</string>
+
+    <!-- Auth -->
+    <string name="sign_in_title">KampüsAğı\'na hoş geldin</string>
+    <string name="sign_in_subtitle">Doğrulanmış üniversite öğrencileriyle bağlantı kur.</string>
+    <string name="sign_up_title">Hesap oluştur</string>
+    <string name="sign_up_subtitle">Kayıttan sonra e-posta adresini doğrulayacak, ardından öğrenci belgeni yükleyeceksin.</string>
+    <string name="verify_email_title">E-postanı kontrol et</string>
+    <string name="verify_email_body">%1$s adresine bir doğrulama bağlantısı gönderdik. Bağlantıya bu cihazda dokunduğunda hesabın açılır.</string>
+    <string name="verify_email_resent">Doğrulama e-postası tekrar gönderildi.</string>
+    <string name="forgot_password_title">Şifreni sıfırla</string>
+    <string name="forgot_password_subtitle">Hesabının e-posta adresini gir, sana bir sıfırlama bağlantısı gönderelim.</string>
+    <string name="forgot_password_sent_title">Bağlantı gönderildi</string>
+    <string name="forgot_password_sent_body">%1$s adresiyle kayıtlı bir hesap varsa şifre sıfırlama bağlantısı gönderildi.</string>
+    <string name="new_password_title">Yeni şifre belirle</string>
+    <string name="new_password_subtitle">Hesabın için yeni bir şifre seç.</string>
+
+    <!-- Profile -->
+    <string name="profile_setup_title">Profilini tamamla</string>
+    <string name="profile_setup_subtitle">Bu bilgiler öğrenci belgenle karşılaştırılarak doğrulanır. Doğrulama başladıktan sonra değiştirilemez.</string>
+    <string name="profile_error_title">Profilin yüklenemedi</string>
+    <string name="universities_loading">Üniversite listesi yükleniyor…</string>
+    <string name="universities_empty">Henüz kayıtlı üniversite yok. Liste yönetici tarafından eklendiğinde burada görünecek.</string>
+    <string name="universities_search">Üniversite ya da şehir ara</string>
+    <string name="universities_no_match">Aramana uyan üniversite yok.</string>
+
+    <!-- Account status -->
+    <string name="status_document_required_title">Öğrenci belgen gerekli</string>
+    <string name="status_document_required_body">Hesabının etkinleşmesi için öğrenci belgeni yükleyip yönetici onayı alman gerekiyor.</string>
+    <string name="status_pending_title">Belgen inceleniyor</string>
+    <string name="status_pending_body">Öğrenci belgen bir yönetici tarafından inceleniyor. Sonuçlandığında hesabın güncellenecek.</string>
+    <string name="status_approved_title">Hesabın onaylandı</string>
+    <string name="status_approved_body">Öğrenci doğrulaman tamamlandı.</string>
+    <string name="status_rejected_title">Belgen onaylanmadı</string>
+    <string name="status_rejected_body">Yüklediğin belge doğrulanamadı.</string>
+    <string name="status_suspended_title">Hesabın askıya alındı</string>
+    <string name="status_suspended_body">Hesabın bir yönetici tarafından askıya alındı.</string>
+</resources>

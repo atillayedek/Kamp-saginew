@@ -1,0 +1,30 @@
+# Gradle / build
+.gradle/
+build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+output-metadata.json
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+.kotlin/
+
+# Local configuration and secrets — never commit these
+local.properties
+keystore.properties
+*.jks
+*.keystore
+*.p12
+.env
+.env.*
+supabase/.temp/
+supabase/.branches/
+supabase/functions/.env

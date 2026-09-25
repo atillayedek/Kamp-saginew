@@ -1,6 +1,15 @@
 # KampüsAğı Android — Çalışma Kuralları
 
-Önce `docs/PHASE1_AUDIT.md` ve kullanıcının Bölüm 0 production kurallarını oku. Bölüm 0 her şeyin üstündedir.
+Önce `docs/PHASE1_AUDIT.md`, `docs/DECISIONS.md` ve kullanıcının Bölüm 0 production kurallarını oku. Bölüm 0 her şeyin üstündedir;
+kullanıcının `docs/DECISIONS.md`'deki açık kararları Bölüm 0'ın ilgili maddesini revize eder.
+
+## Yığın (kullanıcı kararı, 2026-09-25)
+
+- Android: Kotlin, Jetpack Compose + Material 3, Hilt, Coroutines/Flow, Navigation Compose (type-safe), supabase-kt.
+- Backend: Supabase — PostgreSQL + RLS, Supabase Auth, Storage, Edge Functions. Migration'lar `supabase/migrations/`.
+- AI: OpenAI — yalnızca backend (Edge Function) üzerinden; `OPENAI_API_KEY` backend secret'ıdır, Android'e asla girmez.
+  Embedding OpenAI embedding modeliyle üretilir ve pgvector'a yazılır.
+- Sıfırdan yazıldı; `kamp-sag-` / `kamp-sagiweb` yalnızca referanstır, kod kopyalanmaz.
 
 Kod yazım mantığı, aynı hesaptaki `atillayedek/whered-d-put` (WhereDidIPutIt) projesindeki desenlerden alınmıştır.
 
@@ -39,6 +48,14 @@ Kod yazım mantığı, aynı hesaptaki `atillayedek/whered-d-put` (WhereDidIPutI
   `.github/workflows/android.yml` → `./gradlew testDebugUnitTest lintRelease assembleDebug bundleRelease`.
 - Workflow secret'ların **var olup olmadığını** raporlar, değerlerini asla yazdırmaz.
 - Bir faz yalnızca CI'daki gerçek sonuç yeşilse COMPLETE yazılabilir; çalışmayan adım `NOT RUN`, başarısız adım `FAILED`.
+
+## Veritabanı testleri
+
+- `scripts/test-db.sh` tüm migration'ları boş bir PostgreSQL'e uygular ve `supabase/tests/[0-9]*.sql` testlerini çalıştırır.
+  `supabase/tests/_supabase_harness.sql` yalnızca test için Supabase rollerini, varsayılan yetkileri ve `auth` şemasını taklit eder.
+- Her RLS/RPC değişikliği önce başarısız olan bir SQL testiyle gelir. CI'da `database` job'ı aynı betiği çalıştırır.
+- İstemciye dönen veritabanı hataları `SQLSTATE P0001` + sabit snake_case mesajdır (ör. `username_taken`);
+  `ErrorMapping.kt` bunları `AppError`'a çevirir.
 
 ## Test
 
