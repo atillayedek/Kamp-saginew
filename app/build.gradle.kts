@@ -49,7 +49,8 @@ android {
         applicationId = "com.kampusagi.android"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        // CI passes an increasing number (the workflow run number); local builds use 1.
+        versionCode = config("KAMPUSAGI_VERSION_CODE").toIntOrNull() ?: 1
         versionName = "1.0.0"
 
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")

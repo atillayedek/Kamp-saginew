@@ -95,8 +95,25 @@ jobs:
             echo "::warning::PRIVACY_POLICY_URL variable missing: the app states that the policy is not available."
           fi
 
+      - name: Prepare release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KAMPUSAGI_KEYSTORE_BASE64 }}
+        # Reports only whether a keystore is available, never its contents.
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+            echo "KAMPUSAGI_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+            echo "::notice::Release keystore provided: the release AAB is signed."
+          else
+            echo "::warning::KAMPUSAGI_KEYSTORE_BASE64 missing: the release AAB is unsigned and cannot be uploaded to Google Play."
+          fi
+
       - name: Build and verify
         env:
+          KAMPUSAGI_KEYSTORE_PASSWORD: ${{ secrets.KAMPUSAGI_KEYSTORE_PASSWORD }}
+          KAMPUSAGI_KEY_ALIAS: ${{ secrets.KAMPUSAGI_KEY_ALIAS }}
+          KAMPUSAGI_KEY_PASSWORD: ${{ secrets.KAMPUSAGI_KEY_PASSWORD }}
+          KAMPUSAGI_VERSION_CODE: ${{ github.run_number }}
           # Client-safe values only (project URL + anon/publishable key).
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -106,6 +123,18 @@ jobs:
           FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
           PRIVACY_POLICY_URL: ${{ vars.PRIVACY_POLICY_URL }}
         run: ./gradlew --no-daemon --stacktrace testDebugUnitTest lintRelease assembleDebug bundleRelease
+
+      - name: Check release bundle signature
+        run: |
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          test -f "$AAB"
+          RESULT="$(jarsigner -verify "$AAB")"
+          echo "$RESULT"
+          if [ -n "${KAMPUSAGI_KEYSTORE_FILE:-}" ]; then
+            echo "$RESULT" | grep -q "jar verified." || { echo "::error::Release AAB signature did not verify."; exit 1; }
+          else
+            echo "::warning::Release AAB is unsigned (no keystore secret)."
+          fi
 
       - name: Upload build outputs
         if: always()

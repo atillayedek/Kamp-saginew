@@ -74,3 +74,9 @@ Yerelde aynı adlarla `local.properties` veya ortam değişkeni kullanılabilir.
 Release imzası: `keystore.properties` veya ortam değişkenleri
 `KAMPUSAGI_KEYSTORE_FILE`, `KAMPUSAGI_KEYSTORE_PASSWORD`, `KAMPUSAGI_KEY_ALIAS`, `KAMPUSAGI_KEY_PASSWORD`.
 Sağlanmazsa release AAB imzasız üretilir ve Play'e yüklenemez.
+
+CI'da imzalı AAB için GitHub repo secret'ları: `KAMPUSAGI_KEYSTORE_BASE64` (`base64 -w0 upload.jks` çıktısı),
+`KAMPUSAGI_KEYSTORE_PASSWORD`, `KAMPUSAGI_KEY_ALIAS`, `KAMPUSAGI_KEY_PASSWORD`. İş akışı keystore'u yalnızca
+runner'ın geçici dizinine açar, varlığını raporlar, içeriğini yazdırmaz ve `jarsigner -verify` ile imzayı doğrular.
+Play App Signing kullanılır: bu anahtar yükleme anahtarıdır. `versionCode` CI'da iş akışı çalıştırma numarasıdır
+(`KAMPUSAGI_VERSION_CODE`), yerel build'lerde 1'dir.
