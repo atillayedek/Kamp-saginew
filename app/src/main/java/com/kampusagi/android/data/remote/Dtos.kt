@@ -51,3 +51,30 @@ data class PendingVerificationDto(
     @SerialName("document_path") val documentPath: String,
     @SerialName("submitted_at") val submittedAt: String,
 )
+
+@Serializable
+data class PostDto(
+    val id: String,
+    val scope: String,
+    val body: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("like_count") val likeCount: Int,
+    @SerialName("comment_count") val commentCount: Int,
+    @SerialName("liked_by_me") val likedByMe: Boolean,
+    @SerialName("is_mine") val isMine: Boolean,
+    @SerialName("author_id") val authorId: String,
+    @SerialName("author_full_name") val authorFullName: String? = null,
+    @SerialName("author_username") val authorUsername: String? = null,
+    @SerialName("author_university") val authorUniversity: String? = null,
+)
+
+@Serializable
+data class CommentDto(
+    val id: String,
+    val body: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("is_mine") val isMine: Boolean,
+    @SerialName("author_id") val authorId: String,
+    @SerialName("author_full_name") val authorFullName: String? = null,
+    @SerialName("author_username") val authorUsername: String? = null,
+)

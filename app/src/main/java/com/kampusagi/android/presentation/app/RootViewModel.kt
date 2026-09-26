@@ -32,6 +32,7 @@ enum class RootDestination {
     PROFILE_SETUP,
     ACCOUNT_STATUS,
     ADMIN_REVIEW,
+    MAIN,
 }
 
 data class AppUiState(
@@ -89,10 +90,11 @@ class RootViewModel @Inject constructor(
                     val profile = profileState.profile
                     val canEdit = profile.status == AccountStatus.PROFILE_INCOMPLETE ||
                         profile.status == AccountStatus.DOCUMENT_REQUIRED
-                    val destination = if (canEdit && (editing || profile.status == AccountStatus.PROFILE_INCOMPLETE)) {
-                        RootDestination.PROFILE_SETUP
-                    } else {
-                        RootDestination.ACCOUNT_STATUS
+                    val destination = when {
+                        canEdit && (editing || profile.status == AccountStatus.PROFILE_INCOMPLETE) ->
+                            RootDestination.PROFILE_SETUP
+                        profile.status == AccountStatus.APPROVED -> RootDestination.MAIN
+                        else -> RootDestination.ACCOUNT_STATUS
                     }
                     AppUiState(destination, profile = profile, isAdmin = auth.isAdmin)
                 }

@@ -1,5 +1,7 @@
 package com.kampusagi.android.presentation.app
 
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,9 +26,11 @@ import com.kampusagi.android.presentation.admin.AdminReviewScreen
 import com.kampusagi.android.presentation.auth.AuthNavHost
 import com.kampusagi.android.presentation.auth.PasswordRecoveryScreen
 import com.kampusagi.android.presentation.common.messageRes
+import com.kampusagi.android.presentation.main.MainScreen
 import com.kampusagi.android.presentation.profile.ProfileSetupScreen
 import com.kampusagi.android.presentation.status.AccountStatusScreen
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -39,7 +43,8 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
     }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
-        val modifier = Modifier.fillMaxSize().padding(padding)
+        // System bar insets are applied here once; nested bars and scaffolds must not add them again.
+        val modifier = Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)
         when (state.destination) {
             RootDestination.LOADING -> LoadingView(modifier)
             RootDestination.SETUP_REQUIRED -> MessageView(
@@ -83,6 +88,15 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
                 )
             } ?: LoadingView(modifier)
             RootDestination.ADMIN_REVIEW -> AdminReviewScreen(onClose = viewModel::closeAdminReview, modifier = modifier)
+            RootDestination.MAIN -> state.profile?.let { profile ->
+                MainScreen(
+                    profile = profile,
+                    isAdmin = state.isAdmin,
+                    onOpenAdmin = viewModel::openAdminReview,
+                    onSignOut = viewModel::signOut,
+                    modifier = modifier,
+                )
+            } ?: LoadingView(modifier)
         }
     }
 }

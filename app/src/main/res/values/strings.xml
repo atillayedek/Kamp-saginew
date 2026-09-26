@@ -64,6 +64,7 @@
     <string name="error_admin_required">Bu işlem için yönetici yetkisi gerekiyor.</string>
     <string name="error_rejection_reason_required">Ret nedeni 3–500 karakter olmalı.</string>
     <string name="error_verification_not_pending">Bu başvuru zaten sonuçlandırılmış.</string>
+    <string name="error_account_not_approved">Bu özellik yalnızca doğrulanmış öğrenciler içindir.</string>
     <string name="error_not_found">İstenen kayıt bulunamadı.</string>
     <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
     <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
@@ -134,4 +135,51 @@
     <string name="admin_reject_title">Başvuruyu reddet</string>
     <string name="admin_reject_reason">Ret nedeni</string>
     <string name="admin_reject_reason_hint">Başvuru sahibine gösterilir (3–500 karakter).</string>
+    <!-- Main -->
+    <string name="tab_community">Topluluk</string>
+    <string name="tab_profile">Profil</string>
+    <string name="profile_verified">Doğrulanmış öğrenci</string>
+
+    <!-- Community -->
+    <string name="scope_general">Genel</string>
+    <string name="scope_university">Üniversitem</string>
+    <string name="feed_load_failed">Gönderiler yüklenemedi</string>
+    <string name="feed_empty_title">Henüz gönderi yok.</string>
+    <string name="feed_empty_general">İlk gönderiyi sen paylaş.</string>
+    <string name="feed_empty_university">Üniversitenden henüz kimse paylaşım yapmadı. İlk gönderiyi sen paylaş.</string>
+    <string name="feed_end">Hepsi bu kadar.</string>
+    <string name="action_new_post">Gönderi</string>
+    <string name="action_share">Paylaş</string>
+    <string name="create_post_title">Yeni gönderi</string>
+    <string name="create_post_placeholder">Ne paylaşmak istiyorsun?</string>
+    <string name="create_post_general_hint">Tüm doğrulanmış öğrenciler görür.</string>
+    <string name="create_post_university_hint">Yalnızca üniversitendeki doğrulanmış öğrenciler görür.</string>
+    <string name="post_title">Gönderi</string>
+    <string name="post_load_failed">Gönderi yüklenemedi</string>
+    <string name="comments_empty">Henüz yorum yok.</string>
+    <string name="comment_hint">Yorum yaz</string>
+    <string name="action_send_comment">Yorumu gönder</string>
+    <string name="action_delete_comment">Yorumu sil</string>
+    <string name="action_delete_post">Gönderiyi sil</string>
+    <string name="delete_post_title">Gönderi silinsin mi?</string>
+    <string name="delete_post_body">Gönderi ve yorumları artık kimseye görünmeyecek.</string>
+    <string name="author_unknown">Öğrenci</string>
+    <string name="cd_like">Beğen</string>
+    <string name="cd_unlike">Beğeniyi geri al</string>
+    <string name="cd_comments">Yorumlar</string>
+
+    <!-- Time -->
+    <string name="time_just_now">şimdi</string>
+    <plurals name="time_minutes">
+        <item quantity="one">%d dk önce</item>
+        <item quantity="other">%d dk önce</item>
+    </plurals>
+    <plurals name="time_hours">
+        <item quantity="one">%d sa önce</item>
+        <item quantity="other">%d sa önce</item>
+    </plurals>
+    <plurals name="time_days">
+        <item quantity="one">%d gün önce</item>
+        <item quantity="other">%d gün önce</item>
+    </plurals>
 </resources>

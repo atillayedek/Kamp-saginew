@@ -28,6 +28,7 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.ADMIN_REQUIRED -> R.string.error_admin_required
     AppError.REJECTION_REASON_REQUIRED -> R.string.error_rejection_reason_required
     AppError.VERIFICATION_NOT_PENDING -> R.string.error_verification_not_pending
+    AppError.ACCOUNT_NOT_APPROVED -> R.string.error_account_not_approved
     AppError.NOT_FOUND -> R.string.error_not_found
     AppError.SERVER -> R.string.error_server
     AppError.UNKNOWN -> R.string.error_unknown

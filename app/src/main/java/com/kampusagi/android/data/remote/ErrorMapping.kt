@@ -27,6 +27,9 @@ private fun RestException.restError(): AppError {
         "invalid_full_name" in text || "invalid_username" in text || "invalid_department" in text ->
             AppError.INVALID_INPUT
         "not_authenticated" in text -> AppError.SESSION_EXPIRED
+        "approved_student_required" in text -> AppError.ACCOUNT_NOT_APPROVED
+        "post_not_found" in text || "comment_not_found" in text -> AppError.NOT_FOUND
+        "invalid_post_body" in text || "invalid_comment_body" in text || "invalid_scope" in text -> AppError.INVALID_INPUT
         "document_too_large" in text || statusCode == 413 || "payload too large" in text ||
             "maximum allowed size" in text -> AppError.DOCUMENT_TOO_LARGE
         "invalid_document" in text || "invalid_mime_type" in text || "mime type" in text -> AppError.DOCUMENT_NOT_PDF

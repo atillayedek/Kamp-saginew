@@ -9,8 +9,8 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 |---|---|---|
 | 1 | Audit + production gap analizi | Bitti (`docs/PHASE1_AUDIT.md`) |
 | 2 | Proje iskeleti, CI, Supabase şeması, Supabase Auth, profil tamamlama, üniversite verisi | Bitti — CI yeşil (DB testleri, unit test, lintRelease, debug APK, release AAB), `1fb635b` |
-| 3 | Öğrenci belgesi: PDF yükleme → Storage → Edge Function doğrulaması → admin inceleme → APPROVED/REJECTED | Kod bitti; CI bekleniyor. Canlı Supabase'e deploy: dış yapılandırma |
-| 4 | Ana uygulama iskeleti (alt gezinme) + Topluluklar: gönderi, yorum, beğeni (genel / üniversitem) | Bekliyor |
+| 3 | Öğrenci belgesi: PDF yükleme → Storage → Edge Function doğrulaması → admin inceleme → APPROVED/REJECTED | Bitti — CI yeşil `77d5289` (DB, Edge Function, Android). Canlı Supabase'e deploy: dış yapılandırma |
+| 4 | Ana uygulama iskeleti (alt gezinme) + Topluluklar: gönderi, yorum, beğeni (genel / üniversitem) | Kod bitti; CI bekleniyor |
 | 5 | İhtiyaç oluşturma: OpenAI yapılandırılmış çıktı (backend) + embedding + pgvector | Bekliyor |
 | 6 | Eşleşme: pgvector benzerlik sorgusu, gerçek skor, eşleşme ekranı | Bekliyor |
 | 7 | Sohbet: Realtime, gönderildi/iletildi/okundu, yazıyor | Bekliyor |
@@ -24,3 +24,5 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 - 2026-09-25 — `scripts/test-db.sh` yerelde ve CI'da PASS (001, 002).
 - 2026-09-25 — CI `1fb635b`: Android unit test + lintRelease + assembleDebug + bundleRelease PASS.
 - 2026-09-26 — Yerel: SQL 001–003 PASS (+2 mutasyon yakalandı), Deno check + 4 Edge Function testi PASS.
+- 2026-09-26 — CI `77d5289`: DB, Edge Function (Deno), Android (unit test, lintRelease, APK, AAB) PASS.
+- 2026-09-26 — Yerel: SQL 001–004 PASS; 004 cascade testi önce kırmızı (0/1/0) sonra yeşil doğrulandı.

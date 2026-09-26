@@ -3,7 +3,12 @@ package com.kampusagi.android.domain.repository
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.AuthRedirectResult
 import com.kampusagi.android.domain.model.AuthState
+import com.kampusagi.android.domain.model.Comment
+import com.kampusagi.android.domain.model.FeedCursor
+import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.PendingVerification
+import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.model.ProfileDraft
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.model.SignUpResult
@@ -59,4 +64,17 @@ interface AdminRepository {
     suspend fun downloadDocument(path: String): AppResult<File>
 
     suspend fun review(verificationId: String, approve: Boolean, reason: String?): AppResult<Unit>
+}
+
+interface CommunityRepository {
+    suspend fun feed(scope: PostScope, cursor: FeedCursor?): AppResult<FeedPage>
+    suspend fun post(postId: String): AppResult<Post>
+    suspend fun comments(postId: String): AppResult<List<Comment>>
+    suspend fun createPost(scope: PostScope, body: String): AppResult<String>
+    suspend fun deletePost(postId: String): AppResult<Unit>
+    suspend fun addComment(postId: String, body: String): AppResult<Unit>
+    suspend fun deleteComment(commentId: String): AppResult<Unit>
+
+    /** Returns the post's like count after the change. */
+    suspend fun setLiked(postId: String, liked: Boolean): AppResult<Int>
 }

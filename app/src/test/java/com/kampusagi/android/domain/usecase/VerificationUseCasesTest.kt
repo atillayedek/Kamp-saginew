@@ -102,3 +102,14 @@ class VerificationUseCasesTest {
         assertEquals(Triple("v2", true, null), repository.lastReview)
     }
 }
+
+class PostTextValidatorTest {
+    @Test
+    fun `post and comment limits match the database`() {
+        assertEquals(false, PostTextValidator.isValidPost("   "))
+        assertEquals(true, PostTextValidator.isValidPost("a".repeat(PostTextValidator.MAX_POST_LENGTH)))
+        assertEquals(false, PostTextValidator.isValidPost("a".repeat(PostTextValidator.MAX_POST_LENGTH + 1)))
+        assertEquals(true, PostTextValidator.isValidComment(" merhaba "))
+        assertEquals(false, PostTextValidator.isValidComment("a".repeat(PostTextValidator.MAX_COMMENT_LENGTH + 1)))
+    }
+}
