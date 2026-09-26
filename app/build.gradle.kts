@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -40,7 +41,7 @@ fun isClientKey(key: String): Boolean {
     if (key.startsWith("sb_secret_")) return false
     val payload = key.split(".").getOrNull(1) ?: return false
     val claims = try {
-        String(java.util.Base64.getUrlDecoder().decode(payload.padEnd((payload.length + 3) / 4 * 4, '=')))
+        String(Base64.getUrlDecoder().decode(payload.padEnd((payload.length + 3) / 4 * 4, '=')))
     } catch (e: IllegalArgumentException) {
         return false
     }
