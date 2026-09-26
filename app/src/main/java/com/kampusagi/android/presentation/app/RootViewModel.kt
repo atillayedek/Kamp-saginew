@@ -11,8 +11,7 @@ import com.kampusagi.android.domain.model.Profile
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ProfileRepository
-import com.kampusagi.android.domain.repository.PushRepository
-import android.util.Log
+import com.kampusagi.android.presentation.notification.BackgroundNotifier
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -55,14 +54,14 @@ enum class AppMessage { EMAIL_CONFIRMED, LINK_EXPIRED, NETWORK_ERROR, GENERIC_ER
 class RootViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
-    private val pushRepository: PushRepository,
+    private val backgroundNotifier: BackgroundNotifier,
 ) : ViewModel() {
 
     private val passwordRecovery = MutableStateFlow(false)
     private val editingProfile = MutableStateFlow(false)
     private val adminOpen = MutableStateFlow(false)
 
-    /** Set when the app was opened from a push notification; the main screen shows the list. */
+    /** Set when the app was opened from a system notification; the main screen shows the list. */
     private val openNotifications = MutableStateFlow(false)
     val openNotificationsRequested: StateFlow<Boolean> = openNotifications.asStateFlow()
     private val messageChannel = Channel<AppMessage>(Channel.BUFFERED)
@@ -114,17 +113,13 @@ class RootViewModel @Inject constructor(
     }
 
     init {
-        // Every signed-in device registers for push (verification results arrive before approval).
+        // Every signed-in person hears about new notifications while the app runs
+        // (verification results arrive before approval).
         viewModelScope.launch {
             authRepository.authState
                 .map { (it as? AuthState.SignedIn)?.userId }
                 .distinctUntilChanged()
-                .collect { userId ->
-                    if (userId != null && pushRepository.isConfigured) {
-                        val result = pushRepository.registerCurrentDevice()
-                        if (result is AppResult.Failure) Log.w(TAG, "Push registration failed: ${result.error}")
-                    }
-                }
+                .collect { userId -> if (userId != null) backgroundNotifier.start() else backgroundNotifier.stop() }
         }
     }
 
@@ -180,14 +175,7 @@ class RootViewModel @Inject constructor(
             adminOpen.value = false
             editingProfile.value = false
             passwordRecovery.value = false
-            // This device must stop receiving the account's notifications.
-            val unregistered = pushRepository.unregisterCurrentDevice()
-            if (unregistered is AppResult.Failure) Log.w(TAG, "Push token not removed: ${unregistered.error}")
             if (authRepository.signOut() is AppResult.Failure) messageChannel.send(AppMessage.SIGN_OUT_FAILED)
         }
-    }
-
-    private companion object {
-        const val TAG = "Root"
     }
 }

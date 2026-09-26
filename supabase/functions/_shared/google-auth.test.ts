@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import { FCM_SCOPE, pushText, safeEqual, sendToDevice } from "./fcm.ts";
 import { accessToken, parseServiceAccount, signedAssertion } from "./google-auth.ts";
+import { PLAY_SCOPE } from "./play.ts";
 
 async function testAccount() {
   const pair = await crypto.subtle.generateKey(
@@ -12,7 +12,7 @@ async function testAccount() {
   let binary = "";
   for (const b of der) binary += String.fromCharCode(b);
   const pem = `-----BEGIN PRIVATE KEY-----\n${btoa(binary)}\n-----END PRIVATE KEY-----\n`;
-  return { account: { projectId: "kampusagi-test", clientEmail: "push@kampusagi-test.iam.gserviceaccount.com", privateKeyPem: pem }, publicKey: pair.publicKey };
+  return { account: { projectId: "kampusagi-test", clientEmail: "play@kampusagi-test.iam.gserviceaccount.com", privateKeyPem: pem }, publicKey: pair.publicKey };
 }
 
 function decode(part: string): ArrayBuffer {
@@ -43,14 +43,14 @@ Deno.test("service account parsing requires the three fields", () => {
   assertEquals(parseServiceAccount(undefined), null);
 });
 
-Deno.test("the assertion is a verifiable RS256 JWT with the FCM scope", async () => {
+Deno.test("the assertion is a verifiable RS256 JWT with the requested scope", async () => {
   const { account, publicKey } = await testAccount();
-  const jwt = await signedAssertion(account, FCM_SCOPE, 1_800_000_000);
+  const jwt = await signedAssertion(account, PLAY_SCOPE, 1_800_000_000);
   const [header, claims, signature] = jwt.split(".");
   assertEquals(JSON.parse(new TextDecoder().decode(decode(header))), { alg: "RS256", typ: "JWT" });
   const payload = JSON.parse(new TextDecoder().decode(decode(claims)));
   assertEquals(payload.iss, account.clientEmail);
-  assertEquals(payload.scope, "https://www.googleapis.com/auth/firebase.messaging");
+  assertEquals(payload.scope, "https://www.googleapis.com/auth/androidpublisher");
   assertEquals(payload.aud, "https://oauth2.googleapis.com/token");
   assertEquals(payload.exp - payload.iat, 3600);
   const valid = await crypto.subtle.verify(
@@ -62,41 +62,11 @@ Deno.test("the assertion is a verifiable RS256 JWT with the FCM scope", async ()
 Deno.test("access token exchange", async () => {
   const { account } = await testAccount();
   const ok = scriptedFetch(200, JSON.stringify({ access_token: "ya29.token", expires_in: 3599 }));
-  assertEquals(await accessToken(ok.fn, account, FCM_SCOPE, 100), { token: "ya29.token", expiresAt: 3699 });
+  assertEquals(await accessToken(ok.fn, account, PLAY_SCOPE, 100), { token: "ya29.token", expiresAt: 3699 });
   const form = new URLSearchParams(ok.calls[0].init.body as string);
   assertEquals(form.get("grant_type"), "urn:ietf:params:oauth:grant-type:jwt-bearer");
   assertEquals(form.get("assertion")?.split(".").length, 3);
 
-  await assertRejects(() => accessToken(scriptedFetch(401, "{}").fn, account, FCM_SCOPE, 100));
-  await assertRejects(() => accessToken(scriptedFetch(200, "{}").fn, account, FCM_SCOPE, 100));
-});
-
-Deno.test("send maps FCM answers", async () => {
-  const message = { title: "Yeni mesaj", body: "Ali sana mesaj gönderdi.", data: { kind: "NEW_MESSAGE" } };
-  const ok = scriptedFetch(200, "{}");
-  assertEquals(await sendToDevice(ok.fn, "proj", "tok", "device", message), "sent");
-  assertEquals(ok.calls[0].url, "https://fcm.googleapis.com/v1/projects/proj/messages:send");
-  const sent = JSON.parse(ok.calls[0].init.body as string);
-  assertEquals(sent.message.token, "device");
-  assertEquals(sent.message.data, { kind: "NEW_MESSAGE" });
-  assertEquals(sent.message.android.notification.click_action, "com.kampusagi.android.OPEN_NOTIFICATIONS");
-  assertEquals((ok.calls[0].init.headers as Record<string, string>)["Authorization"], "Bearer tok");
-
-  assertEquals(await sendToDevice(scriptedFetch(404, '{"error":{"status":"NOT_FOUND"}}').fn, "p", "t", "d", message), "unregistered");
-  assertEquals(await sendToDevice(scriptedFetch(400, '{"error":{"details":[{"errorCode":"UNREGISTERED"}]}}').fn, "p", "t", "d", message), "unregistered");
-  assertEquals(await sendToDevice(scriptedFetch(503, "unavailable").fn, "p", "t", "d", message), "failed");
-});
-
-Deno.test("push texts never include message content", () => {
-  assertEquals(pushText("NEW_MESSAGE", "Ayşe Yılmaz"), { title: "Yeni mesaj", body: "Ayşe Yılmaz sana mesaj gönderdi." });
-  assertEquals(pushText("NEW_COMMENT", null)?.body, "Bir öğrenci gönderine yorum yaptı.");
-  assertEquals(pushText("VERIFICATION_APPROVED", null)?.title, "Hesabın onaylandı");
-  assertEquals(pushText("UNKNOWN", null), null);
-});
-
-Deno.test("secret comparison", () => {
-  assertEquals(safeEqual("abc", "abc"), true);
-  assertEquals(safeEqual("abc", "abd"), false);
-  assertEquals(safeEqual("abc", "abcd"), false);
-  assertEquals(safeEqual("", ""), true);
+  await assertRejects(() => accessToken(scriptedFetch(401, "{}").fn, account, PLAY_SCOPE, 100));
+  await assertRejects(() => accessToken(scriptedFetch(200, "{}").fn, account, PLAY_SCOPE, 100));
 });

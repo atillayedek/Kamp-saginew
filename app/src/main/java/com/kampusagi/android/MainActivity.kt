@@ -9,8 +9,8 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kampusagi.android.core.config.AppConfig
 import com.kampusagi.android.core.designsystem.theme.KampusAgiTheme
-import com.kampusagi.android.data.push.KampusAgiMessagingService
 import com.kampusagi.android.presentation.app.KampusAgiApp
 import com.kampusagi.android.presentation.app.RootViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,9 +40,9 @@ class MainActivity : ComponentActivity() {
         handleAuthLink(intent)
     }
 
-    /** Email confirmation and password reset links from Supabase Auth, and taps on push notifications. */
+    /** Email confirmation and password reset links from Supabase Auth, and taps on system notifications. */
     private fun handleAuthLink(intent: Intent?) {
-        if (intent?.action == KampusAgiMessagingService.ACTION_OPEN_NOTIFICATIONS) {
+        if (intent?.action == AppConfig.ACTION_OPEN_NOTIFICATIONS) {
             viewModel.onOpenNotificationsIntent()
             return
         }

@@ -1,7 +1,6 @@
 package com.kampusagi.android.core.di
 
 import com.kampusagi.android.data.document.ContentResolverDocumentReader
-import com.kampusagi.android.data.push.PushRepositoryImpl
 import com.kampusagi.android.data.repository.AccountRepositoryImpl
 import com.kampusagi.android.data.repository.AdminRepositoryImpl
 import com.kampusagi.android.data.repository.AuthRepositoryImpl
@@ -23,7 +22,6 @@ import com.kampusagi.android.domain.repository.DocumentReader
 import com.kampusagi.android.domain.repository.ModerationRepository
 import com.kampusagi.android.domain.repository.NotificationRepository
 import com.kampusagi.android.domain.repository.PremiumRepository
-import com.kampusagi.android.domain.repository.PushRepository
 import com.kampusagi.android.domain.repository.ProfileRepository
 import com.kampusagi.android.domain.repository.RequirementRepository
 import com.kampusagi.android.domain.repository.UniversityRepository
@@ -45,7 +43,6 @@ abstract class RepositoryModule {
     @Binds abstract fun bindRequirementRepository(impl: RequirementRepositoryImpl): RequirementRepository
     @Binds abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
     @Binds abstract fun bindNotificationRepository(impl: NotificationRepositoryImpl): NotificationRepository
-    @Binds abstract fun bindPushRepository(impl: PushRepositoryImpl): PushRepository
     @Binds abstract fun bindPremiumRepository(impl: PremiumRepositoryImpl): PremiumRepository
     @Binds abstract fun bindModerationRepository(impl: ModerationRepositoryImpl): ModerationRepository
     @Binds abstract fun bindAccountRepository(impl: AccountRepositoryImpl): AccountRepository

@@ -10,16 +10,10 @@ object AppConfig {
     val isBackendConfigured: Boolean =
         supabaseUrl.startsWith("https://") && supabaseAnonKey.isNotBlank()
 
-    val firebaseProjectId: String = BuildConfig.FIREBASE_PROJECT_ID
-    val firebaseAppId: String = BuildConfig.FIREBASE_APP_ID
-    val firebaseApiKey: String = BuildConfig.FIREBASE_API_KEY
-    val firebaseSenderId: String = BuildConfig.FIREBASE_SENDER_ID
-
-    /** False when the build has no Firebase client configuration: push stays off. */
-    val isPushConfigured: Boolean = listOf(firebaseProjectId, firebaseAppId, firebaseApiKey, firebaseSenderId)
-        .all { it.isNotBlank() }
-
     const val NOTIFICATION_CHANNEL_ID = "kampusagi_default"
+
+    /** Intent action of a tapped system notification: the app opens the notification list. */
+    const val ACTION_OPEN_NOTIFICATIONS = "com.kampusagi.android.OPEN_NOTIFICATIONS"
 
     const val AUTH_SCHEME = "kampusagi"
     const val AUTH_HOST = "auth-callback"

@@ -35,7 +35,6 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.AI_REFUSED -> R.string.error_ai_refused
     AppError.TOO_MANY_ACTIVE_REQUIREMENTS -> R.string.error_too_many_active_requirements
     AppError.RECIPIENT_NOT_AVAILABLE -> R.string.error_recipient_not_available
-    AppError.PUSH_NOT_CONFIGURED -> R.string.error_push_not_configured
     AppError.BILLING_UNAVAILABLE -> R.string.error_billing_unavailable
     AppError.BILLING_NOT_CONFIGURED -> R.string.error_billing_not_configured
     AppError.PLAN_NOT_AVAILABLE -> R.string.error_plan_not_available

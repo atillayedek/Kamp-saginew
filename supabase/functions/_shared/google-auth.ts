@@ -1,6 +1,6 @@
 // Google service-account authentication: an RS256-signed JWT is exchanged for
-// an OAuth access token with the requested scope. Used for FCM and for the
-// Google Play Developer API. `fetchFn` is injectable for tests.
+// an OAuth access token with the requested scope. Used for the Google Play
+// Developer API. `fetchFn` is injectable for tests.
 
 type Fetch = typeof fetch;
 

@@ -40,13 +40,10 @@ supabase functions deploy delete-account
 supabase secrets set OPENAI_API_KEY=... OPENAI_CHAT_MODEL=... OPENAI_EMBEDDING_MODEL=...
 ```
 
-### Push (FCM)
+### Bildirimler
 
-1. Firebase Console'da proje oluştur, Android uygulaması ekle (paket: `com.kampusagi.android`).
-2. **Edge Function secret'ları:** `FCM_SERVICE_ACCOUNT` (Firebase → Project settings → Service accounts → yeni özel anahtar JSON'u, tek satır), `PUSH_WEBHOOK_SECRET` (rastgele uzun bir dize).
-3. `supabase functions deploy dispatch-push --no-verify-jwt` (webhook JWT değil, gizli başlıkla doğrulanır).
-4. **Supabase Dashboard → Database → Webhooks:** tablo `public.notifications`, olay `INSERT`, tür "Supabase Edge Functions" → `dispatch-push`, HTTP başlığı `x-webhook-secret: <PUSH_WEBHOOK_SECRET>`.
-5. **Android build değişkenleri (istemciye açık):** `FIREBASE_PROJECT_ID`, `FIREBASE_APP_ID`, `FIREBASE_API_KEY`, `FIREBASE_SENDER_ID` (Firebase → Project settings → General). GitHub repo secret'ı olarak eklenirse CI build'i push'lu olur.
+FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push` Edge Function'ı kaldıysa
+**Dashboard → Edge Functions → dispatch-push → Delete** ile silinir (artık kullanılmıyor).
 
 ### Premium (Google Play Billing)
 

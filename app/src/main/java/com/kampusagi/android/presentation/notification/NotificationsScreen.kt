@@ -37,14 +37,9 @@ fun NotificationsScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        val pushNote = when {
-            !viewModel.isPushConfigured -> R.string.push_not_configured
-            !notificationsAllowed -> R.string.push_permission_denied
-            else -> null
-        }
-        pushNote?.let {
+        if (!notificationsAllowed) {
             Text(
-                stringResource(it),
+                stringResource(R.string.push_permission_denied),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant).padding(Spacing.md),

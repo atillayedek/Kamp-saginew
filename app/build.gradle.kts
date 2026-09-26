@@ -30,12 +30,6 @@ fun config(name: String, source: Properties = localProperties): String =
 val supabaseUrl = config("SUPABASE_URL")
 val supabaseAnonKey = config("SUPABASE_ANON_KEY")
 
-// Firebase client configuration for push (FCM). All four are client-safe
-// identifiers; without them the app builds and push stays off.
-val firebaseProjectId = config("FIREBASE_PROJECT_ID")
-val firebaseAppId = config("FIREBASE_APP_ID")
-val firebaseApiKey = config("FIREBASE_API_KEY")
-val firebaseSenderId = config("FIREBASE_SENDER_ID")
 val privacyPolicyUrl = config("PRIVACY_POLICY_URL")
 
 val releaseStoreFile = config("KAMPUSAGI_KEYSTORE_FILE", keystoreProperties)
@@ -55,10 +49,6 @@ android {
 
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
-        buildConfigField("String", "FIREBASE_PROJECT_ID", "\"$firebaseProjectId\"")
-        buildConfigField("String", "FIREBASE_APP_ID", "\"$firebaseAppId\"")
-        buildConfigField("String", "FIREBASE_API_KEY", "\"$firebaseApiKey\"")
-        buildConfigField("String", "FIREBASE_SENDER_ID", "\"$firebaseSenderId\"")
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"$privacyPolicyUrl\"")
     }
 
@@ -120,6 +110,7 @@ kotlin {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.splashscreen)
@@ -147,12 +138,8 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.billing.ktx)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

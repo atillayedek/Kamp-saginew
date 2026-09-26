@@ -85,13 +85,13 @@ fun MainScreen(
     val conversationsViewModel: ConversationsViewModel = hiltViewModel(key = "conversations-${profile.id}")
     val notificationsViewModel: NotificationsViewModel = hiltViewModel(key = "notifications-${profile.id}")
 
-    // Android 13+ asks once for permission to show push notifications.
+    // Android 13+ asks once for permission to show system notifications.
     var notificationsAllowed by remember { mutableStateOf(notificationPermissionGranted(context)) }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         notificationsAllowed = granted
     }
     LaunchedEffect(Unit) {
-        if (!notificationsAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && notificationsViewModel.isPushConfigured) {
+        if (!notificationsAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }

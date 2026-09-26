@@ -14,7 +14,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 5 | İhtiyaç oluşturma: OpenAI yapılandırılmış çıktı (backend) + embedding + pgvector | Bitti — CI yeşil `dfdaa4e`. Canlı OpenAI: dış yapılandırma (`docs/DEPLOYMENT.md`) |
 | 6 | Eşleşme: pgvector benzerlik sorgusu, gerçek skor, eşleşme ekranı | Bitti — CI yeşil `dfdaa4e` |
 | 7 | Sohbet: Realtime, gönderildi/okundu | Bitti — CI yeşil `86297d5` (`69b1b42`'deki KampusAgiApp derleme hatası düzeltildi). Yazıyor/çevrimiçi yok (D20) |
-| 8 | Bildirimler: uygulama içi + FCM push | Bitti — CI yeşil `86297d5`. Firebase projesi + webhook: dış yapılandırma |
+| 8 | Bildirimler: uygulama içi + FCM push | Bitti — CI yeşil `86297d5`. FCM sonradan kaldırıldı (D30): bildirimler Supabase Realtime ile |
 | 9 | Premium: Google Play Billing + sunucu doğrulaması + entitlement | Bitti — CI yeşil `ddeb8e7` (`5acb808`'deki lint hatası ContextCastToActivity `a41a6d2` ile düzeltildi). Play Console ürünleri + plan içeriği: dış yapılandırma / ürün kararı |
 | 10 | Ayarlar, hesap silme, gizlilik, raporlama/engelleme | Bitti — CI yeşil `ddeb8e7`. Gizlilik politikası URL'si ve web silme sayfası: dış yapılandırma |
 | 11 | Release sertleştirme: imza, AAB, R8, erişilebilirlik, son tarama | Kod bitti — CI yeşil `ddeb8e7` (R8 + kaynak küçültme, yedekleme kapalı, cleartext kapalı, CI'da keystore secret'ıyla imza + `jarsigner` doğrulaması, versionCode = CI çalıştırma no). Keystore secret'ları yok → AAB **imzasız**: dış yapılandırma |

@@ -105,33 +105,14 @@ select public.mark_notifications_read();
 select tests.assert_equals((select count(*) from public.list_notifications() where read_at is null), 0::bigint, 'mark all read');
 rollback;
 
--- 5. Device tokens: registration moves a token to its latest owner; push data is service-role only.
+-- 5. There is no push delivery (D30): no device tokens or push functions exist.
 begin;
-select tests.act_as((select a from people));
-select public.register_device_token('token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-select tests.expect_error($$select public.register_device_token('short')$$, 'invalid_token');
-select tests.assert_equals((select count(*) from public.device_tokens), 0::bigint, 'tokens not readable by clients');
-select tests.expect_error(format($$select * from public.push_payload(%L)$$, gen_random_uuid()), 'permission denied for function push_payload');
-select tests.reset_role();
-select tests.act_as((select b from people));
-select public.register_device_token('token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-create temp table conv as select public.start_conversation((select a from people)) as id;
-select public.send_message((select id from conv), gen_random_uuid(), 'selam');
-select tests.reset_role();
+select tests.assert_equals(to_regclass('public.device_tokens')::text, null::text, 'device_tokens dropped');
 select tests.assert_equals(
-    (select user_id from public.device_tokens where token = 'token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
-    (select b from people),
-    'token moved to latest owner'
+    (select count(*) from pg_proc
+     where pronamespace = 'public'::regnamespace
+       and proname in ('register_device_token', 'unregister_device_token', 'push_payload', 'delete_device_tokens')),
+    0::bigint,
+    'push functions dropped'
 );
--- a no longer owns the token, so the notification for a has no device.
-select tests.act_as_service();
-select tests.assert_equals(
-    (select kind::text || '|' || actor_name || '|' || cardinality(tokens)::text
-     from public.push_payload((select id from public.notifications where user_id = (select a from people)))),
-    'NEW_MESSAGE|Kişi niki|0',
-    'push payload'
-);
-select public.delete_device_tokens(array['token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
-select tests.reset_role();
-select tests.assert_equals((select count(*) from public.device_tokens), 0::bigint, 'invalid tokens removed');
 rollback;

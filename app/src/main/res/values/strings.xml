@@ -71,7 +71,6 @@
     <string name="error_ai_refused">Bu metin analiz edilemedi. İhtiyacını farklı bir şekilde yaz.</string>
     <string name="error_too_many_active_requirements">En fazla 20 aktif ilanın olabilir. Önce eski bir ilanı kapat.</string>
     <string name="error_recipient_not_available">Bu öğrenciye şu an mesaj gönderilemiyor.</string>
-    <string name="error_push_not_configured">Anlık bildirimler bu sürümde yapılandırılmamış.</string>
     <string name="error_billing_unavailable">Google Play ödeme hizmetine ulaşılamadı. Tekrar dene.</string>
     <string name="error_billing_not_configured">Satın alma doğrulaması henüz yapılandırılmamış.</string>
     <string name="error_plan_not_available">Bu plan şu an sunulmuyor.</string>
@@ -267,8 +266,7 @@
     <string name="notification_new_comment">%1$s gönderine yorum yaptı.</string>
     <string name="notification_verification_approved">Öğrenci doğrulaman onaylandı.</string>
     <string name="notification_verification_rejected">Öğrenci belgen onaylanmadı. Nedenini profil durumunda görebilirsin.</string>
-    <string name="push_not_configured">Bu sürümde anlık bildirimler (push) yapılandırılmamış; bildirimlerini yalnızca bu listede görürsün.</string>
-    <string name="push_permission_denied">Anlık bildirimler kapalı. Açmak için Android ayarlarından KampüsAğı bildirim iznini ver.</string>
+    <string name="push_permission_denied">Bildirim izni kapalı. Uygulama açıkken gelen bildirimleri görmek için Android ayarlarından KampüsAğı bildirim iznini ver.</string>
     <!-- Premium -->
     <string name="premium_title">Premium</string>
     <string name="premium_load_failed">Premium bilgileri yüklenemedi</string>

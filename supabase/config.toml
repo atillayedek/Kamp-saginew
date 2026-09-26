@@ -18,10 +18,6 @@ verify_jwt = true
 [functions.publish-requirement]
 verify_jwt = true
 
-# Called by a Database Webhook with a shared secret header, not by users.
-[functions.dispatch-push]
-verify_jwt = false
-
 [functions.verify-purchase]
 verify_jwt = true
 

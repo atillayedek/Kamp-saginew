@@ -10,7 +10,6 @@ import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppNotification
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.repository.NotificationRepository
-import com.kampusagi.android.domain.repository.PushRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.catch
@@ -25,10 +24,7 @@ sealed interface NotificationsState {
 @HiltViewModel
 class NotificationsViewModel @Inject constructor(
     private val repository: NotificationRepository,
-    pushRepository: PushRepository,
 ) : ViewModel() {
-
-    val isPushConfigured: Boolean = pushRepository.isConfigured
 
     var state by mutableStateOf<NotificationsState>(NotificationsState.Loading)
         private set

@@ -26,7 +26,7 @@ Kod yazım mantığı, aynı hesaptaki `atillayedek/whered-d-put` (WhereDidIPutI
 
 - Tüm yapılandırma önce ortam değişkeninden, sonra git'e girmeyen `local.properties` / `keystore.properties`
   dosyasından okunur (`config("NAME")` yardımcı fonksiyonu, `app/build.gradle.kts`). Repoya hiçbir değer commit edilmez.
-- Yalnızca istemciye açık değerler `BuildConfig`'e girer (proje URL'si, publishable/anon key, Firebase istemci yapılandırması).
+- Yalnızca istemciye açık değerler `BuildConfig`'e girer (proje URL'si, publishable/anon key, gizlilik politikası URL'si).
   Service account, Gemini anahtarı, Play Developer API anahtarı yalnızca backend secret'tır.
 - `AppConfig.isBackendConfigured` false ise uygulama **"Henüz bağlı değil / kurulum gerekli"** ekranını gösterir.
   Sahte veri, sahte giriş veya sahte başarı gösterilmez (Bölüm 0.2).
