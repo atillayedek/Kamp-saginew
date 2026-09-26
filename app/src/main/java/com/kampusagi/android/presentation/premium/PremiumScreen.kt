@@ -1,6 +1,5 @@
 package com.kampusagi.android.presentation.premium
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kampusagi.android.R
@@ -40,7 +39,7 @@ fun PremiumScreen(
     modifier: Modifier = Modifier,
     viewModel: PremiumViewModel = hiltViewModel(),
 ) {
-    val activity = LocalContext.current as? Activity
+    val activity = LocalActivity.current
     Column(modifier = modifier.fillMaxSize()) {
         TopAppBar(
             title = { Text(stringResource(R.string.premium_title)) },
