@@ -54,6 +54,23 @@ jobs:
       - name: Tests
         run: deno test supabase/functions/
 
+  live-smoke:
+    name: Live Supabase checks (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the deployed backend over HTTP
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::warning::Supabase secrets missing: live checks NOT RUN."
+            exit 0
+          fi
+          ./scripts/live-smoke.sh
+
   android:
     name: Unit tests, lint, debug APK and release AAB
     runs-on: ubuntu-latest

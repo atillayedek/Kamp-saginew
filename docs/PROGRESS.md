@@ -18,6 +18,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 9 | Premium: Google Play Billing + sunucu doğrulaması + entitlement | Bitti — CI yeşil `ddeb8e7` (`5acb808`'deki lint hatası ContextCastToActivity `a41a6d2` ile düzeltildi). Play Console ürünleri + plan içeriği: dış yapılandırma / ürün kararı |
 | 10 | Ayarlar, hesap silme, gizlilik, raporlama/engelleme | Bitti — CI yeşil `ddeb8e7`. Gizlilik politikası URL'si ve web silme sayfası: dış yapılandırma |
 | 11 | Release sertleştirme: imza, AAB, R8, erişilebilirlik, son tarama | Kod bitti — CI yeşil `ddeb8e7` (R8 + kaynak küçültme, yedekleme kapalı, cleartext kapalı, CI'da keystore secret'ıyla imza + `jarsigner` doğrulaması, versionCode = CI çalıştırma no). Keystore secret'ları yok → AAB **imzasız**: dış yapılandırma |
+| 12 | Gözlemlenebilirlik: Supabase çökme raporları (D31), canlı backend CI kontrolü (D32) | Kod bitti; SQL 012 (4 mutasyon yakalandı), canlıya uygulandı; CI bekleniyor |
 
 ## Son doğrulamalar
 

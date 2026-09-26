@@ -11,6 +11,7 @@ import com.kampusagi.android.domain.model.Profile
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ProfileRepository
+import com.kampusagi.android.data.crash.CrashReporter
 import com.kampusagi.android.presentation.notification.BackgroundNotifier
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -55,6 +56,7 @@ class RootViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val backgroundNotifier: BackgroundNotifier,
+    private val crashReporter: CrashReporter,
 ) : ViewModel() {
 
     private val passwordRecovery = MutableStateFlow(false)
@@ -119,7 +121,15 @@ class RootViewModel @Inject constructor(
             authRepository.authState
                 .map { (it as? AuthState.SignedIn)?.userId }
                 .distinctUntilChanged()
-                .collect { userId -> if (userId != null) backgroundNotifier.start() else backgroundNotifier.stop() }
+                .collect { userId ->
+                    if (userId != null) {
+                        backgroundNotifier.start()
+                        // Crashes recorded earlier on this device are sent under the signed-in account.
+                        crashReporter.sendPending()
+                    } else {
+                        backgroundNotifier.stop()
+                    }
+                }
         }
     }
 

@@ -40,6 +40,12 @@ supabase functions deploy delete-account
 supabase secrets set OPENAI_API_KEY=... OPENAI_CHAT_MODEL=... OPENAI_EMBEDDING_MODEL=...
 ```
 
+### Çökme raporları
+
+Ek yapılandırma gerekmez. Raporlar **Dashboard → Table Editor → `client_errors`** tablosunda görünür (sürüm, cihaz,
+istisna türü, yığın izi). Gizlilik politikasında çökme verilerinin (cihaz modeli, Android sürümü, hata kaydı) hesapla
+ilişkilendirilerek saklandığı belirtilmelidir.
+
 ### Bildirimler
 
 FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push` Edge Function'ı kaldıysa
