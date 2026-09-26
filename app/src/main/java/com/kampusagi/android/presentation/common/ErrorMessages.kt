@@ -21,6 +21,13 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.UNIVERSITY_NOT_FOUND -> R.string.error_university_not_found
     AppError.PROFILE_LOCKED -> R.string.error_profile_locked
     AppError.INVALID_INPUT -> R.string.error_invalid_input
+    AppError.DOCUMENT_TOO_LARGE -> R.string.error_document_too_large
+    AppError.DOCUMENT_NOT_PDF -> R.string.error_document_not_pdf
+    AppError.DOCUMENT_UNREADABLE -> R.string.error_document_unreadable
+    AppError.VERIFICATION_NOT_ALLOWED -> R.string.error_verification_not_allowed
+    AppError.ADMIN_REQUIRED -> R.string.error_admin_required
+    AppError.REJECTION_REASON_REQUIRED -> R.string.error_rejection_reason_required
+    AppError.VERIFICATION_NOT_PENDING -> R.string.error_verification_not_pending
     AppError.NOT_FOUND -> R.string.error_not_found
     AppError.SERVER -> R.string.error_server
     AppError.UNKNOWN -> R.string.error_unknown

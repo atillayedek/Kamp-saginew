@@ -14,4 +14,7 @@ object AppConfig {
     const val AUTH_HOST = "auth-callback"
     const val AUTH_REDIRECT_URL = "$AUTH_SCHEME://$AUTH_HOST"
     const val PASSWORD_RECOVERY_REDIRECT_URL = "$AUTH_REDIRECT_URL?type=recovery"
+
+    const val STUDENT_DOCUMENTS_BUCKET = "student-documents"
+    const val SUBMIT_STUDENT_DOCUMENT_FUNCTION = "submit-student-document"
 }

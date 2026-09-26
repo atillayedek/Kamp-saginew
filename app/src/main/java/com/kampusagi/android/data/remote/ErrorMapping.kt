@@ -13,7 +13,7 @@ internal fun Throwable.toAppError(): AppError = when (this) {
     is HttpRequestException, is IOException -> AppError.NETWORK
     is RestException -> restError()
     is SerializationException -> AppError.SERVER
-    is UnknownAccountStatusException -> AppError.SERVER
+    is UnknownStatusException -> AppError.SERVER
     else -> AppError.UNKNOWN
 }
 
@@ -27,6 +27,14 @@ private fun RestException.restError(): AppError {
         "invalid_full_name" in text || "invalid_username" in text || "invalid_department" in text ->
             AppError.INVALID_INPUT
         "not_authenticated" in text -> AppError.SESSION_EXPIRED
+        "document_too_large" in text || statusCode == 413 || "payload too large" in text ||
+            "maximum allowed size" in text -> AppError.DOCUMENT_TOO_LARGE
+        "invalid_document" in text || "invalid_mime_type" in text || "mime type" in text -> AppError.DOCUMENT_NOT_PDF
+        "verification_not_allowed" in text || "row-level security" in text -> AppError.VERIFICATION_NOT_ALLOWED
+        "admin_required" in text -> AppError.ADMIN_REQUIRED
+        "rejection_reason_required" in text -> AppError.REJECTION_REASON_REQUIRED
+        "verification_not_pending" in text -> AppError.VERIFICATION_NOT_PENDING
+        "document_not_found" in text -> AppError.NOT_FOUND
         // Supabase Auth.
         "email_not_confirmed" in text || "email not confirmed" in text -> AppError.EMAIL_NOT_CONFIRMED
         "invalid_credentials" in text || "invalid login credentials" in text || "invalid_grant" in text ->
@@ -51,5 +59,21 @@ internal inline fun <T> safeCall(block: () -> T): Result<T> = try {
     Result.failure(e)
 }
 
-/** The database returned an account status this app version does not know. */
-class UnknownAccountStatusException(value: String) : IllegalStateException("Unknown account status: $value")
+/** The database returned a status value this app version does not know. */
+class UnknownStatusException(value: String) : IllegalStateException("Unknown status: $value")
+
+/** Maps an Edge Function's `{"error": "<code>"}` response to a domain error. */
+internal fun functionError(status: Int, body: String): AppError {
+    val text = body.lowercase()
+    return when {
+        "invalid_document_path" in text -> AppError.INVALID_INPUT
+        "document_too_large" in text -> AppError.DOCUMENT_TOO_LARGE
+        "invalid_document" in text -> AppError.DOCUMENT_NOT_PDF
+        "verification_not_allowed" in text -> AppError.VERIFICATION_NOT_ALLOWED
+        "document_not_found" in text || "profile_not_found" in text -> AppError.NOT_FOUND
+        "not_authenticated" in text || status == 401 -> AppError.SESSION_EXPIRED
+        status == 429 -> AppError.RATE_LIMITED
+        status >= 500 -> AppError.SERVER
+        else -> AppError.UNKNOWN
+    }
+}

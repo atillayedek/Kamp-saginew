@@ -18,6 +18,7 @@ import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import java.io.IOException
@@ -31,6 +32,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
@@ -52,14 +55,19 @@ class AuthRepositoryImpl @Inject constructor(
      * reports a network error until the connection is back.
      */
     private fun SessionStatus.toAuthState(client: SupabaseClient): AuthState = when (this) {
-        is SessionStatus.Authenticated -> session.user?.let { AuthState.SignedIn(it.id, it.email.orEmpty()) }
-            ?: AuthState.Loading
+        is SessionStatus.Authenticated -> session.user?.toSignedIn() ?: AuthState.Loading
         is SessionStatus.NotAuthenticated -> AuthState.SignedOut
-        is SessionStatus.RefreshFailure -> client.auth.currentSessionOrNull()?.user
-            ?.let { AuthState.SignedIn(it.id, it.email.orEmpty()) }
+        is SessionStatus.RefreshFailure -> client.auth.currentSessionOrNull()?.user?.toSignedIn()
             ?: AuthState.SignedOut
         else -> AuthState.Loading
     }
+
+    /** app_metadata can only be written with the service role, so users cannot mark themselves admin. */
+    private fun UserInfo.toSignedIn() = AuthState.SignedIn(
+        userId = id,
+        email = email.orEmpty(),
+        isAdmin = (appMetadata?.get("role") as? JsonPrimitive)?.contentOrNull == ADMIN_ROLE,
+    )
 
     override suspend fun signIn(email: String, password: String): AppResult<Unit> = call { client ->
         client.auth.signInWith(Email) {
@@ -163,5 +171,6 @@ class AuthRepositoryImpl @Inject constructor(
 
     private companion object {
         const val TAG = "AuthRepository"
+        const val ADMIN_ROLE = "admin"
     }
 }

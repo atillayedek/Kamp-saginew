@@ -4,7 +4,7 @@ import android.util.Log
 import com.kampusagi.android.core.di.ApplicationScope
 import com.kampusagi.android.data.remote.ProfileDto
 import com.kampusagi.android.data.remote.SupabaseProvider
-import com.kampusagi.android.data.remote.UnknownAccountStatusException
+import com.kampusagi.android.data.remote.UnknownStatusException
 import com.kampusagi.android.data.remote.safeCall
 import com.kampusagi.android.data.remote.toAppError
 import com.kampusagi.android.domain.model.AccountStatus
@@ -120,7 +120,7 @@ class ProfileRepositoryImpl @Inject constructor(
         universityName = universities?.name,
         department = department,
         status = AccountStatus.entries.firstOrNull { it.name == accountStatus }
-            ?: throw UnknownAccountStatusException(accountStatus),
+            ?: throw UnknownStatusException(accountStatus),
     )
 
     private companion object {

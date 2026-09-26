@@ -31,12 +31,14 @@ enum class RootDestination {
     PROFILE_ERROR,
     PROFILE_SETUP,
     ACCOUNT_STATUS,
+    ADMIN_REVIEW,
 }
 
 data class AppUiState(
     val destination: RootDestination = RootDestination.LOADING,
     val profile: Profile? = null,
     val profileError: AppError? = null,
+    val isAdmin: Boolean = false,
 ) {
     val isLoading: Boolean get() = destination == RootDestination.LOADING
 }
@@ -51,6 +53,7 @@ class RootViewModel @Inject constructor(
 
     private val passwordRecovery = MutableStateFlow(false)
     private val editingProfile = MutableStateFlow(false)
+    private val adminOpen = MutableStateFlow(false)
     private val messageChannel = Channel<AppMessage>(Channel.BUFFERED)
     val messages: Flow<AppMessage> = messageChannel.receiveAsFlow()
 
@@ -59,8 +62,9 @@ class RootViewModel @Inject constructor(
         profileRepository.profileState,
         passwordRecovery,
         editingProfile,
-    ) { auth, profileState, recovering, editing ->
-        resolve(auth, profileState, recovering, editing)
+        adminOpen,
+    ) { auth, profileState, recovering, editing, admin ->
+        resolve(auth, profileState, recovering, editing, admin)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, AppUiState())
 
     private fun resolve(
@@ -68,6 +72,7 @@ class RootViewModel @Inject constructor(
         profileState: ProfileState?,
         recovering: Boolean,
         editing: Boolean,
+        admin: Boolean,
     ): AppUiState {
         if (!authRepository.isBackendConfigured) return AppUiState(RootDestination.SETUP_REQUIRED)
         return when (auth) {
@@ -75,9 +80,11 @@ class RootViewModel @Inject constructor(
             AuthState.SignedOut -> AppUiState(RootDestination.AUTH)
             is AuthState.SignedIn -> when {
                 recovering -> AppUiState(RootDestination.PASSWORD_RECOVERY)
+                // Admins do not need to be verified students to review requests.
+                admin && auth.isAdmin -> AppUiState(RootDestination.ADMIN_REVIEW, isAdmin = true)
                 profileState == null || profileState is ProfileState.Loading -> AppUiState(RootDestination.LOADING)
                 profileState is ProfileState.Failed ->
-                    AppUiState(RootDestination.PROFILE_ERROR, profileError = profileState.error)
+                    AppUiState(RootDestination.PROFILE_ERROR, profileError = profileState.error, isAdmin = auth.isAdmin)
                 profileState is ProfileState.Loaded -> {
                     val profile = profileState.profile
                     val canEdit = profile.status == AccountStatus.PROFILE_INCOMPLETE ||
@@ -87,7 +94,7 @@ class RootViewModel @Inject constructor(
                     } else {
                         RootDestination.ACCOUNT_STATUS
                     }
-                    AppUiState(destination, profile = profile)
+                    AppUiState(destination, profile = profile, isAdmin = auth.isAdmin)
                 }
                 else -> AppUiState(RootDestination.LOADING)
             }
@@ -125,8 +132,17 @@ class RootViewModel @Inject constructor(
         editingProfile.value = false
     }
 
+    fun openAdminReview() {
+        adminOpen.value = true
+    }
+
+    fun closeAdminReview() {
+        adminOpen.value = false
+    }
+
     fun signOut() {
         viewModelScope.launch {
+            adminOpen.value = false
             editingProfile.value = false
             passwordRecovery.value = false
             if (authRepository.signOut() is AppResult.Failure) messageChannel.send(AppMessage.SIGN_OUT_FAILED)

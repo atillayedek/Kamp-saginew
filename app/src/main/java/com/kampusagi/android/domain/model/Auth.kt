@@ -3,7 +3,11 @@ package com.kampusagi.android.domain.model
 sealed interface AuthState {
     data object Loading : AuthState
     data object SignedOut : AuthState
-    data class SignedIn(val userId: String, val email: String) : AuthState
+    /**
+     * [isAdmin] comes from the JWT's app_metadata and only decides what the UI
+     * offers; every admin action is authorised again by the database.
+     */
+    data class SignedIn(val userId: String, val email: String, val isAdmin: Boolean = false) : AuthState
 }
 
 enum class SignUpResult {

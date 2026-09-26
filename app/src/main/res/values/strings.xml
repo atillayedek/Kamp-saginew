@@ -57,6 +57,13 @@
     <string name="error_university_not_found">Seçilen üniversite artık listede yok. Listeyi yenileyip tekrar seç.</string>
     <string name="error_profile_locked">Doğrulama başladığı için profil bilgilerin artık değiştirilemez.</string>
     <string name="error_invalid_input">Girilen bilgilerden biri geçersiz. Alanları kontrol et.</string>
+    <string name="error_document_too_large">Belge 10 MB\'tan büyük olamaz.</string>
+    <string name="error_document_not_pdf">Seçilen dosya geçerli bir PDF değil.</string>
+    <string name="error_document_unreadable">Seçilen dosya okunamadı. Başka bir dosya dene.</string>
+    <string name="error_verification_not_allowed">Şu an yeni belge yüklenemez. Durumunu yenileyip tekrar dene.</string>
+    <string name="error_admin_required">Bu işlem için yönetici yetkisi gerekiyor.</string>
+    <string name="error_rejection_reason_required">Ret nedeni 3–500 karakter olmalı.</string>
+    <string name="error_verification_not_pending">Bu başvuru zaten sonuçlandırılmış.</string>
     <string name="error_not_found">İstenen kayıt bulunamadı.</string>
     <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
     <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
@@ -106,4 +113,25 @@
     <string name="status_rejected_body">Yüklediğin belge doğrulanamadı.</string>
     <string name="status_suspended_title">Hesabın askıya alındı</string>
     <string name="status_suspended_body">Hesabın bir yönetici tarafından askıya alındı.</string>
+    <!-- Student document -->
+    <string name="action_upload_document">Öğrenci belgesi yükle (PDF)</string>
+    <string name="document_requirements">Güncel tarihli öğrenci belgeni PDF olarak yükle (en fazla 10 MB). Belgedeki ad ve üniversite profilinle aynı olmalı.</string>
+    <string name="rejection_reason">Ret nedeni: %1$s</string>
+
+    <!-- Admin -->
+    <string name="action_open_admin">Doğrulama başvuruları</string>
+    <string name="action_open_document">Belgeyi aç</string>
+    <string name="action_approve">Onayla</string>
+    <string name="action_reject">Reddet</string>
+    <string name="cd_back">Geri</string>
+    <string name="admin_title">Doğrulama başvuruları</string>
+    <string name="admin_load_failed">Başvurular yüklenemedi</string>
+    <string name="admin_empty_title">Bekleyen başvuru yok</string>
+    <string name="admin_empty_body">İncelenmeyi bekleyen öğrenci belgesi şu an yok.</string>
+    <string name="admin_submitted_at">Gönderildi: %1$s (UTC)</string>
+    <string name="admin_working">İşleniyor…</string>
+    <string name="admin_no_pdf_viewer">Cihazda PDF açabilen bir uygulama yok.</string>
+    <string name="admin_reject_title">Başvuruyu reddet</string>
+    <string name="admin_reject_reason">Ret nedeni</string>
+    <string name="admin_reject_reason_hint">Başvuru sahibine gösterilir (3–500 karakter).</string>
 </resources>

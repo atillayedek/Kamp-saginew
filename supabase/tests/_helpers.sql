@@ -22,6 +22,28 @@ begin
 end;
 $$;
 
+-- Acts as a user whose JWT carries app_metadata.role = 'admin'.
+create function tests.act_as_admin(p_user uuid) returns void
+language plpgsql as $$
+begin
+    perform set_config(
+        'request.jwt.claims',
+        json_build_object('sub', p_user, 'role', 'authenticated', 'app_metadata', json_build_object('role', 'admin'))::text,
+        true
+    );
+    execute 'set local role authenticated';
+end;
+$$;
+
+-- Acts as the service role (Edge Functions with the service key).
+create function tests.act_as_service() returns void
+language plpgsql as $$
+begin
+    perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
+    execute 'set local role service_role';
+end;
+$$;
+
 create function tests.act_as_anon() returns void
 language plpgsql as $$
 begin

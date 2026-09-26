@@ -20,6 +20,7 @@ import com.kampusagi.android.core.designsystem.component.MessageView
 import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.component.SecondaryButton
 import com.kampusagi.android.domain.model.AppError
+import com.kampusagi.android.presentation.admin.AdminReviewScreen
 import com.kampusagi.android.presentation.auth.AuthNavHost
 import com.kampusagi.android.presentation.auth.PasswordRecoveryScreen
 import com.kampusagi.android.presentation.common.messageRes
@@ -59,6 +60,9 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
                 modifier = modifier,
             ) {
                 PrimaryButton(text = stringResource(R.string.action_retry), onClick = viewModel::retryProfile)
+                if (state.isAdmin) {
+                    SecondaryButton(text = stringResource(R.string.action_open_admin), onClick = viewModel::openAdminReview)
+                }
                 SecondaryButton(text = stringResource(R.string.action_sign_out), onClick = viewModel::signOut)
             }
             RootDestination.PROFILE_SETUP -> ProfileSetupScreen(
@@ -70,12 +74,15 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
             RootDestination.ACCOUNT_STATUS -> state.profile?.let { profile ->
                 AccountStatusScreen(
                     profile = profile,
+                    isAdmin = state.isAdmin,
+                    onOpenAdmin = viewModel::openAdminReview,
                     onEditProfile = viewModel::editProfile,
                     onRefresh = viewModel::retryProfile,
                     onSignOut = viewModel::signOut,
                     modifier = modifier,
                 )
             } ?: LoadingView(modifier)
+            RootDestination.ADMIN_REVIEW -> AdminReviewScreen(onClose = viewModel::closeAdminReview, modifier = modifier)
         }
     }
 }

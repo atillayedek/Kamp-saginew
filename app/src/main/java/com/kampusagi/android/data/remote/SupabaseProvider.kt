@@ -5,9 +5,11 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.serializer.KotlinXSerializer
+import io.github.jan.supabase.storage.Storage
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
@@ -42,6 +44,8 @@ class SupabaseProvider @Inject constructor() {
                 flowType = FlowType.PKCE
             }
             install(Postgrest)
+            install(Storage)
+            install(Functions)
         }
     }
 

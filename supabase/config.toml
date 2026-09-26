@@ -1,0 +1,13 @@
+# Supabase CLI configuration for local development and deploys.
+# The project ref is passed on the command line (`supabase link --project-ref ...`).
+project_id = "kampusagi"
+
+[auth]
+site_url = "kampusagi://auth-callback"
+additional_redirect_urls = ["kampusagi://auth-callback", "kampusagi://auth-callback?type=recovery"]
+
+[auth.email]
+enable_confirmations = true
+
+[functions.submit-student-document]
+verify_jwt = true

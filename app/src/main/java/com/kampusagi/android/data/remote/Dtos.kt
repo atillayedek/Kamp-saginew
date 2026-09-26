@@ -30,3 +30,24 @@ data class UniversityDto(
     val name: String,
     val city: String,
 )
+
+@Serializable
+data class VerificationDto(
+    val id: String,
+    val status: String,
+    @SerialName("rejection_reason") val rejectionReason: String? = null,
+    @SerialName("created_at") val createdAt: String,
+)
+
+@Serializable
+data class PendingVerificationDto(
+    @SerialName("verification_id") val verificationId: String,
+    @SerialName("user_id") val userId: String,
+    val email: String,
+    @SerialName("full_name") val fullName: String? = null,
+    val username: String? = null,
+    @SerialName("university_name") val universityName: String? = null,
+    val department: String? = null,
+    @SerialName("document_path") val documentPath: String,
+    @SerialName("submitted_at") val submittedAt: String,
+)
