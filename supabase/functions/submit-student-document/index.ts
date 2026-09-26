@@ -5,8 +5,8 @@
 // a real PDF within the size limit, then records the request with the service
 // role. Invalid uploads are deleted so they never reach an admin.
 
-import { createClient } from "npm:@supabase/supabase-js@2";
-import { errorResponse, json, requireEnv } from "../_shared/http.ts";
+import { authenticate, readJson } from "../_shared/auth.ts";
+import { errorResponse, json } from "../_shared/http.ts";
 import { checkDocument, isOwnDocumentPath, mapSubmitError } from "./logic.ts";
 
 const BUCKET = "student-documents";
@@ -14,30 +14,14 @@ const BUCKET = "student-documents";
 Deno.serve(async (request) => {
   if (request.method !== "POST") return errorResponse("method_not_allowed", 405);
 
-  const authorization = request.headers.get("Authorization");
-  if (!authorization) return errorResponse("not_authenticated", 401);
+  const caller = await authenticate(request);
+  if (!caller) return errorResponse("not_authenticated", 401);
+  const { userId, admin } = caller;
 
-  const url = requireEnv("SUPABASE_URL");
-  const caller = createClient(url, requireEnv("SUPABASE_ANON_KEY"), {
-    global: { headers: { Authorization: authorization } },
-    auth: { persistSession: false },
-  });
-  const { data: userData, error: userError } = await caller.auth.getUser();
-  if (userError || !userData.user) return errorResponse("not_authenticated", 401);
-  const userId = userData.user.id;
-
-  let body: { path?: unknown };
-  try {
-    body = await request.json();
-  } catch (_error) {
-    return errorResponse("invalid_request", 400);
-  }
+  const body = await readJson(request);
+  if (!body) return errorResponse("invalid_request", 400);
   if (!isOwnDocumentPath(body.path, userId)) return errorResponse("invalid_document_path", 400);
   const path = body.path;
-
-  const admin = createClient(url, requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
-    auth: { persistSession: false },
-  });
 
   const { data: file, error: downloadError } = await admin.storage.from(BUCKET).download(path);
   if (downloadError || !file) return errorResponse("document_not_found", 404);

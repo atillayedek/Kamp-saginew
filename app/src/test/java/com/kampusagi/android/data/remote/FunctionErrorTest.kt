@@ -17,3 +17,16 @@ class FunctionErrorTest {
         assertEquals(AppError.UNKNOWN, functionError(418, "teapot"))
     }
 }
+
+class AiErrorMappingTest {
+    @Test
+    fun `maps ai error codes`() {
+        assertEquals(AppError.AI_NOT_CONFIGURED, functionError(503, """{"error":"ai_not_configured"}"""))
+        assertEquals(AppError.AI_QUOTA_EXCEEDED, functionError(429, """{"error":"ai_quota_exceeded"}"""))
+        assertEquals(AppError.AI_REFUSED, functionError(422, """{"error":"ai_refused"}"""))
+        assertEquals(AppError.AI_FAILED, functionError(502, """{"error":"ai_failed"}"""))
+        assertEquals(AppError.INVALID_INPUT, functionError(422, """{"error":"invalid_requirement"}"""))
+        assertEquals(AppError.TOO_MANY_ACTIVE_REQUIREMENTS, functionError(409, """{"error":"too_many_active_requirements"}"""))
+        assertEquals(AppError.ACCOUNT_NOT_APPROVED, functionError(403, """{"error":"approved_student_required"}"""))
+    }
+}

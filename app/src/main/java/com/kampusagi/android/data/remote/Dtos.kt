@@ -78,3 +78,59 @@ data class CommentDto(
     @SerialName("author_full_name") val authorFullName: String? = null,
     @SerialName("author_username") val authorUsername: String? = null,
 )
+
+/** Draft exchanged with the analyze/publish Edge Functions (snake_case like the backend). */
+@Serializable
+data class RequirementDraftDto(
+    val title: String,
+    val description: String,
+    val category: String,
+    val tags: List<String>,
+    @SerialName("location_text") val locationText: String? = null,
+    @SerialName("starts_at") val startsAt: String? = null,
+    @SerialName("participants_needed") val participantsNeeded: Int? = null,
+)
+
+@Serializable
+data class AnalyzeResponseDto(val draft: RequirementDraftDto)
+
+@Serializable
+data class PublishRequestDto(
+    @SerialName("original_text") val originalText: String,
+    val draft: RequirementDraftDto,
+)
+
+@Serializable
+data class PublishResponseDto(val id: String)
+
+@Serializable
+data class RequirementDto(
+    val id: String,
+    val title: String,
+    val description: String,
+    val category: String,
+    val tags: List<String> = emptyList(),
+    @SerialName("location_text") val locationText: String? = null,
+    @SerialName("starts_at") val startsAt: String? = null,
+    @SerialName("participants_needed") val participantsNeeded: Int? = null,
+    val status: String,
+    @SerialName("created_at") val createdAt: String,
+)
+
+@Serializable
+data class MatchDto(
+    @SerialName("requirement_id") val requirementId: String,
+    val title: String,
+    val description: String,
+    val category: String,
+    val tags: List<String> = emptyList(),
+    @SerialName("location_text") val locationText: String? = null,
+    @SerialName("starts_at") val startsAt: String? = null,
+    @SerialName("participants_needed") val participantsNeeded: Int? = null,
+    @SerialName("created_at") val createdAt: String,
+    val score: Int,
+    @SerialName("owner_id") val ownerId: String,
+    @SerialName("owner_full_name") val ownerFullName: String? = null,
+    @SerialName("owner_username") val ownerUsername: String? = null,
+    @SerialName("owner_department") val ownerDepartment: String? = null,
+)

@@ -65,6 +65,11 @@
     <string name="error_rejection_reason_required">Ret nedeni 3–500 karakter olmalı.</string>
     <string name="error_verification_not_pending">Bu başvuru zaten sonuçlandırılmış.</string>
     <string name="error_account_not_approved">Bu özellik yalnızca doğrulanmış öğrenciler içindir.</string>
+    <string name="error_ai_not_configured">Yapay zekâ analizi şu an kullanılamıyor. Daha sonra tekrar dene.</string>
+    <string name="error_ai_quota_exceeded">Bugünlük yapay zekâ kullanım sınırına ulaştın. Yarın tekrar dene.</string>
+    <string name="error_ai_failed">Yapay zekâ analizi tamamlanamadı. Tekrar dene.</string>
+    <string name="error_ai_refused">Bu metin analiz edilemedi. İhtiyacını farklı bir şekilde yaz.</string>
+    <string name="error_too_many_active_requirements">En fazla 20 aktif ilanın olabilir. Önce eski bir ilanı kapat.</string>
     <string name="error_not_found">İstenen kayıt bulunamadı.</string>
     <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
     <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
@@ -182,4 +187,47 @@
         <item quantity="one">%d gün önce</item>
         <item quantity="other">%d gün önce</item>
     </plurals>
+    <!-- Requirements -->
+    <string name="tab_requirements">İhtiyaç</string>
+    <string name="requirements_load_failed">İhtiyaçların yüklenemedi</string>
+    <string name="requirements_empty_title">Henüz ihtiyaç paylaşmadın.</string>
+    <string name="requirements_empty_body">Ne aradığını kendi cümlelerinle yaz; ilanını oluşturalım ve seninle eşleşebilecek öğrencileri bulalım.</string>
+    <string name="action_new_requirement">Yeni ihtiyaç</string>
+    <string name="action_close_requirement">İlanı kapat</string>
+    <string name="requirement_active">Aktif</string>
+    <string name="requirement_closed">Kapalı</string>
+    <string name="requirement_starts_at">Zaman: %1$s</string>
+    <string name="requirement_location">Yer: %1$s</string>
+    <string name="create_requirement_title">İhtiyaç oluştur</string>
+    <string name="create_requirement_intro">Neye ihtiyacın var? Zamanı, yeri ve kaç kişi aradığını da yazabilirsin.</string>
+    <string name="create_requirement_placeholder">Örneğin: Cuma akşamı kampüste basketbol oynayacak iki kişi arıyorum.</string>
+    <string name="ai_privacy_note">Metnin, ilanı düzenlemek için sunucumuz üzerinden OpenAI\'ye gönderilir. Telefon numarası gibi kişisel bilgileri yazma.</string>
+    <string name="ai_draft_note">Yapay zekâ taslağı hazırladı. Kontrol et, gerekirse düzenle, sonra yayınla.</string>
+    <string name="action_analyze">Analiz et</string>
+    <string name="action_publish_requirement">Yayınla</string>
+    <string name="action_edit_text">Metni düzenle</string>
+    <string name="field_requirement_title">Başlık</string>
+    <string name="field_requirement_description">Açıklama</string>
+    <string name="field_requirement_category">Kategori</string>
+    <string name="field_requirement_tags">Etiketler</string>
+    <string name="field_requirement_tags_hint">Virgülle ayır, en fazla 8 etiket.</string>
+    <string name="field_requirement_location">Yer (isteğe bağlı)</string>
+    <string name="field_requirement_participants">Kaç kişi (isteğe bağlı, 1–50)</string>
+    <string name="cd_remove_time">Zamanı kaldır</string>
+    <string name="category_sports">Spor</string>
+    <string name="category_study">Ders</string>
+    <string name="category_project">Proje</string>
+    <string name="category_transport">Ulaşım</string>
+    <string name="category_item">Eşya</string>
+    <string name="category_event">Etkinlik</string>
+    <string name="category_housing">Barınma</string>
+    <string name="category_other">Diğer</string>
+    <!-- Matches -->
+    <string name="action_show_matches">Eşleşmeler</string>
+    <string name="matches_title">Eşleşmeler</string>
+    <string name="matches_load_failed">Eşleşmeler yüklenemedi</string>
+    <string name="matches_empty_title">Henüz eşleşme bulunamadı.</string>
+    <string name="matches_empty_body">Üniversitende benzer bir ihtiyaç paylaşıldığında burada görünecek.</string>
+    <string name="matches_score_explained">Benzerlik, ilanların anlamına göre hesaplanır; yalnızca üniversitendeki aktif ilanlar gösterilir.</string>
+    <string name="match_score">%%%1$d benzer</string>
 </resources>

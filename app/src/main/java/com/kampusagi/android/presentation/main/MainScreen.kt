@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Forum
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -29,9 +30,14 @@ import com.kampusagi.android.presentation.community.CreatePostScreen
 import com.kampusagi.android.presentation.community.FeedScreen
 import com.kampusagi.android.presentation.community.FeedViewModel
 import com.kampusagi.android.presentation.community.PostDetailScreen
+import com.kampusagi.android.presentation.requirement.CreateRequirementScreen
+import com.kampusagi.android.presentation.requirement.MatchesScreen
+import com.kampusagi.android.presentation.requirement.RequirementsScreen
+import com.kampusagi.android.presentation.requirement.RequirementsViewModel
 
 private enum class Tab(val route: Any, val label: Int, val icon: ImageVector) {
     COMMUNITY(FeedRoute, R.string.tab_community, Icons.Outlined.Forum),
+    REQUIREMENTS(RequirementsRoute, R.string.tab_requirements, Icons.Outlined.Lightbulb),
     PROFILE(ProfileRoute, R.string.tab_profile, Icons.Outlined.Person),
 }
 
@@ -47,6 +53,7 @@ fun MainScreen(
     val navController = rememberNavController()
     // Keyed by account so a different person signing in never sees the previous feed.
     val feedViewModel: FeedViewModel = hiltViewModel(key = "feed-${profile.id}")
+    val requirementsViewModel: RequirementsViewModel = hiltViewModel(key = "requirements-${profile.id}")
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBar = Tab.entries.any { tab -> destination?.hasRoute(tab.route::class) == true }
@@ -99,6 +106,25 @@ fun MainScreen(
                     onBack = { navController.popBackStack() },
                     onCreated = { scope ->
                         feedViewModel.onPostCreated(scope)
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable<RequirementsRoute> {
+                RequirementsScreen(
+                    viewModel = requirementsViewModel,
+                    onCreate = { navController.navigate(CreateRequirementRoute) },
+                    onOpenMatches = { navController.navigate(MatchesRoute(it.id, it.title)) },
+                )
+            }
+            composable<MatchesRoute> {
+                MatchesScreen(onBack = { navController.popBackStack() })
+            }
+            composable<CreateRequirementRoute> {
+                CreateRequirementScreen(
+                    onBack = { navController.popBackStack() },
+                    onPublished = {
+                        requirementsViewModel.load()
                         navController.popBackStack()
                     },
                 )

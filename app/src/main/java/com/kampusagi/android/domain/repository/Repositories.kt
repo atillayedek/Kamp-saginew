@@ -6,11 +6,14 @@ import com.kampusagi.android.domain.model.AuthState
 import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
+import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.model.PendingVerification
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.model.ProfileDraft
 import com.kampusagi.android.domain.model.ProfileState
+import com.kampusagi.android.domain.model.Requirement
+import com.kampusagi.android.domain.model.RequirementDraft
 import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.model.University
 import com.kampusagi.android.domain.model.Verification
@@ -77,4 +80,19 @@ interface CommunityRepository {
 
     /** Returns the post's like count after the change. */
     suspend fun setLiked(postId: String, liked: Boolean): AppResult<Int>
+}
+
+interface RequirementRepository {
+    /** Asks the backend (OpenAI) to structure the student's text. Nothing is stored. */
+    suspend fun analyze(text: String): AppResult<RequirementDraft>
+
+    /** Stores the edited draft; the backend embeds it for matching. Returns the new id. */
+    suspend fun publish(originalText: String, draft: RequirementDraft): AppResult<String>
+
+    suspend fun myRequirements(): AppResult<List<Requirement>>
+
+    suspend fun close(requirementId: String): AppResult<Unit>
+
+    /** Other students' active requirements ranked by similarity to one of ours. */
+    suspend fun matches(requirementId: String): AppResult<List<Match>>
 }

@@ -29,6 +29,11 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.REJECTION_REASON_REQUIRED -> R.string.error_rejection_reason_required
     AppError.VERIFICATION_NOT_PENDING -> R.string.error_verification_not_pending
     AppError.ACCOUNT_NOT_APPROVED -> R.string.error_account_not_approved
+    AppError.AI_NOT_CONFIGURED -> R.string.error_ai_not_configured
+    AppError.AI_QUOTA_EXCEEDED -> R.string.error_ai_quota_exceeded
+    AppError.AI_FAILED -> R.string.error_ai_failed
+    AppError.AI_REFUSED -> R.string.error_ai_refused
+    AppError.TOO_MANY_ACTIVE_REQUIREMENTS -> R.string.error_too_many_active_requirements
     AppError.NOT_FOUND -> R.string.error_not_found
     AppError.SERVER -> R.string.error_server
     AppError.UNKNOWN -> R.string.error_unknown

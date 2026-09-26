@@ -7,3 +7,6 @@ import kotlinx.serialization.Serializable
 @Serializable data object ProfileRoute
 @Serializable data class PostDetailRoute(val postId: String)
 @Serializable data class CreatePostRoute(val scope: PostScope)
+@Serializable data object RequirementsRoute
+@Serializable data object CreateRequirementRoute
+@Serializable data class MatchesRoute(val requirementId: String, val title: String)

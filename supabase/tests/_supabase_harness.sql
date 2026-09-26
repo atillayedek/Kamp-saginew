@@ -9,6 +9,10 @@ create role service_role nologin noinherit bypassrls;
 
 create extension if not exists pgcrypto;
 
+-- Supabase keeps extensions (pgvector included) in this schema.
+create schema extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
+
 create schema auth;
 grant usage on schema auth to anon, authenticated, service_role;
 
