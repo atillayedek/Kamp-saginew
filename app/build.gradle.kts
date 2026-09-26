@@ -30,6 +30,31 @@ fun config(name: String, source: Properties = localProperties): String =
 val supabaseUrl = config("SUPABASE_URL")
 val supabaseAnonKey = config("SUPABASE_ANON_KEY")
 
+/**
+ * The key is compiled into the APK, so it must be the client key: a
+ * publishable key or a legacy JWT whose role is "anon". A secret or
+ * service_role key would bypass row level security for anyone holding the app.
+ */
+fun isClientKey(key: String): Boolean {
+    if (key.startsWith("sb_publishable_")) return true
+    if (key.startsWith("sb_secret_")) return false
+    val payload = key.split(".").getOrNull(1) ?: return false
+    val claims = try {
+        String(java.util.Base64.getUrlDecoder().decode(payload.padEnd((payload.length + 3) / 4 * 4, '=')))
+    } catch (e: IllegalArgumentException) {
+        return false
+    }
+    return Regex("\"role\"\\s*:\\s*\"anon\"").containsMatchIn(claims)
+}
+
+if (supabaseAnonKey.isNotEmpty() && !isClientKey(supabaseAnonKey)) {
+    throw GradleException(
+        "SUPABASE_ANON_KEY is not a client key. Use the publishable key (sb_publishable_...) or the legacy " +
+            "anon key from Supabase Dashboard -> Project Settings -> API Keys. Never build with the secret or " +
+            "service_role key: it is compiled into the APK and bypasses row level security.",
+    )
+}
+
 val privacyPolicyUrl = config("PRIVACY_POLICY_URL")
 
 val releaseStoreFile = config("KAMPUSAGI_KEYSTORE_FILE", keystoreProperties)

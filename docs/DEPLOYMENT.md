@@ -13,6 +13,10 @@ Supabase güvenlik/performans danışmanı çalıştırıldı ve bulgular `20260
 Android build için: `SUPABASE_URL=https://kbyiaqitiukuthjdkwwd.supabase.co`, `SUPABASE_ANON_KEY` = Dashboard → Project Settings → API
 (istemciye açık publishable/anon anahtar) — GitHub repo secret'ı olarak girilir.
 
+> **Uyarı:** `SUPABASE_ANON_KEY` yalnızca **publishable** (`sb_publishable_...`) veya eski **anon** JWT anahtarı olabilir.
+> **Secret / service_role** anahtarı APK'ya gömülür ve RLS'i herkes için devre dışı bırakır. Gradle build'i bu durumda
+> bilerek hata verir, CI `live-smoke` işi de anahtarın rolünü kontrol eder.
+
 ```bash
 supabase link --project-ref <proje-ref>
 supabase db push                       # supabase/migrations/* (üniversite listesi dahil)
