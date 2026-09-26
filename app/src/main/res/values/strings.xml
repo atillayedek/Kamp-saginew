@@ -71,6 +71,7 @@
     <string name="error_ai_refused">Bu metin analiz edilemedi. İhtiyacını farklı bir şekilde yaz.</string>
     <string name="error_too_many_active_requirements">En fazla 20 aktif ilanın olabilir. Önce eski bir ilanı kapat.</string>
     <string name="error_recipient_not_available">Bu öğrenciye şu an mesaj gönderilemiyor.</string>
+    <string name="error_push_not_configured">Anlık bildirimler bu sürümde yapılandırılmamış.</string>
     <string name="error_not_found">İstenen kayıt bulunamadı.</string>
     <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
     <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
@@ -249,4 +250,17 @@
     <string name="chat_status_failed">Gönderilemedi · Tekrar denemek için dokun</string>
     <string name="chat_status_sent">Gönderildi</string>
     <string name="chat_status_read">Okundu</string>
+    <!-- Notifications -->
+    <string name="tab_notifications">Bildirimler</string>
+    <string name="notification_channel_name">KampüsAğı bildirimleri</string>
+    <string name="notifications_load_failed">Bildirimler yüklenemedi</string>
+    <string name="notifications_empty_title">Henüz bildiriminiz yok.</string>
+    <string name="notifications_empty_body">Mesaj, yorum ve doğrulama sonuçları burada görünür.</string>
+    <string name="action_mark_all_read">Tümünü okundu işaretle</string>
+    <string name="notification_new_message">%1$s sana mesaj gönderdi.</string>
+    <string name="notification_new_comment">%1$s gönderine yorum yaptı.</string>
+    <string name="notification_verification_approved">Öğrenci doğrulaman onaylandı.</string>
+    <string name="notification_verification_rejected">Öğrenci belgen onaylanmadı. Nedenini profil durumunda görebilirsin.</string>
+    <string name="push_not_configured">Bu sürümde anlık bildirimler (push) yapılandırılmamış; bildirimlerini yalnızca bu listede görürsün.</string>
+    <string name="push_permission_denied">Anlık bildirimler kapalı. Açmak için Android ayarlarından KampüsAğı bildirim iznini ver.</string>
 </resources>

@@ -19,3 +19,16 @@ data class ChatMessage(
 )
 
 data class MessageCursor(val createdAt: String, val id: String)
+
+/** Mirrors `public.notification_kind`. */
+enum class NotificationKind { NEW_MESSAGE, NEW_COMMENT, VERIFICATION_APPROVED, VERIFICATION_REJECTED }
+
+data class AppNotification(
+    val id: String,
+    val kind: NotificationKind,
+    val createdAt: String,
+    val read: Boolean,
+    val actorName: String?,
+    val conversationId: String?,
+    val postId: String?,
+)

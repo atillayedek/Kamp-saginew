@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Asked at runtime on Android 13+ before push notifications are shown. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".KampusAgiApplication"
@@ -30,6 +32,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Taps on push notifications (FCM click_action, see _shared/fcm.ts). -->
+            <intent-filter>
+                <action android:name="com.kampusagi.android.OPEN_NOTIFICATIONS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
             <!-- Email confirmation and password reset links from Supabase Auth. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -40,6 +48,19 @@
                     android:scheme="kampusagi" />
             </intent-filter>
         </activity>
+
+        <!-- Push notifications sent by the dispatch-push Edge Function through FCM. -->
+        <service
+            android:name=".data.push.KampusAgiMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="kampusagi_default" />
 
         <!-- Opens a student document an admin is reviewing in a PDF viewer. -->
         <provider

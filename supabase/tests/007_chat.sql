@@ -139,8 +139,9 @@ rollback;
 -- 6. Messages are published to Realtime.
 begin;
 select tests.assert_equals(
-    (select string_agg(tablename, ',' order by tablename) from pg_publication_tables where pubname = 'supabase_realtime'),
-    'conversation_members,messages',
+    (select count(*) from pg_publication_tables
+     where pubname = 'supabase_realtime' and schemaname = 'public' and tablename in ('messages', 'conversation_members')),
+    2::bigint,
     'realtime publication'
 );
 rollback;

@@ -12,6 +12,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +36,7 @@ import com.kampusagi.android.presentation.status.AccountStatusScreen
 @Composable
 fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val openNotificationsRequested by viewModel.openNotificationsRequested.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(viewModel) {
@@ -84,6 +87,8 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
                     onEditProfile = viewModel::editProfile,
                     onRefresh = viewModel::retryProfile,
                     onSignOut = viewModel::signOut,
+                    openNotificationsRequested = openNotificationsRequested,
+                    onNotificationsOpened = viewModel::onNotificationsOpened,
                     modifier = modifier,
                 )
             } ?: LoadingView(modifier)
@@ -94,6 +99,8 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
                     isAdmin = state.isAdmin,
                     onOpenAdmin = viewModel::openAdminReview,
                     onSignOut = viewModel::signOut,
+                    openNotificationsRequested = openNotificationsRequested,
+                    onNotificationsOpened = viewModel::onNotificationsOpened,
                     modifier = modifier,
                 )
             } ?: LoadingView(modifier)

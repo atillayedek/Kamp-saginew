@@ -157,3 +157,15 @@ data class ChatMessageDto(
     @SerialName("is_mine") val isMine: Boolean,
     @SerialName("read_by_other") val readByOther: Boolean,
 )
+
+@Serializable
+data class NotificationDto(
+    val id: String,
+    val kind: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("read_at") val readAt: String? = null,
+    @SerialName("actor_full_name") val actorFullName: String? = null,
+    @SerialName("actor_username") val actorUsername: String? = null,
+    @SerialName("conversation_id") val conversationId: String? = null,
+    @SerialName("post_id") val postId: String? = null,
+)

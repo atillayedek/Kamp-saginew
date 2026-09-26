@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -16,7 +17,18 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -37,6 +49,8 @@ import com.kampusagi.android.presentation.community.CreatePostScreen
 import com.kampusagi.android.presentation.community.FeedScreen
 import com.kampusagi.android.presentation.community.FeedViewModel
 import com.kampusagi.android.presentation.community.PostDetailScreen
+import com.kampusagi.android.presentation.notification.NotificationsScreen
+import com.kampusagi.android.presentation.notification.NotificationsViewModel
 import com.kampusagi.android.presentation.requirement.CreateRequirementScreen
 import com.kampusagi.android.presentation.requirement.MatchesScreen
 import com.kampusagi.android.presentation.requirement.RequirementsScreen
@@ -46,6 +60,7 @@ private enum class Tab(val route: Any, val label: Int, val icon: ImageVector) {
     COMMUNITY(FeedRoute, R.string.tab_community, Icons.Outlined.Forum),
     REQUIREMENTS(RequirementsRoute, R.string.tab_requirements, Icons.Outlined.Lightbulb),
     CHAT(ConversationsRoute, R.string.tab_chat, Icons.Outlined.ChatBubbleOutline),
+    NOTIFICATIONS(NotificationsRoute, R.string.tab_notifications, Icons.Outlined.Notifications),
     PROFILE(ProfileRoute, R.string.tab_profile, Icons.Outlined.Person),
 }
 
@@ -56,13 +71,35 @@ fun MainScreen(
     isAdmin: Boolean,
     onOpenAdmin: () -> Unit,
     onSignOut: () -> Unit,
+    openNotificationsRequested: Boolean,
+    onNotificationsOpened: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
     // Keyed by account so a different person signing in never sees the previous feed.
     val feedViewModel: FeedViewModel = hiltViewModel(key = "feed-${profile.id}")
     val requirementsViewModel: RequirementsViewModel = hiltViewModel(key = "requirements-${profile.id}")
     val conversationsViewModel: ConversationsViewModel = hiltViewModel(key = "conversations-${profile.id}")
+    val notificationsViewModel: NotificationsViewModel = hiltViewModel(key = "notifications-${profile.id}")
+
+    // Android 13+ asks once for permission to show push notifications.
+    var notificationsAllowed by remember { mutableStateOf(notificationPermissionGranted(context)) }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        notificationsAllowed = granted
+    }
+    LaunchedEffect(Unit) {
+        if (!notificationsAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && notificationsViewModel.isPushConfigured) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+    LaunchedEffect(openNotificationsRequested) {
+        if (openNotificationsRequested) {
+            onNotificationsOpened()
+            notificationsViewModel.load()
+            navController.navigate(NotificationsRoute) { launchSingleTop = true }
+        }
+    }
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBar = Tab.entries.any { tab -> destination?.hasRoute(tab.route::class) == true }
@@ -84,7 +121,11 @@ fun MainScreen(
                                 }
                             },
                             icon = {
-                                val unread = if (tab == Tab.CHAT) conversationsViewModel.unreadTotal else 0
+                                val unread = when (tab) {
+                                    Tab.CHAT -> conversationsViewModel.unreadTotal
+                                    Tab.NOTIFICATIONS -> notificationsViewModel.unreadCount
+                                    else -> 0
+                                }
                                 if (unread > 0) {
                                     BadgedBox(badge = { Badge { Text(if (unread > 99) "99+" else unread.toString()) } }) {
                                         Icon(tab.icon, contentDescription = null)
@@ -164,9 +205,27 @@ fun MainScreen(
                     },
                 )
             }
+            composable<NotificationsRoute> {
+                NotificationsScreen(
+                    viewModel = notificationsViewModel,
+                    notificationsAllowed = notificationsAllowed,
+                    onOpen = { notification ->
+                        when {
+                            notification.conversationId != null -> navController.navigate(
+                                ChatRoute(notification.conversationId, notification.actorName.orEmpty()),
+                            )
+                            notification.postId != null -> navController.navigate(PostDetailRoute(notification.postId))
+                        }
+                    },
+                )
+            }
             composable<ProfileRoute> {
                 ProfileTab(profile = profile, isAdmin = isAdmin, onOpenAdmin = onOpenAdmin, onSignOut = onSignOut)
             }
         }
     }
 }
+
+private fun notificationPermissionGranted(context: android.content.Context): Boolean =
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED

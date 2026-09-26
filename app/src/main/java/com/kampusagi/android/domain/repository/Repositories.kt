@@ -10,6 +10,7 @@ import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.model.MessageCursor
+import com.kampusagi.android.domain.model.AppNotification
 import com.kampusagi.android.domain.model.PendingVerification
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostScope
@@ -121,4 +122,27 @@ interface ChatRepository {
      * Supabase Realtime; callers reload from the server on each emission.
      */
     fun changes(conversationId: String?): Flow<Unit>
+}
+
+interface NotificationRepository {
+    suspend fun notifications(): AppResult<List<AppNotification>>
+
+    /** Marks the given notifications read, or all of them when [ids] is null. */
+    suspend fun markRead(ids: List<String>?): AppResult<Unit>
+
+    /** Emits when the person's notifications change (Supabase Realtime). */
+    fun changes(): Flow<Unit>
+}
+
+interface PushRepository {
+    /** False when this build has no Firebase configuration. */
+    val isConfigured: Boolean
+
+    /** Registers this device's FCM token for the signed-in person. */
+    suspend fun registerCurrentDevice(): AppResult<Unit>
+
+    suspend fun registerToken(token: String): AppResult<Unit>
+
+    /** Removes this device's token before signing out. */
+    suspend fun unregisterCurrentDevice(): AppResult<Unit>
 }

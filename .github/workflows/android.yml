@@ -72,6 +72,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
         # Prints only whether the values are present, never the values.
         run: |
           if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
@@ -79,12 +83,21 @@ jobs:
           else
             echo "::warning::Supabase secrets missing: this build shows the 'not configured' screen."
           fi
+          if [ -n "$FIREBASE_PROJECT_ID" ] && [ -n "$FIREBASE_APP_ID" ] && [ -n "$FIREBASE_API_KEY" ] && [ -n "$FIREBASE_SENDER_ID" ]; then
+            echo "::notice::Firebase configured: push notifications are enabled in this build."
+          else
+            echo "::warning::Firebase secrets missing: push notifications are off in this build."
+          fi
 
       - name: Build and verify
         env:
           # Client-safe values only (project URL + anon/publishable key).
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
         run: ./gradlew --no-daemon --stacktrace testDebugUnitTest lintRelease assembleDebug bundleRelease
 
       - name: Upload build outputs
