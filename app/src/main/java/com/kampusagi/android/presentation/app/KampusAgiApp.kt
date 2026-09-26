@@ -87,8 +87,6 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
                     onEditProfile = viewModel::editProfile,
                     onRefresh = viewModel::retryProfile,
                     onSignOut = viewModel::signOut,
-                    openNotificationsRequested = openNotificationsRequested,
-                    onNotificationsOpened = viewModel::onNotificationsOpened,
                     modifier = modifier,
                 )
             } ?: LoadingView(modifier)
