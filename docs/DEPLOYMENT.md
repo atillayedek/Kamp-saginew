@@ -5,6 +5,14 @@ Hiçbir değer repoya yazılmaz.
 
 ## 1. Supabase projesi
 
+**Durum (2026-09-26):** `KampusAgi` projesi (`kbyiaqitiukuthjdkwwd`, eu-central-1, free plan) oluşturuldu.
+11 migration uygulandı (repo dosya sürümleri canlı migration geçmişiyle aynıdır), 6 Edge Function deploy edildi,
+Supabase güvenlik/performans danışmanı çalıştırıldı ve bulgular `20260926070413_hardening` ile giderildi.
+Ücretsiz plandaki 2 aktif proje sınırı nedeniyle `WhereDidIPutIt2` projesi kullanıcı onayıyla **duraklatıldı**
+(veri korunur; Dashboard'dan geri açılabilir). Aşağıdaki Dashboard ayarları ve secret'lar henüz **yapılmadı**.
+Android build için: `SUPABASE_URL=https://kbyiaqitiukuthjdkwwd.supabase.co`, `SUPABASE_ANON_KEY` = Dashboard → Project Settings → API
+(istemciye açık publishable/anon anahtar) — GitHub repo secret'ı olarak girilir.
+
 ```bash
 supabase link --project-ref <proje-ref>
 supabase db push                       # supabase/migrations/* (üniversite listesi dahil)

@@ -32,3 +32,15 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 - 2026-09-26 — CI `dfdaa4e`: DB, Edge Function, Android (unit test, lintRelease, APK, AAB) PASS.
 - 2026-09-26 — Yerel: SQL 001–008 PASS, Deno check + 21 test PASS.
 - 2026-09-26 — Yerel: SQL 001–009 PASS, Deno check + 24 test PASS.
+
+## Canlı Supabase (2026-09-26)
+
+- Proje `kbyiaqitiukuthjdkwwd` (KampusAgi): 11 migration + 6 Edge Function deploy edildi.
+- Canlıda doğrulandı (SQL, rol simülasyonu): 206 üniversite / 81 il, 17 tablo (hepsi RLS), 54 fonksiyon (yerel test DB ile aynı),
+  realtime yayını (messages, conversation_members, notifications), özel `student-documents` bucket, pgvector 0.8.2;
+  anon üniversiteleri göremez ve RPC çağıramaz; onaysız hesap `approved_student_required`, admin olmayan `admin_required` alır;
+  tabloya doğrudan yazma RLS ile reddedilir.
+- Danışman bulguları: `handle_new_user` anon/authenticated'a açıktı ve `reports.resolved_by` indekssizdi → düzeltildi, SQL test 011 eklendi.
+- HTTP üzerinden uçtan uca test: **NOT RUN** — bu ortamın ağ politikası `*.supabase.co` bağlantısını reddediyor.
+- Auth yönlendirme URL'leri, OpenAI/FCM/Play secret'ları, webhook: **dış yapılandırma** (docs/DEPLOYMENT.md).
+
