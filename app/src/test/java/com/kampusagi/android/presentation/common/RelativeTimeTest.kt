@@ -21,7 +21,10 @@ class RelativeTimeTest {
 
     @Test
     fun `parses postgrest timestamps with fractions and offsets`() {
-        assertEquals(RelativeTime.Minutes(2), of("2026-09-26T14:58:00.123456+03:00"))
+        // 11:57:59.5Z -> 2 min 0.5 s before now; the offset and the fraction must both be honoured.
+        assertEquals(RelativeTime.Minutes(2), of("2026-09-26T14:57:59.500000+03:00"))
+        // 1 min 59.88 s is still "1 minute": elapsed time is truncated, not rounded.
+        assertEquals(RelativeTime.Minutes(1), of("2026-09-26T14:58:00.123456+03:00"))
     }
 
     @Test
