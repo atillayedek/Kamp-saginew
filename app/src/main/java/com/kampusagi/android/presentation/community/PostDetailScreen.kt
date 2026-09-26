@@ -41,7 +41,12 @@ import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
 import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.presentation.common.messageRes
+import com.kampusagi.android.presentation.moderation.BlockDialog
+import com.kampusagi.android.presentation.moderation.MenuAction
+import com.kampusagi.android.presentation.moderation.OverflowMenu
+import com.kampusagi.android.presentation.moderation.ReportDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +54,7 @@ fun PostDetailScreen(
     onBack: () -> Unit,
     onPostChanged: (Post) -> Unit,
     onPostDeleted: (String) -> Unit,
+    onAuthorBlocked: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
@@ -57,6 +63,12 @@ fun PostDetailScreen(
 
     // Keep the feed in step with likes and comment counts made here.
     LaunchedEffect(loaded?.post) { loaded?.post?.let(onPostChanged) }
+    LaunchedEffect(viewModel.blockedAuthorId) {
+        viewModel.blockedAuthorId?.let {
+            onAuthorBlocked(it)
+            onBack()
+        }
+    }
     LaunchedEffect(viewModel.deleted) {
         if (viewModel.deleted) {
             loaded?.post?.id?.let(onPostDeleted)
@@ -73,10 +85,19 @@ fun PostDetailScreen(
                 }
             },
             actions = {
-                if (loaded?.post?.isMine == true) {
+                val post = loaded?.post
+                if (post?.isMine == true) {
                     IconButton(onClick = { confirmDelete = true }, enabled = !viewModel.isWorking) {
                         Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete_post))
                     }
+                } else if (post != null) {
+                    OverflowMenu(
+                        enabled = !viewModel.isWorking,
+                        actions = listOf(
+                            MenuAction(R.string.report_post) { viewModel.requestReport(ReportTarget.POST, post.id) },
+                            MenuAction(R.string.action_block_user) { viewModel.requestBlock(post.author) },
+                        ),
+                    )
                 }
             },
         )
@@ -116,8 +137,22 @@ fun PostDetailScreen(
                         }
                     }
                     items(state.comments, key = { it.id }) { comment ->
-                        CommentRow(comment, enabled = !viewModel.isWorking, onDelete = { viewModel.deleteComment(comment) })
+                        CommentRow(
+                            comment,
+                            enabled = !viewModel.isWorking,
+                            onDelete = { viewModel.deleteComment(comment) },
+                            onReport = { viewModel.requestReport(ReportTarget.COMMENT, comment.id) },
+                            onBlock = { viewModel.requestBlock(comment.author) },
+                        )
                     }
+                }
+                if (viewModel.reportSent) {
+                    Text(
+                        stringResource(R.string.report_sent),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = Spacing.md),
+                    )
                 }
                 viewModel.actionError?.let { error ->
                     Text(
@@ -146,6 +181,22 @@ fun PostDetailScreen(
         }
     }
 
+    viewModel.reportRequest?.let { request ->
+        ReportDialog(
+            target = request.target,
+            submitting = viewModel.isWorking,
+            onSubmit = viewModel::submitReport,
+            onDismiss = viewModel::cancelReport,
+        )
+    }
+    viewModel.blockRequest?.let { author ->
+        BlockDialog(
+            name = author.fullName ?: author.username?.let { "@$it" } ?: stringResource(R.string.author_unknown),
+            onConfirm = viewModel::confirmBlock,
+            onDismiss = viewModel::cancelBlock,
+        )
+    }
+
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
@@ -163,7 +214,7 @@ fun PostDetailScreen(
 }
 
 @Composable
-private fun CommentRow(comment: Comment, enabled: Boolean, onDelete: () -> Unit) {
+private fun CommentRow(comment: Comment, enabled: Boolean, onDelete: () -> Unit, onReport: () -> Unit, onBlock: () -> Unit) {
     Row(
         verticalAlignment = Alignment.Top,
         modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.md),
@@ -176,6 +227,14 @@ private fun CommentRow(comment: Comment, enabled: Boolean, onDelete: () -> Unit)
             IconButton(onClick = onDelete, enabled = enabled) {
                 Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete_comment))
             }
+        } else {
+            OverflowMenu(
+                enabled = enabled,
+                actions = listOf(
+                    MenuAction(R.string.report_comment, onReport),
+                    MenuAction(R.string.action_block_user, onBlock),
+                ),
+            )
         }
     }
 }

@@ -31,4 +31,9 @@ object AppConfig {
     const val ANALYZE_REQUIREMENT_FUNCTION = "analyze-requirement"
     const val PUBLISH_REQUIREMENT_FUNCTION = "publish-requirement"
     const val VERIFY_PURCHASE_FUNCTION = "verify-purchase"
+    const val DELETE_ACCOUNT_FUNCTION = "delete-account"
+    const val DELETE_ACCOUNT_CONFIRMATION = "DELETE"
+
+    /** Public privacy policy page required by Google Play; empty when the build was made without it. */
+    val privacyPolicyUrl: String = BuildConfig.PRIVACY_POLICY_URL.takeIf { it.startsWith("https://") }.orEmpty()
 }

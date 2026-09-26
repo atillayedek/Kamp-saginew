@@ -11,6 +11,7 @@ supabase db push                       # supabase/migrations/* (üniversite list
 supabase functions deploy submit-student-document
 supabase functions deploy analyze-requirement
 supabase functions deploy publish-requirement
+supabase functions deploy delete-account
 ```
 
 - **Auth → URL Configuration:** Redirect URL'lere `kampusagi://auth-callback` ve `kampusagi://auth-callback?type=recovery` eklenir.
@@ -52,10 +53,18 @@ supabase secrets set OPENAI_API_KEY=... OPENAI_CHAT_MODEL=... OPENAI_EMBEDDING_M
    ```
 5. Billing yalnızca Play'den (iç test kanalı dahil) kurulan sürümde çalışır.
 
+### Hesap silme ve gizlilik (Google Play zorunlulukları)
+
+1. `delete-account` Edge Function'ı deploy edilmiş olmalı (yukarıda). Ek secret gerekmez; `SUPABASE_SERVICE_ROLE_KEY` Supabase tarafından sağlanır.
+2. **Gizlilik politikası:** herkese açık bir `https://` sayfası yayınla ve adresini `PRIVACY_POLICY_URL` olarak ver
+   (GitHub → Settings → Variables → Actions → `PRIVACY_POLICY_URL`, yerelde `local.properties`). Aynı adres Play Console → Uygulama içeriği → Gizlilik politikası alanına girilir.
+   Politikada şikayet edilen mesajların yöneticilere gösterildiği belirtilmelidir.
+3. **Web'den hesap silme talebi:** Play Console, uygulamayı kurmadan da silme talebi yapılabilen bir web adresi ister (Veri güvenliği → Hesap silme). Bu repo bir web sayfası içermez; ürün sahibinin bu sayfayı sağlaması gerekir.
+
 ## 3. İlk yönetici
 
 Supabase Dashboard → Authentication → kullanıcı → **app_metadata**: `{"role": "admin"}` (yalnızca service role/Dashboard yazabilir).
-Kullanıcı yeniden giriş yaptığında (yeni JWT) uygulamada "Doğrulama başvuruları" görünür.
+Kullanıcı yeniden giriş yaptığında (yeni JWT) uygulamada "Yönetim" ekranı (doğrulamalar + şikayetler) görünür.
 
 ## 4. Android build
 

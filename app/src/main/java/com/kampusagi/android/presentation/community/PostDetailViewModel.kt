@@ -9,12 +9,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
+import com.kampusagi.android.domain.model.Author
 import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.ReportReason
+import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.domain.repository.CommunityRepository
+import com.kampusagi.android.domain.repository.ModerationRepository
 import com.kampusagi.android.domain.usecase.AddCommentUseCase
 import com.kampusagi.android.domain.usecase.PostTextValidator
 import com.kampusagi.android.presentation.main.PostDetailRoute
+import com.kampusagi.android.presentation.moderation.ReportRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -31,6 +36,7 @@ class PostDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: CommunityRepository,
     private val addComment: AddCommentUseCase,
+    private val moderation: ModerationRepository,
 ) : ViewModel() {
 
     private val postId = savedStateHandle.toRoute<PostDetailRoute>().postId
@@ -49,6 +55,20 @@ class PostDetailViewModel @Inject constructor(
 
     /** Set once the post was deleted, so the screen can close. */
     var deleted by mutableStateOf(false)
+        private set
+
+    var reportRequest by mutableStateOf<ReportRequest?>(null)
+        private set
+
+    var blockRequest by mutableStateOf<Author?>(null)
+        private set
+
+    /** Shown once a report was accepted. */
+    var reportSent by mutableStateOf(false)
+        private set
+
+    /** Set when the post's author was blocked, so the screen can close and the feed drop their posts. */
+    var blockedAuthorId by mutableStateOf<String?>(null)
         private set
 
     val canSendComment: Boolean get() = !isWorking && PostTextValidator.isValidComment(commentText)
@@ -105,6 +125,59 @@ class PostDetailViewModel @Inject constructor(
                 null
             }
             is AppResult.Failure -> result.error
+        }
+    }
+
+    fun requestReport(target: ReportTarget, id: String) {
+        reportRequest = ReportRequest(target, id)
+        reportSent = false
+    }
+
+    fun cancelReport() {
+        reportRequest = null
+    }
+
+    fun submitReport(reason: ReportReason, details: String?) {
+        val request = reportRequest ?: return
+        runAction {
+            when (val result = moderation.report(request.target, request.id, reason, details)) {
+                is AppResult.Success -> {
+                    reportRequest = null
+                    reportSent = true
+                    null
+                }
+                is AppResult.Failure -> {
+                    reportRequest = null
+                    result.error
+                }
+            }
+        }
+    }
+
+    fun requestBlock(author: Author) {
+        blockRequest = author
+    }
+
+    fun cancelBlock() {
+        blockRequest = null
+    }
+
+    /** Blocking the post's author closes the post; blocking a commenter hides their comments. */
+    fun confirmBlock() {
+        val author = blockRequest ?: return
+        blockRequest = null
+        runAction {
+            when (val result = moderation.block(author.id)) {
+                is AppResult.Success -> {
+                    if ((state as? PostDetailState.Loaded)?.post?.author?.id == author.id) {
+                        blockedAuthorId = author.id
+                    } else {
+                        reload()
+                    }
+                    null
+                }
+                is AppResult.Failure -> result.error
+            }
         }
     }
 

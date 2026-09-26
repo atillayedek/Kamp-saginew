@@ -56,6 +56,7 @@ import com.kampusagi.android.presentation.requirement.CreateRequirementScreen
 import com.kampusagi.android.presentation.requirement.MatchesScreen
 import com.kampusagi.android.presentation.requirement.RequirementsScreen
 import com.kampusagi.android.presentation.requirement.RequirementsViewModel
+import com.kampusagi.android.presentation.settings.SettingsScreen
 
 private enum class Tab(val route: Any, val label: Int, val icon: ImageVector) {
     COMMUNITY(FeedRoute, R.string.tab_community, Icons.Outlined.Forum),
@@ -159,6 +160,7 @@ fun MainScreen(
                     onBack = { navController.popBackStack() },
                     onPostChanged = feedViewModel::onPostChanged,
                     onPostDeleted = feedViewModel::onPostDeleted,
+                    onAuthorBlocked = feedViewModel::onAuthorBlocked,
                 )
             }
             composable<CreatePostRoute> {
@@ -195,6 +197,11 @@ fun MainScreen(
                         conversationsViewModel.load()
                         navController.popBackStack()
                     },
+                    onBlocked = {
+                        conversationsViewModel.load()
+                        feedViewModel.refresh()
+                        navController.popBackStack()
+                    },
                 )
             }
             composable<CreateRequirementRoute> {
@@ -226,11 +233,22 @@ fun MainScreen(
                     isAdmin = isAdmin,
                     onOpenAdmin = onOpenAdmin,
                     onOpenPremium = { navController.navigate(PremiumRoute) },
+                    onOpenSettings = { navController.navigate(SettingsRoute) },
                     onSignOut = onSignOut,
                 )
             }
             composable<PremiumRoute> {
                 PremiumScreen(onBack = { navController.popBackStack() })
+            }
+            composable<SettingsRoute> {
+                SettingsScreen(
+                    onBack = {
+                        // Unblocked people reappear in the feed and chats.
+                        feedViewModel.refresh()
+                        conversationsViewModel.load()
+                        navController.popBackStack()
+                    },
+                )
             }
         }
     }

@@ -36,6 +36,7 @@ val firebaseProjectId = config("FIREBASE_PROJECT_ID")
 val firebaseAppId = config("FIREBASE_APP_ID")
 val firebaseApiKey = config("FIREBASE_API_KEY")
 val firebaseSenderId = config("FIREBASE_SENDER_ID")
+val privacyPolicyUrl = config("PRIVACY_POLICY_URL")
 
 val releaseStoreFile = config("KAMPUSAGI_KEYSTORE_FILE", keystoreProperties)
 val hasReleaseSigning = releaseStoreFile.isNotEmpty() && rootProject.file(releaseStoreFile).exists()
@@ -57,6 +58,7 @@ android {
         buildConfigField("String", "FIREBASE_APP_ID", "\"$firebaseAppId\"")
         buildConfigField("String", "FIREBASE_API_KEY", "\"$firebaseApiKey\"")
         buildConfigField("String", "FIREBASE_SENDER_ID", "\"$firebaseSenderId\"")
+        buildConfigField("String", "PRIVACY_POLICY_URL", "\"$privacyPolicyUrl\"")
     }
 
     signingConfigs {

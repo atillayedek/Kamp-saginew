@@ -196,3 +196,30 @@ data class VerifyPurchaseRequestDto(
     @SerialName("product_id") val productId: String,
     @SerialName("purchase_token") val purchaseToken: String,
 )
+
+@Serializable
+data class BlockedUserDto(
+    @SerialName("user_id") val userId: String,
+    @SerialName("full_name") val fullName: String? = null,
+    val username: String? = null,
+    @SerialName("blocked_at") val blockedAt: String,
+)
+
+@Serializable
+data class OpenReportDto(
+    @SerialName("report_id") val reportId: String,
+    @SerialName("target_kind") val targetKind: String,
+    @SerialName("target_excerpt") val targetExcerpt: String,
+    val reason: String,
+    val details: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("report_count") val reportCount: Int,
+    @SerialName("reporter_username") val reporterUsername: String? = null,
+    @SerialName("target_user_id") val targetUserId: String,
+    @SerialName("target_full_name") val targetFullName: String? = null,
+    @SerialName("target_username") val targetUsername: String? = null,
+    @SerialName("target_account_status") val targetAccountStatus: String,
+)
+
+@Serializable
+data class DeleteAccountRequestDto(val confirm: String)

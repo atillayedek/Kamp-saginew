@@ -2,21 +2,25 @@ package com.kampusagi.android.core.di
 
 import com.kampusagi.android.data.document.ContentResolverDocumentReader
 import com.kampusagi.android.data.push.PushRepositoryImpl
+import com.kampusagi.android.data.repository.AccountRepositoryImpl
 import com.kampusagi.android.data.repository.AdminRepositoryImpl
 import com.kampusagi.android.data.repository.AuthRepositoryImpl
 import com.kampusagi.android.data.repository.ChatRepositoryImpl
 import com.kampusagi.android.data.repository.CommunityRepositoryImpl
+import com.kampusagi.android.data.repository.ModerationRepositoryImpl
 import com.kampusagi.android.data.repository.NotificationRepositoryImpl
 import com.kampusagi.android.data.repository.PremiumRepositoryImpl
 import com.kampusagi.android.data.repository.ProfileRepositoryImpl
 import com.kampusagi.android.data.repository.RequirementRepositoryImpl
 import com.kampusagi.android.data.repository.UniversityRepositoryImpl
 import com.kampusagi.android.data.repository.VerificationRepositoryImpl
+import com.kampusagi.android.domain.repository.AccountRepository
 import com.kampusagi.android.domain.repository.AdminRepository
 import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ChatRepository
 import com.kampusagi.android.domain.repository.CommunityRepository
 import com.kampusagi.android.domain.repository.DocumentReader
+import com.kampusagi.android.domain.repository.ModerationRepository
 import com.kampusagi.android.domain.repository.NotificationRepository
 import com.kampusagi.android.domain.repository.PremiumRepository
 import com.kampusagi.android.domain.repository.PushRepository
@@ -43,5 +47,7 @@ abstract class RepositoryModule {
     @Binds abstract fun bindNotificationRepository(impl: NotificationRepositoryImpl): NotificationRepository
     @Binds abstract fun bindPushRepository(impl: PushRepositoryImpl): PushRepository
     @Binds abstract fun bindPremiumRepository(impl: PremiumRepositoryImpl): PremiumRepository
+    @Binds abstract fun bindModerationRepository(impl: ModerationRepositoryImpl): ModerationRepository
+    @Binds abstract fun bindAccountRepository(impl: AccountRepositoryImpl): AccountRepository
     @Binds abstract fun bindDocumentReader(impl: ContentResolverDocumentReader): DocumentReader
 }

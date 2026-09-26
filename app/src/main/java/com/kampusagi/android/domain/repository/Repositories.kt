@@ -3,6 +3,7 @@ package com.kampusagi.android.domain.repository
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.AuthRedirectResult
 import com.kampusagi.android.domain.model.AuthState
+import com.kampusagi.android.domain.model.BlockedUser
 import com.kampusagi.android.domain.model.ChatMessage
 import com.kampusagi.android.domain.model.Conversation
 import com.kampusagi.android.domain.model.Comment
@@ -11,6 +12,7 @@ import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.model.MessageCursor
 import com.kampusagi.android.domain.model.AppNotification
+import com.kampusagi.android.domain.model.OpenReport
 import com.kampusagi.android.domain.model.PendingVerification
 import com.kampusagi.android.domain.model.Plan
 import com.kampusagi.android.domain.model.StoreOffer
@@ -22,6 +24,9 @@ import com.kampusagi.android.domain.model.ProfileDraft
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.model.Requirement
 import com.kampusagi.android.domain.model.RequirementDraft
+import com.kampusagi.android.domain.model.ReportAction
+import com.kampusagi.android.domain.model.ReportReason
+import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.model.University
 import com.kampusagi.android.domain.model.Verification
@@ -158,4 +163,25 @@ interface PremiumRepository {
 
     /** Sends a Google Play purchase to the backend, which verifies it with Google. */
     suspend fun verify(purchase: StorePurchase): AppResult<Unit>
+}
+
+/** Blocking and reporting for students; the report queue for admins. */
+interface ModerationRepository {
+    suspend fun block(userId: String): AppResult<Unit>
+    suspend fun unblock(userId: String): AppResult<Unit>
+    suspend fun blockedUsers(): AppResult<List<BlockedUser>>
+
+    /** Reporting the same thing again while it is open is not an error. */
+    suspend fun report(target: ReportTarget, targetId: String, reason: ReportReason, details: String?): AppResult<Unit>
+
+    /** The other member of a conversation, for blocking or reporting them from the chat. */
+    suspend fun conversationPartner(conversationId: String): AppResult<String>
+
+    suspend fun openReports(): AppResult<List<OpenReport>>
+    suspend fun resolve(reportId: String, action: ReportAction): AppResult<Unit>
+}
+
+interface AccountRepository {
+    /** Permanently deletes the signed-in account on the server, then ends the local session. */
+    suspend fun deleteAccount(): AppResult<Unit>
 }

@@ -12,8 +12,12 @@ import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.ChatMessage
 import com.kampusagi.android.domain.model.MessageCursor
+import com.kampusagi.android.domain.model.ReportReason
+import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.domain.repository.ChatRepository
+import com.kampusagi.android.domain.repository.ModerationRepository
 import com.kampusagi.android.presentation.main.ChatRoute
+import com.kampusagi.android.presentation.moderation.ReportRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -41,6 +45,7 @@ data class ChatState(
 class ChatViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: ChatRepository,
+    private val moderation: ModerationRepository,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<ChatRoute>()
@@ -51,6 +56,24 @@ class ChatViewModel @Inject constructor(
 
     var draft by mutableStateOf("")
         private set
+
+    var reportRequest by mutableStateOf<ReportRequest?>(null)
+        private set
+
+    var blockRequested by mutableStateOf(false)
+        private set
+
+    var moderationBusy by mutableStateOf(false)
+        private set
+
+    var reportSent by mutableStateOf(false)
+        private set
+
+    /** True once the other person was blocked; the screen closes. */
+    var blocked by mutableStateOf(false)
+        private set
+
+    private var partnerId: String? = null
 
     init {
         refresh(markRead = true)
@@ -80,6 +103,85 @@ class ChatViewModel @Inject constructor(
     fun retry(message: OutgoingMessage) {
         state = state.copy(outgoing = state.outgoing.map { if (it.id == message.id) it.copy(failed = false) else it })
         deliver(message)
+    }
+
+    fun requestMessageReport(message: ChatMessage) {
+        if (!message.isMine) reportRequest = ReportRequest(ReportTarget.MESSAGE, message.id)
+    }
+
+    fun requestUserReport() {
+        // The id is filled in when the partner is known (see submitReport).
+        reportRequest = ReportRequest(ReportTarget.USER, id = "")
+    }
+
+    fun cancelReport() {
+        reportRequest = null
+    }
+
+    fun submitReport(reason: ReportReason, details: String?) {
+        val request = reportRequest ?: return
+        reportRequest = null
+        moderate {
+            val targetId = if (request.target == ReportTarget.USER) {
+                when (val partner = partner()) {
+                    is AppResult.Success -> partner.value
+                    is AppResult.Failure -> return@moderate partner.error
+                }
+            } else {
+                request.id
+            }
+            when (val result = moderation.report(request.target, targetId, reason, details)) {
+                is AppResult.Success -> {
+                    reportSent = true
+                    null
+                }
+                is AppResult.Failure -> result.error
+            }
+        }
+    }
+
+    fun requestBlock() {
+        blockRequested = true
+    }
+
+    fun cancelBlock() {
+        blockRequested = false
+    }
+
+    fun confirmBlock() {
+        blockRequested = false
+        moderate {
+            val partner = when (val result = partner()) {
+                is AppResult.Success -> result.value
+                is AppResult.Failure -> return@moderate result.error
+            }
+            when (val result = moderation.block(partner)) {
+                is AppResult.Success -> {
+                    blocked = true
+                    null
+                }
+                is AppResult.Failure -> result.error
+            }
+        }
+    }
+
+    private suspend fun partner(): AppResult<String> {
+        partnerId?.let { return AppResult.Success(it) }
+        return when (val result = moderation.conversationPartner(route.conversationId)) {
+            is AppResult.Success -> result.also { partnerId = it.value }
+            is AppResult.Failure -> result
+        }
+    }
+
+    private fun moderate(action: suspend () -> AppError?) {
+        if (moderationBusy) return
+        moderationBusy = true
+        reportSent = false
+        viewModelScope.launch {
+            val error = action()
+            if (error != null) state = state.copy(error = error)
+            moderationBusy = false
+        }
     }
 
     fun loadOlder() {

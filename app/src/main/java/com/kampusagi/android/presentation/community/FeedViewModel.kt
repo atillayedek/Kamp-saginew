@@ -101,6 +101,14 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    /** Drops a blocked person's posts at once; the server leaves them out of every later page. */
+    fun onAuthorBlocked(userId: String) {
+        PostScope.entries.forEach { scope ->
+            val current = state(scope)
+            feeds[scope] = current.copy(posts = current.posts.filterNot { it.author.id == userId })
+        }
+    }
+
     /** Optimistic: the heart changes at once and is rolled back if the server refuses. */
     fun toggleLike(post: Post) {
         val liked = !post.likedByMe

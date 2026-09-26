@@ -95,6 +95,9 @@ private fun knownCode(text: String): AppError? = when {
     "plan_not_available" in text -> AppError.PLAN_NOT_AVAILABLE
     "purchase_not_active" in text -> AppError.PURCHASE_NOT_ACTIVE
     "purchase_not_for_account" in text || "purchase_belongs_to_another_account" in text -> AppError.PURCHASE_NOT_FOR_ACCOUNT
+    "user_not_found" in text || "report_target_not_found" in text || "report_not_found" in text -> AppError.NOT_FOUND
+    "invalid_report" in text || "invalid_action" in text || "confirmation_required" in text -> AppError.INVALID_INPUT
+    "account_deletion_failed" in text -> AppError.SERVER
     "rate_limited" in text -> AppError.RATE_LIMITED
     else -> null
 }

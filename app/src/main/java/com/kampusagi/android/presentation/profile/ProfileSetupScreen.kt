@@ -43,6 +43,7 @@ import com.kampusagi.android.domain.usecase.ProfileInputError
 import com.kampusagi.android.presentation.auth.AuthScaffold
 import com.kampusagi.android.presentation.auth.ErrorBanner
 import com.kampusagi.android.presentation.common.messageRes
+import com.kampusagi.android.presentation.settings.DeleteAccountSection
 import java.util.Locale
 
 @Composable
@@ -113,6 +114,7 @@ fun ProfileSetupScreen(
             SecondaryButton(text = stringResource(R.string.action_cancel), onClick = onDone, enabled = !form.isSubmitting)
         }
         LinkButton(stringResource(R.string.action_sign_out), onSignOut, enabled = !form.isSubmitting)
+        DeleteAccountSection()
     }
 
     val loaded = universities as? UniversitiesState.Loaded

@@ -1,6 +1,6 @@
 package com.kampusagi.android.presentation.chat
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,15 +43,21 @@ import com.kampusagi.android.domain.model.Author
 import com.kampusagi.android.domain.model.ChatMessage
 import com.kampusagi.android.presentation.common.messageRes
 import com.kampusagi.android.presentation.common.relativeTime
+import com.kampusagi.android.presentation.moderation.BlockDialog
+import com.kampusagi.android.presentation.moderation.MenuAction
+import com.kampusagi.android.presentation.moderation.OverflowMenu
+import com.kampusagi.android.presentation.moderation.ReportDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     onBack: () -> Unit,
+    onBlocked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChatViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state
+    LaunchedEffect(viewModel.blocked) { if (viewModel.blocked) onBlocked() }
     Column(modifier = modifier.fillMaxSize().imePadding()) {
         TopAppBar(
             title = { Text(viewModel.title) },
@@ -59,6 +65,15 @@ fun ChatScreen(
                 IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
+            },
+            actions = {
+                OverflowMenu(
+                    enabled = !viewModel.moderationBusy,
+                    actions = listOf(
+                        MenuAction(R.string.report_user, viewModel::requestUserReport),
+                        MenuAction(R.string.action_block_user, viewModel::requestBlock),
+                    ),
+                )
             },
         )
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -78,6 +93,14 @@ fun ChatScreen(
                 )
                 else -> MessageList(state, viewModel)
             }
+        }
+        if (viewModel.reportSent) {
+            Text(
+                stringResource(R.string.report_sent),
+                color = MaterialTheme.colorScheme.secondary,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = Spacing.md),
+            )
         }
         if (state.loaded && state.error != null) {
             Text(
@@ -99,6 +122,18 @@ fun ChatScreen(
                 Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = stringResource(R.string.action_send_message))
             }
         }
+    }
+
+    viewModel.reportRequest?.let { request ->
+        ReportDialog(
+            target = request.target,
+            submitting = viewModel.moderationBusy,
+            onSubmit = viewModel::submitReport,
+            onDismiss = viewModel::cancelReport,
+        )
+    }
+    if (viewModel.blockRequested) {
+        BlockDialog(name = viewModel.title, onConfirm = viewModel::confirmBlock, onDismiss = viewModel::cancelBlock)
     }
 }
 
@@ -131,6 +166,8 @@ private fun MessageList(state: ChatState, viewModel: ChatViewModel) {
                 time = relativeTime(message.createdAt),
                 // Receipt only under the newest own message, like most messengers.
                 status = if (message.id == lastMine) receipt(message) else null,
+                // Long-press on the other person's message to report it.
+                onLongClick = if (message.isMine) null else ({ viewModel.requestMessageReport(message) }),
             )
         }
         if (state.olderAvailable) {
@@ -155,7 +192,9 @@ private fun Bubble(
     status: String? = null,
     statusIsError: Boolean = false,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
+    val reportLabel = stringResource(R.string.report_message)
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = if (mine) Alignment.End else Alignment.Start,
@@ -166,7 +205,17 @@ private fun Bubble(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .widthIn(max = 300.dp)
-                .let { if (onClick != null) it.clickable(onClick = onClick) else it },
+                .let {
+                    if (onClick != null || onLongClick != null) {
+                        it.combinedClickable(
+                            onClick = onClick ?: {},
+                            onLongClickLabel = if (onLongClick != null) reportLabel else null,
+                            onLongClick = onLongClick,
+                        )
+                    } else {
+                        it
+                    }
+                },
         ) {
             Text(body, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(Spacing.sm))
         }

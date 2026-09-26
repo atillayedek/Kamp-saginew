@@ -42,3 +42,17 @@ class BillingErrorMappingTest {
         assertEquals(AppError.RECIPIENT_NOT_AVAILABLE, functionError(400, """{"error":"recipient_not_available"}"""))
     }
 }
+
+class ModerationErrorMappingTest {
+    @Test
+    fun `maps moderation and account deletion codes`() {
+        assertEquals(AppError.NOT_FOUND, functionError(400, """{"message":"user_not_found"}"""))
+        assertEquals(AppError.NOT_FOUND, functionError(400, """{"message":"report_target_not_found"}"""))
+        assertEquals(AppError.NOT_FOUND, functionError(400, """{"message":"report_not_found"}"""))
+        assertEquals(AppError.INVALID_INPUT, functionError(400, """{"message":"invalid_report"}"""))
+        assertEquals(AppError.INVALID_INPUT, functionError(400, """{"message":"invalid_action"}"""))
+        assertEquals(AppError.ADMIN_REQUIRED, functionError(400, """{"message":"admin_required"}"""))
+        assertEquals(AppError.INVALID_INPUT, functionError(400, """{"error":"confirmation_required"}"""))
+        assertEquals(AppError.SERVER, functionError(500, """{"error":"account_deletion_failed"}"""))
+    }
+}

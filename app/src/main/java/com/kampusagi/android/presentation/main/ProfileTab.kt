@@ -23,6 +23,7 @@ fun ProfileTab(
     isAdmin: Boolean,
     onOpenAdmin: () -> Unit,
     onOpenPremium: () -> Unit,
+    onOpenSettings: () -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -41,6 +42,7 @@ fun ProfileTab(
             color = MaterialTheme.colorScheme.secondary,
         )
         SecondaryButton(text = stringResource(R.string.premium_title), onClick = onOpenPremium)
+        SecondaryButton(text = stringResource(R.string.settings_title), onClick = onOpenSettings)
         if (isAdmin) SecondaryButton(text = stringResource(R.string.action_open_admin), onClick = onOpenAdmin)
         LinkButton(text = stringResource(R.string.action_sign_out), onClick = onSignOut)
     }

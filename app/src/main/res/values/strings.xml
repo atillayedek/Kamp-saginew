@@ -286,4 +286,58 @@
     <string name="premium_activated">Premium etkinleştirildi.</string>
     <string name="premium_pending">Ödemen onay bekliyor. Onaylandığında Premium etkinleşecek.</string>
     <string name="premium_nothing_to_restore">Bu Google Play hesabında aktif abonelik bulunamadı.</string>
+
+    <!-- Moderation -->
+    <string name="cd_more_actions">Diğer işlemler</string>
+    <string name="report_post">Gönderiyi şikayet et</string>
+    <string name="report_comment">Yorumu şikayet et</string>
+    <string name="report_user">Kullanıcıyı şikayet et</string>
+    <string name="report_message">Mesajı şikayet et</string>
+    <string name="report_body">Şikayetin yöneticilere iletilir. Kimin şikayet ettiği karşı tarafa gösterilmez.</string>
+    <string name="report_details">Açıklama (isteğe bağlı)</string>
+    <string name="report_reason_spam">Spam veya reklam</string>
+    <string name="report_reason_harassment">Taciz veya zorbalık</string>
+    <string name="report_reason_inappropriate">Uygunsuz içerik</string>
+    <string name="report_reason_fake_profile">Sahte profil</string>
+    <string name="report_reason_other">Diğer</string>
+    <string name="action_send_report">Şikayet et</string>
+    <string name="report_sent">Şikayetin alındı. Yöneticiler inceleyecek.</string>
+    <string name="action_block_user">Kullanıcıyı engelle</string>
+    <string name="action_block">Engelle</string>
+    <string name="action_unblock">Engeli kaldır</string>
+    <string name="block_title">%1$s engellensin mi?</string>
+    <string name="block_body">Birbirinizin gönderilerini, yorumlarını, ilanlarını ve mesajlarını artık görmezsiniz; birbirinize mesaj gönderemezsiniz. Karşı tarafa bildirim gitmez. Engeli Ayarlar\'dan kaldırabilirsin.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_blocked_title">Engellenen kullanıcılar</string>
+    <string name="settings_blocked_empty">Kimseyi engellemedin.</string>
+    <string name="settings_privacy_title">Gizlilik</string>
+    <string name="settings_privacy_open">Gizlilik politikasını aç</string>
+    <string name="settings_privacy_not_configured">Gizlilik politikası bağlantısı bu sürümde tanımlı değil.</string>
+    <string name="settings_no_browser">Bağlantıyı açacak bir tarayıcı bulunamadı.</string>
+    <string name="delete_account_title">Hesabı sil</string>
+    <string name="delete_account_summary">Hesabın ve ona bağlı tüm veriler (profil, belge, gönderiler, yorumlar, ilanlar, mesajlar, bildirimler) kalıcı olarak silinir.</string>
+    <string name="action_delete_account">Hesabımı sil</string>
+    <string name="delete_account_confirm_title">Hesabın kalıcı olarak silinsin mi?</string>
+    <string name="delete_account_confirm_body">Bu işlem geri alınamaz. Premium aboneliğin varsa Google Play tarafından faturalandırılmaya devam eder; Google Play → Ödemeler ve abonelikler bölümünden ayrıca iptal etmelisin.</string>
+
+    <!-- Admin reports -->
+    <string name="admin_panel_title">Yönetim</string>
+    <string name="admin_tab_verifications">Doğrulamalar</string>
+    <string name="admin_tab_reports">Şikayetler</string>
+    <string name="admin_reports_load_failed">Şikayetler yüklenemedi</string>
+    <string name="admin_reports_empty_title">Açık şikayet yok</string>
+    <string name="admin_reports_empty_body">Yeni şikayetler burada görünür.</string>
+    <string name="admin_report_reason">Neden: %1$s · %2$d şikayet</string>
+    <string name="admin_report_details">Açıklama: %1$s</string>
+    <string name="admin_report_people">Hakkında: %1$s · Şikayet eden: @%2$s</string>
+    <string name="admin_report_user_suspended">Bu kullanıcı zaten askıya alınmış.</string>
+    <string name="admin_action_dismiss">Reddet</string>
+    <string name="admin_action_remove">İçeriği kaldır</string>
+    <string name="admin_action_suspend">Kullanıcıyı askıya al</string>
+    <string name="admin_confirm_dismiss">Şikayet işlem yapılmadan kapatılır. Aynı içerikle ilgili diğer açık şikayetler de kapanır.</string>
+    <string name="admin_confirm_remove">İçerik herkes için kaldırılır. Aynı içerikle ilgili diğer açık şikayetler de kapanır.</string>
+    <string name="admin_confirm_suspend">Kullanıcının hesabı askıya alınır ve uygulamayı kullanamaz. Bu kullanıcı hakkındaki tüm açık şikayetler kapanır.</string>
+    <string name="action_confirm">Onayla</string>
 </resources>

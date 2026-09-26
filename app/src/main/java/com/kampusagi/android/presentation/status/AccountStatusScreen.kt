@@ -31,6 +31,7 @@ import com.kampusagi.android.domain.model.AccountStatus
 import com.kampusagi.android.domain.model.Profile
 import com.kampusagi.android.domain.model.VerificationStatus
 import com.kampusagi.android.presentation.common.messageRes
+import com.kampusagi.android.presentation.settings.DeleteAccountSection
 
 /**
  * Shows where the account is in the verification lifecycle. The status comes
@@ -95,6 +96,7 @@ fun AccountStatusScreen(
             enabled = !viewModel.isUploading,
         )
         LinkButton(text = stringResource(R.string.action_sign_out), onClick = onSignOut, enabled = !viewModel.isUploading)
+        DeleteAccountSection()
     }
 }
 

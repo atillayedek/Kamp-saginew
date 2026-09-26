@@ -24,12 +24,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -58,6 +61,7 @@ fun AdminReviewScreen(
     val context = LocalContext.current
     var noViewer by rememberSaveable { mutableStateOf(false) }
     var rejecting by rememberSaveable { mutableStateOf<String?>(null) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(viewModel) {
         viewModel.documentsToOpen.collect { file ->
@@ -77,54 +81,62 @@ fun AdminReviewScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         TopAppBar(
-            title = { Text(stringResource(R.string.admin_title)) },
+            title = { Text(stringResource(R.string.admin_panel_title)) },
             navigationIcon = {
                 IconButton(onClick = onClose) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
-        val error: AppError? = viewModel.actionError
-        if (error != null || noViewer) {
-            Text(
-                text = if (noViewer) stringResource(R.string.admin_no_pdf_viewer) else stringResource(error!!.messageRes()),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.sm),
-            )
+        PrimaryTabRow(selectedTabIndex = tab) {
+            Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(R.string.admin_tab_verifications)) })
+            Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(stringResource(R.string.admin_tab_reports)) })
         }
-        when (val list = viewModel.list) {
-            PendingListState.Loading -> LoadingView()
-            is PendingListState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
-                title = stringResource(R.string.admin_load_failed),
-                body = stringResource(list.error.messageRes()),
-            ) {
-                PrimaryButton(text = stringResource(R.string.action_retry), onClick = viewModel::refresh)
+        if (tab == 1) {
+            AdminReportsContent()
+        } else {
+            val error: AppError? = viewModel.actionError
+            if (error != null || noViewer) {
+                Text(
+                    text = if (noViewer) stringResource(R.string.admin_no_pdf_viewer) else stringResource(error!!.messageRes()),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                )
             }
-            is PendingListState.Loaded -> if (list.items.isEmpty()) {
-                MessageView(
-                    icon = Icons.Outlined.Inbox,
-                    title = stringResource(R.string.admin_empty_title),
-                    body = stringResource(R.string.admin_empty_body),
+            when (val list = viewModel.list) {
+                PendingListState.Loading -> LoadingView()
+                is PendingListState.Failed -> MessageView(
+                    icon = Icons.Outlined.CloudOff,
+                    title = stringResource(R.string.admin_load_failed),
+                    body = stringResource(list.error.messageRes()),
                 ) {
-                    PrimaryButton(text = stringResource(R.string.action_refresh_status), onClick = viewModel::refresh)
+                    PrimaryButton(text = stringResource(R.string.action_retry), onClick = viewModel::refresh)
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.md),
-                ) {
-                    items(list.items, key = { it.verificationId }) { item ->
-                        PendingCard(
-                            item = item,
-                            busy = viewModel.busyId == item.verificationId,
-                            enabled = viewModel.busyId == null,
-                            onOpen = { viewModel.openDocument(item) },
-                            onApprove = { viewModel.approve(item) },
-                            onReject = { rejecting = item.verificationId },
-                        )
+                is PendingListState.Loaded -> if (list.items.isEmpty()) {
+                    MessageView(
+                        icon = Icons.Outlined.Inbox,
+                        title = stringResource(R.string.admin_empty_title),
+                        body = stringResource(R.string.admin_empty_body),
+                    ) {
+                        PrimaryButton(text = stringResource(R.string.action_refresh_status), onClick = viewModel::refresh)
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.md),
+                    ) {
+                        items(list.items, key = { it.verificationId }) { item ->
+                            PendingCard(
+                                item = item,
+                                busy = viewModel.busyId == item.verificationId,
+                                enabled = viewModel.busyId == null,
+                                onOpen = { viewModel.openDocument(item) },
+                                onApprove = { viewModel.approve(item) },
+                                onReject = { rejecting = item.verificationId },
+                            )
+                        }
                     }
                 }
             }

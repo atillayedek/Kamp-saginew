@@ -14,3 +14,4 @@ import kotlinx.serialization.Serializable
 @Serializable data class ChatRoute(val conversationId: String, val title: String)
 @Serializable data object NotificationsRoute
 @Serializable data object PremiumRoute
+@Serializable data object SettingsRoute
