@@ -30,4 +30,5 @@ object AppConfig {
     const val SUBMIT_STUDENT_DOCUMENT_FUNCTION = "submit-student-document"
     const val ANALYZE_REQUIREMENT_FUNCTION = "analyze-requirement"
     const val PUBLISH_REQUIREMENT_FUNCTION = "publish-requirement"
+    const val VERIFY_PURCHASE_FUNCTION = "verify-purchase"
 }

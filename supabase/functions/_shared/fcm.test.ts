@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import { accessToken, parseServiceAccount, pushText, safeEqual, sendToDevice, signedAssertion } from "./fcm.ts";
+import { FCM_SCOPE, pushText, safeEqual, sendToDevice } from "./fcm.ts";
+import { accessToken, parseServiceAccount, signedAssertion } from "./google-auth.ts";
 
 async function testAccount() {
   const pair = await crypto.subtle.generateKey(
@@ -44,7 +45,7 @@ Deno.test("service account parsing requires the three fields", () => {
 
 Deno.test("the assertion is a verifiable RS256 JWT with the FCM scope", async () => {
   const { account, publicKey } = await testAccount();
-  const jwt = await signedAssertion(account, 1_800_000_000);
+  const jwt = await signedAssertion(account, FCM_SCOPE, 1_800_000_000);
   const [header, claims, signature] = jwt.split(".");
   assertEquals(JSON.parse(new TextDecoder().decode(decode(header))), { alg: "RS256", typ: "JWT" });
   const payload = JSON.parse(new TextDecoder().decode(decode(claims)));
@@ -61,13 +62,13 @@ Deno.test("the assertion is a verifiable RS256 JWT with the FCM scope", async ()
 Deno.test("access token exchange", async () => {
   const { account } = await testAccount();
   const ok = scriptedFetch(200, JSON.stringify({ access_token: "ya29.token", expires_in: 3599 }));
-  assertEquals(await accessToken(ok.fn, account, 100), { token: "ya29.token", expiresAt: 3699 });
+  assertEquals(await accessToken(ok.fn, account, FCM_SCOPE, 100), { token: "ya29.token", expiresAt: 3699 });
   const form = new URLSearchParams(ok.calls[0].init.body as string);
   assertEquals(form.get("grant_type"), "urn:ietf:params:oauth:grant-type:jwt-bearer");
   assertEquals(form.get("assertion")?.split(".").length, 3);
 
-  await assertRejects(() => accessToken(scriptedFetch(401, "{}").fn, account, 100));
-  await assertRejects(() => accessToken(scriptedFetch(200, "{}").fn, account, 100));
+  await assertRejects(() => accessToken(scriptedFetch(401, "{}").fn, account, FCM_SCOPE, 100));
+  await assertRejects(() => accessToken(scriptedFetch(200, "{}").fn, account, FCM_SCOPE, 100));
 });
 
 Deno.test("send maps FCM answers", async () => {

@@ -13,9 +13,9 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 4 | Ana uygulama iskeleti (alt gezinme) + Topluluklar: gönderi, yorum, beğeni (genel / üniversitem) | Bitti — CI yeşil `dfdaa4e` (4d111da'daki test derleme hatası df07226 ile, RelativeTimeTest beklentisi dfdaa4e ile düzeltildi) |
 | 5 | İhtiyaç oluşturma: OpenAI yapılandırılmış çıktı (backend) + embedding + pgvector | Bitti — CI yeşil `dfdaa4e`. Canlı OpenAI: dış yapılandırma (`docs/DEPLOYMENT.md`) |
 | 6 | Eşleşme: pgvector benzerlik sorgusu, gerçek skor, eşleşme ekranı | Bitti — CI yeşil `dfdaa4e` |
-| 7 | Sohbet: Realtime, gönderildi/okundu | Kod bitti; CI bekleniyor. Yazıyor/çevrimiçi yok (D20) |
+| 7 | Sohbet: Realtime, gönderildi/okundu | Kod bitti; CI `69b1b42` derleme hatası (KampusAgiApp) → `86297d5` ile düzeltildi, CI bekleniyor. Yazıyor/çevrimiçi yok (D20) |
 | 8 | Bildirimler: uygulama içi + FCM push | Kod bitti; CI bekleniyor. Firebase projesi + webhook: dış yapılandırma |
-| 9 | Premium: Google Play Billing + sunucu doğrulaması + entitlement | Bekliyor |
+| 9 | Premium: Google Play Billing + sunucu doğrulaması + entitlement | Kod bitti; CI bekleniyor. Play Console ürünleri + plan içeriği: dış yapılandırma / ürün kararı |
 | 10 | Ayarlar, hesap silme, gizlilik, raporlama/engelleme | Bekliyor |
 | 11 | Release sertleştirme: imza, AAB, R8, erişilebilirlik, son tarama | Bekliyor |
 
@@ -31,3 +31,4 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 - 2026-09-26 — Yerel: SQL 007 (sohbet) PASS; üyelik kontrolü mutasyonu yakalandı. CI `dfdaa4e` (faz 4–6 + test düzeltmeleri) bekleniyor.
 - 2026-09-26 — CI `dfdaa4e`: DB, Edge Function, Android (unit test, lintRelease, APK, AAB) PASS.
 - 2026-09-26 — Yerel: SQL 001–008 PASS, Deno check + 21 test PASS.
+- 2026-09-26 — Yerel: SQL 001–009 PASS, Deno check + 24 test PASS.

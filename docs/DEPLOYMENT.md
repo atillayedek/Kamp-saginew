@@ -39,6 +39,19 @@ supabase secrets set OPENAI_API_KEY=... OPENAI_CHAT_MODEL=... OPENAI_EMBEDDING_M
 4. **Supabase Dashboard → Database → Webhooks:** tablo `public.notifications`, olay `INSERT`, tür "Supabase Edge Functions" → `dispatch-push`, HTTP başlığı `x-webhook-secret: <PUSH_WEBHOOK_SECRET>`.
 5. **Android build değişkenleri (istemciye açık):** `FIREBASE_PROJECT_ID`, `FIREBASE_APP_ID`, `FIREBASE_API_KEY`, `FIREBASE_SENDER_ID` (Firebase → Project settings → General). GitHub repo secret'ı olarak eklenirse CI build'i push'lu olur.
 
+### Premium (Google Play Billing)
+
+1. Play Console'da abonelik ürün(ler)ini oluştur (ör. `kampusagi.plus`) ve temel planı/fiyatı tanımla.
+2. Play Console → Kurulum → API erişimi: bir Google Cloud service account'u bağla, "Finansal verileri görüntüleme" ve "Siparişleri yönetme" izinlerini ver; JSON anahtarını `GOOGLE_PLAY_SERVICE_ACCOUNT` secret'ı yap. `ANDROID_PACKAGE_NAME=com.kampusagi.android`.
+3. `supabase functions deploy verify-purchase`
+4. Planı veritabanına ekle (ürün sahibi kararı; örnek değil, şablon):
+   ```sql
+   insert into public.subscription_plans (play_product_id, name, description, is_active,
+       ai_analyze_daily, ai_publish_daily, max_active_requirements)
+   values ('<play ürün kimliği>', '<ad>', '<açıklama>', true, <n>, <n>, <n>);
+   ```
+5. Billing yalnızca Play'den (iç test kanalı dahil) kurulan sürümde çalışır.
+
 ## 3. İlk yönetici
 
 Supabase Dashboard → Authentication → kullanıcı → **app_metadata**: `{"role": "admin"}` (yalnızca service role/Dashboard yazabilir).

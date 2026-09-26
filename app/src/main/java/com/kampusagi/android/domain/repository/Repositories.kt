@@ -12,6 +12,10 @@ import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.model.MessageCursor
 import com.kampusagi.android.domain.model.AppNotification
 import com.kampusagi.android.domain.model.PendingVerification
+import com.kampusagi.android.domain.model.Plan
+import com.kampusagi.android.domain.model.StoreOffer
+import com.kampusagi.android.domain.model.StorePurchase
+import com.kampusagi.android.domain.model.SubscriptionStatus
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.model.ProfileDraft
@@ -145,4 +149,13 @@ interface PushRepository {
 
     /** Removes this device's token before signing out. */
     suspend fun unregisterCurrentDevice(): AppResult<Unit>
+}
+
+/** Backend side of Premium: plans, the person's status and server-side purchase verification. */
+interface PremiumRepository {
+    suspend fun plans(): AppResult<List<Plan>>
+    suspend fun subscription(): AppResult<SubscriptionStatus>
+
+    /** Sends a Google Play purchase to the backend, which verifies it with Google. */
+    suspend fun verify(purchase: StorePurchase): AppResult<Unit>
 }

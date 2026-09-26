@@ -5,7 +5,8 @@
 // to the person's devices through FCM and forgets tokens FCM no longer knows.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { accessToken, parseServiceAccount, pushText, safeEqual, sendToDevice } from "../_shared/fcm.ts";
+import { fcmAccessToken, pushText, safeEqual, sendToDevice } from "../_shared/fcm.ts";
+import { parseServiceAccount } from "../_shared/google-auth.ts";
 import { errorResponse, json, requireEnv } from "../_shared/http.ts";
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
@@ -50,7 +51,7 @@ Deno.serve(async (request) => {
 
   const now = Math.floor(Date.now() / 1000);
   try {
-    if (!cachedToken || cachedToken.expiresAt - 60 < now) cachedToken = await accessToken(fetch, account, now);
+    if (!cachedToken || cachedToken.expiresAt - 60 < now) cachedToken = await fcmAccessToken(fetch, account, now);
   } catch (tokenError) {
     console.error("FCM OAuth failed", tokenError instanceof Error ? tokenError.message : String(tokenError));
     return errorResponse("push_failed", 502);

@@ -30,3 +30,15 @@ class AiErrorMappingTest {
         assertEquals(AppError.ACCOUNT_NOT_APPROVED, functionError(403, """{"error":"approved_student_required"}"""))
     }
 }
+
+class BillingErrorMappingTest {
+    @Test
+    fun `maps purchase verification codes`() {
+        assertEquals(AppError.BILLING_NOT_CONFIGURED, functionError(503, """{"error":"billing_not_configured"}"""))
+        assertEquals(AppError.BILLING_UNAVAILABLE, functionError(502, """{"error":"billing_unavailable"}"""))
+        assertEquals(AppError.PLAN_NOT_AVAILABLE, functionError(404, """{"error":"plan_not_available"}"""))
+        assertEquals(AppError.PURCHASE_NOT_ACTIVE, functionError(422, """{"error":"purchase_not_active"}"""))
+        assertEquals(AppError.PURCHASE_NOT_FOR_ACCOUNT, functionError(403, """{"error":"purchase_not_for_account"}"""))
+        assertEquals(AppError.RECIPIENT_NOT_AVAILABLE, functionError(400, """{"error":"recipient_not_available"}"""))
+    }
+}

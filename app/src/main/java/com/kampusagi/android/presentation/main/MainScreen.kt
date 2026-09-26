@@ -51,6 +51,7 @@ import com.kampusagi.android.presentation.community.FeedViewModel
 import com.kampusagi.android.presentation.community.PostDetailScreen
 import com.kampusagi.android.presentation.notification.NotificationsScreen
 import com.kampusagi.android.presentation.notification.NotificationsViewModel
+import com.kampusagi.android.presentation.premium.PremiumScreen
 import com.kampusagi.android.presentation.requirement.CreateRequirementScreen
 import com.kampusagi.android.presentation.requirement.MatchesScreen
 import com.kampusagi.android.presentation.requirement.RequirementsScreen
@@ -220,7 +221,16 @@ fun MainScreen(
                 )
             }
             composable<ProfileRoute> {
-                ProfileTab(profile = profile, isAdmin = isAdmin, onOpenAdmin = onOpenAdmin, onSignOut = onSignOut)
+                ProfileTab(
+                    profile = profile,
+                    isAdmin = isAdmin,
+                    onOpenAdmin = onOpenAdmin,
+                    onOpenPremium = { navController.navigate(PremiumRoute) },
+                    onSignOut = onSignOut,
+                )
+            }
+            composable<PremiumRoute> {
+                PremiumScreen(onBack = { navController.popBackStack() })
             }
         }
     }

@@ -90,6 +90,11 @@ private fun knownCode(text: String): AppError? = when {
     "recipient_not_available" in text -> AppError.RECIPIENT_NOT_AVAILABLE
     "conversation_not_found" in text -> AppError.NOT_FOUND
     "invalid_message" in text -> AppError.INVALID_INPUT
+    "billing_not_configured" in text -> AppError.BILLING_NOT_CONFIGURED
+    "billing_unavailable" in text -> AppError.BILLING_UNAVAILABLE
+    "plan_not_available" in text -> AppError.PLAN_NOT_AVAILABLE
+    "purchase_not_active" in text -> AppError.PURCHASE_NOT_ACTIVE
+    "purchase_not_for_account" in text || "purchase_belongs_to_another_account" in text -> AppError.PURCHASE_NOT_FOR_ACCOUNT
     "rate_limited" in text -> AppError.RATE_LIMITED
     else -> null
 }

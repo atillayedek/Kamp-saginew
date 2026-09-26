@@ -146,6 +146,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
 
+    implementation(libs.billing.ktx)
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
 

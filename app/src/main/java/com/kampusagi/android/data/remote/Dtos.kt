@@ -169,3 +169,30 @@ data class NotificationDto(
     @SerialName("conversation_id") val conversationId: String? = null,
     @SerialName("post_id") val postId: String? = null,
 )
+
+@Serializable
+data class PlanDto(
+    val id: String,
+    @SerialName("play_product_id") val playProductId: String,
+    val name: String,
+    val description: String,
+    @SerialName("ai_analyze_daily") val aiAnalyzeDaily: Int,
+    @SerialName("ai_publish_daily") val aiPublishDaily: Int,
+    @SerialName("max_active_requirements") val maxActiveRequirements: Int,
+)
+
+@Serializable
+data class SubscriptionDto(
+    @SerialName("plan_name") val planName: String? = null,
+    @SerialName("play_product_id") val playProductId: String? = null,
+    @SerialName("expires_at") val expiresAt: String? = null,
+    @SerialName("ai_analyze_daily") val aiAnalyzeDaily: Int,
+    @SerialName("ai_publish_daily") val aiPublishDaily: Int,
+    @SerialName("max_active_requirements") val maxActiveRequirements: Int,
+)
+
+@Serializable
+data class VerifyPurchaseRequestDto(
+    @SerialName("product_id") val productId: String,
+    @SerialName("purchase_token") val purchaseToken: String,
+)
