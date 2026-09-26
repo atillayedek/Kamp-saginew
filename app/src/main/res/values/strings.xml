@@ -70,6 +70,7 @@
     <string name="error_ai_failed">Yapay zekâ analizi tamamlanamadı. Tekrar dene.</string>
     <string name="error_ai_refused">Bu metin analiz edilemedi. İhtiyacını farklı bir şekilde yaz.</string>
     <string name="error_too_many_active_requirements">En fazla 20 aktif ilanın olabilir. Önce eski bir ilanı kapat.</string>
+    <string name="error_recipient_not_available">Bu öğrenciye şu an mesaj gönderilemiyor.</string>
     <string name="error_not_found">İstenen kayıt bulunamadı.</string>
     <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
     <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
@@ -230,4 +231,22 @@
     <string name="matches_empty_body">Üniversitende benzer bir ihtiyaç paylaşıldığında burada görünecek.</string>
     <string name="matches_score_explained">Benzerlik, ilanların anlamına göre hesaplanır; yalnızca üniversitendeki aktif ilanlar gösterilir.</string>
     <string name="match_score">%%%1$d benzer</string>
+    <!-- Chat -->
+    <string name="tab_chat">Sohbet</string>
+    <string name="action_message">Mesaj gönder</string>
+    <string name="conversations_load_failed">Sohbetler yüklenemedi</string>
+    <string name="conversations_empty_title">Henüz mesajınız yok.</string>
+    <string name="conversations_empty_body">Bir ihtiyacının eşleşmelerinden \"Mesaj gönder\" ile sohbet başlatabilirsin.</string>
+    <string name="chat_you_prefix">Sen: %1$s</string>
+    <string name="chat_no_messages_yet">Henüz mesaj yok</string>
+    <string name="chat_load_failed">Mesajlar yüklenemedi</string>
+    <string name="chat_empty_title">İlk mesajı sen gönder.</string>
+    <string name="chat_empty_body">Mesajların yalnızca bu sohbetteki iki kişiye görünür.</string>
+    <string name="chat_input_hint">Mesaj yaz</string>
+    <string name="action_send_message">Gönder</string>
+    <string name="chat_load_older">Önceki mesajlar</string>
+    <string name="chat_status_sending">Gönderiliyor…</string>
+    <string name="chat_status_failed">Gönderilemedi · Tekrar denemek için dokun</string>
+    <string name="chat_status_sent">Gönderildi</string>
+    <string name="chat_status_read">Okundu</string>
 </resources>

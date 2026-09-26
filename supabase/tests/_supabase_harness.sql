@@ -38,6 +38,9 @@ as $$
     select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
 $$;
 
+-- Supabase Realtime's publication (created empty by Supabase).
+create publication supabase_realtime;
+
 -- Supabase grants broad table and function privileges to the API roles and
 -- relies on RLS and explicit REVOKEs. Reproduce that so the tests exercise
 -- the same protection the real project has.

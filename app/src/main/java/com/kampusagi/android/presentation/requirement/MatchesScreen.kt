@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.PersonSearch
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,9 +42,16 @@ import com.kampusagi.android.presentation.common.messageRes
 @Composable
 fun MatchesScreen(
     onBack: () -> Unit,
+    onOpenChat: (conversationId: String, title: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MatchesViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(viewModel.openChat) {
+        viewModel.openChat?.let { (id, title) ->
+            viewModel.onChatOpened()
+            onOpenChat(id, title)
+        }
+    }
     Column(modifier = modifier.fillMaxSize()) {
         TopAppBar(
             title = {
@@ -85,6 +94,15 @@ fun MatchesScreen(
                     verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                     contentPadding = PaddingValues(Spacing.md),
                 ) {
+                    viewModel.chatError?.let { error ->
+                        item {
+                            Text(
+                                stringResource(error.messageRes()),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
                     item {
                         Text(
                             stringResource(R.string.matches_score_explained),
@@ -92,7 +110,14 @@ fun MatchesScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    items(state.matches, key = { it.requirementId }) { match -> MatchCard(match) }
+                    items(state.matches, key = { it.requirementId }) { match ->
+                        MatchCard(
+                            match = match,
+                            starting = viewModel.startingChatWith == match.owner.id,
+                            enabled = viewModel.startingChatWith == null,
+                            onMessage = { viewModel.startChat(match) },
+                        )
+                    }
                 }
             }
         }
@@ -100,7 +125,7 @@ fun MatchesScreen(
 }
 
 @Composable
-private fun MatchCard(match: Match) {
+private fun MatchCard(match: Match, starting: Boolean, enabled: Boolean, onMessage: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -136,6 +161,9 @@ private fun MatchCard(match: Match) {
             }
             if (match.tags.isNotEmpty()) {
                 Text(match.tags.joinToString("  ") { "#$it" }, style = MaterialTheme.typography.bodySmall)
+            }
+            Button(onClick = onMessage, enabled = enabled) {
+                Text(stringResource(if (starting) R.string.admin_working else R.string.action_message))
             }
         }
     }

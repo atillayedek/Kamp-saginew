@@ -10,6 +10,7 @@ import androidx.navigation.toRoute
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.Match
+import com.kampusagi.android.domain.repository.ChatRepository
 import com.kampusagi.android.domain.repository.RequirementRepository
 import com.kampusagi.android.presentation.main.MatchesRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,7 @@ sealed interface MatchesState {
 class MatchesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: RequirementRepository,
+    private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<MatchesRoute>()
@@ -34,8 +36,35 @@ class MatchesViewModel @Inject constructor(
     var state by mutableStateOf<MatchesState>(MatchesState.Loading)
         private set
 
+    /** Conversation to open (id to title) once it exists on the server. */
+    var openChat by mutableStateOf<Pair<String, String>?>(null)
+        private set
+
+    var startingChatWith by mutableStateOf<String?>(null)
+        private set
+
+    var chatError by mutableStateOf<AppError?>(null)
+        private set
+
     init {
         load()
+    }
+
+    fun startChat(match: Match) {
+        if (startingChatWith != null) return
+        startingChatWith = match.owner.id
+        chatError = null
+        viewModelScope.launch {
+            when (val result = chatRepository.startConversation(match.owner.id)) {
+                is AppResult.Success -> openChat = result.value to (match.owner.fullName ?: match.owner.username.orEmpty())
+                is AppResult.Failure -> chatError = result.error
+            }
+            startingChatWith = null
+        }
+    }
+
+    fun onChatOpened() {
+        openChat = null
     }
 
     fun load() {

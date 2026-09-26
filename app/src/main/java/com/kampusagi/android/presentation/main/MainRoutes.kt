@@ -10,3 +10,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object RequirementsRoute
 @Serializable data object CreateRequirementRoute
 @Serializable data class MatchesRoute(val requirementId: String, val title: String)
+@Serializable data object ConversationsRoute
+@Serializable data class ChatRoute(val conversationId: String, val title: String)

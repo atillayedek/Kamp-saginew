@@ -4,9 +4,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -26,6 +29,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kampusagi.android.R
 import com.kampusagi.android.domain.model.Profile
+import com.kampusagi.android.presentation.chat.ChatScreen
+import com.kampusagi.android.presentation.chat.ConversationsScreen
+import com.kampusagi.android.presentation.chat.ConversationsViewModel
+import com.kampusagi.android.presentation.chat.displayName
 import com.kampusagi.android.presentation.community.CreatePostScreen
 import com.kampusagi.android.presentation.community.FeedScreen
 import com.kampusagi.android.presentation.community.FeedViewModel
@@ -38,6 +45,7 @@ import com.kampusagi.android.presentation.requirement.RequirementsViewModel
 private enum class Tab(val route: Any, val label: Int, val icon: ImageVector) {
     COMMUNITY(FeedRoute, R.string.tab_community, Icons.Outlined.Forum),
     REQUIREMENTS(RequirementsRoute, R.string.tab_requirements, Icons.Outlined.Lightbulb),
+    CHAT(ConversationsRoute, R.string.tab_chat, Icons.Outlined.ChatBubbleOutline),
     PROFILE(ProfileRoute, R.string.tab_profile, Icons.Outlined.Person),
 }
 
@@ -54,6 +62,7 @@ fun MainScreen(
     // Keyed by account so a different person signing in never sees the previous feed.
     val feedViewModel: FeedViewModel = hiltViewModel(key = "feed-${profile.id}")
     val requirementsViewModel: RequirementsViewModel = hiltViewModel(key = "requirements-${profile.id}")
+    val conversationsViewModel: ConversationsViewModel = hiltViewModel(key = "conversations-${profile.id}")
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBar = Tab.entries.any { tab -> destination?.hasRoute(tab.route::class) == true }
@@ -74,7 +83,16 @@ fun MainScreen(
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(tab.icon, contentDescription = null) },
+                            icon = {
+                                val unread = if (tab == Tab.CHAT) conversationsViewModel.unreadTotal else 0
+                                if (unread > 0) {
+                                    BadgedBox(badge = { Badge { Text(if (unread > 99) "99+" else unread.toString()) } }) {
+                                        Icon(tab.icon, contentDescription = null)
+                                    }
+                                } else {
+                                    Icon(tab.icon, contentDescription = null)
+                                }
+                            },
                             label = { Text(stringResource(tab.label)) },
                         )
                     }
@@ -118,7 +136,24 @@ fun MainScreen(
                 )
             }
             composable<MatchesRoute> {
-                MatchesScreen(onBack = { navController.popBackStack() })
+                MatchesScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                )
+            }
+            composable<ConversationsRoute> {
+                ConversationsScreen(
+                    viewModel = conversationsViewModel,
+                    onOpen = { navController.navigate(ChatRoute(it.id, it.other.displayName())) },
+                )
+            }
+            composable<ChatRoute> {
+                ChatScreen(
+                    onBack = {
+                        conversationsViewModel.load()
+                        navController.popBackStack()
+                    },
+                )
             }
             composable<CreateRequirementRoute> {
                 CreateRequirementScreen(

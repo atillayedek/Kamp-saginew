@@ -3,6 +3,7 @@ package com.kampusagi.android.core.di
 import com.kampusagi.android.data.document.ContentResolverDocumentReader
 import com.kampusagi.android.data.repository.AdminRepositoryImpl
 import com.kampusagi.android.data.repository.AuthRepositoryImpl
+import com.kampusagi.android.data.repository.ChatRepositoryImpl
 import com.kampusagi.android.data.repository.CommunityRepositoryImpl
 import com.kampusagi.android.data.repository.ProfileRepositoryImpl
 import com.kampusagi.android.data.repository.RequirementRepositoryImpl
@@ -10,6 +11,7 @@ import com.kampusagi.android.data.repository.UniversityRepositoryImpl
 import com.kampusagi.android.data.repository.VerificationRepositoryImpl
 import com.kampusagi.android.domain.repository.AdminRepository
 import com.kampusagi.android.domain.repository.AuthRepository
+import com.kampusagi.android.domain.repository.ChatRepository
 import com.kampusagi.android.domain.repository.CommunityRepository
 import com.kampusagi.android.domain.repository.DocumentReader
 import com.kampusagi.android.domain.repository.ProfileRepository
@@ -31,5 +33,6 @@ abstract class RepositoryModule {
     @Binds abstract fun bindAdminRepository(impl: AdminRepositoryImpl): AdminRepository
     @Binds abstract fun bindCommunityRepository(impl: CommunityRepositoryImpl): CommunityRepository
     @Binds abstract fun bindRequirementRepository(impl: RequirementRepositoryImpl): RequirementRepository
+    @Binds abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
     @Binds abstract fun bindDocumentReader(impl: ContentResolverDocumentReader): DocumentReader
 }

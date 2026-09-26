@@ -3,10 +3,13 @@ package com.kampusagi.android.domain.repository
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.AuthRedirectResult
 import com.kampusagi.android.domain.model.AuthState
+import com.kampusagi.android.domain.model.ChatMessage
+import com.kampusagi.android.domain.model.Conversation
 import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Match
+import com.kampusagi.android.domain.model.MessageCursor
 import com.kampusagi.android.domain.model.PendingVerification
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostScope
@@ -18,6 +21,7 @@ import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.model.University
 import com.kampusagi.android.domain.model.Verification
 import java.io.File
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface AuthRepository {
@@ -95,4 +99,26 @@ interface RequirementRepository {
 
     /** Other students' active requirements ranked by similarity to one of ours. */
     suspend fun matches(requirementId: String): AppResult<List<Match>>
+}
+
+interface ChatRepository {
+    suspend fun conversations(): AppResult<List<Conversation>>
+
+    /** Returns the existing conversation with that student or creates it. */
+    suspend fun startConversation(otherUserId: String): AppResult<String>
+
+    /** Newest first; [before] pages towards older messages. */
+    suspend fun messages(conversationId: String, before: MessageCursor?): AppResult<List<ChatMessage>>
+
+    /** Idempotent for the same [messageId]; returns the server timestamp. */
+    suspend fun send(conversationId: String, messageId: String, body: String): AppResult<String>
+
+    suspend fun markRead(conversationId: String): AppResult<Unit>
+
+    /**
+     * Emits whenever a message or read receipt changes in [conversationId]
+     * (or in any of the person's conversations when it is null). Backed by
+     * Supabase Realtime; callers reload from the server on each emission.
+     */
+    fun changes(conversationId: String?): Flow<Unit>
 }

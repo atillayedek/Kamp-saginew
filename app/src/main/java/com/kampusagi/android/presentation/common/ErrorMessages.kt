@@ -34,6 +34,7 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.AI_FAILED -> R.string.error_ai_failed
     AppError.AI_REFUSED -> R.string.error_ai_refused
     AppError.TOO_MANY_ACTIVE_REQUIREMENTS -> R.string.error_too_many_active_requirements
+    AppError.RECIPIENT_NOT_AVAILABLE -> R.string.error_recipient_not_available
     AppError.NOT_FOUND -> R.string.error_not_found
     AppError.SERVER -> R.string.error_server
     AppError.UNKNOWN -> R.string.error_unknown

@@ -87,6 +87,9 @@ private fun knownCode(text: String): AppError? = when {
     "verification_not_pending" in text -> AppError.VERIFICATION_NOT_PENDING
     "document_not_found" in text || "profile_not_found" in text -> AppError.NOT_FOUND
     "post_not_found" in text || "comment_not_found" in text || "requirement_not_found" in text -> AppError.NOT_FOUND
+    "recipient_not_available" in text -> AppError.RECIPIENT_NOT_AVAILABLE
+    "conversation_not_found" in text -> AppError.NOT_FOUND
+    "invalid_message" in text -> AppError.INVALID_INPUT
     "rate_limited" in text -> AppError.RATE_LIMITED
     else -> null
 }

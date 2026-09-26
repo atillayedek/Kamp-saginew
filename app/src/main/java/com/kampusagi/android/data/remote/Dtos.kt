@@ -134,3 +134,26 @@ data class MatchDto(
     @SerialName("owner_username") val ownerUsername: String? = null,
     @SerialName("owner_department") val ownerDepartment: String? = null,
 )
+
+@Serializable
+data class ConversationDto(
+    @SerialName("conversation_id") val conversationId: String,
+    @SerialName("other_user_id") val otherUserId: String,
+    @SerialName("other_full_name") val otherFullName: String? = null,
+    @SerialName("other_username") val otherUsername: String? = null,
+    @SerialName("other_university") val otherUniversity: String? = null,
+    @SerialName("last_message_body") val lastMessageBody: String? = null,
+    @SerialName("last_message_at") val lastMessageAt: String? = null,
+    @SerialName("last_message_is_mine") val lastMessageIsMine: Boolean? = null,
+    @SerialName("unread_count") val unreadCount: Int,
+)
+
+@Serializable
+data class ChatMessageDto(
+    val id: String,
+    @SerialName("sender_id") val senderId: String,
+    val body: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("is_mine") val isMine: Boolean,
+    @SerialName("read_by_other") val readByOther: Boolean,
+)

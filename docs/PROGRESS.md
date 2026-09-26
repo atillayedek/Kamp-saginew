@@ -13,7 +13,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 4 | Ana uygulama iskeleti (alt gezinme) + Topluluklar: gönderi, yorum, beğeni (genel / üniversitem) | Kod bitti. CI `4d111da`: test derlemesi FAILED (test yardımcısı gölgelendi) → `df07226` ile düzeltildi, CI bekleniyor |
 | 5 | İhtiyaç oluşturma: OpenAI yapılandırılmış çıktı (backend) + embedding + pgvector | Kod bitti; CI bekleniyor. Canlı OpenAI: dış yapılandırma (`docs/DEPLOYMENT.md`) |
 | 6 | Eşleşme: pgvector benzerlik sorgusu, gerçek skor, eşleşme ekranı | Kod bitti; CI bekleniyor. Sohbete geçiş Faz 7'de |
-| 7 | Sohbet: Realtime, gönderildi/iletildi/okundu, yazıyor | Bekliyor |
+| 7 | Sohbet: Realtime, gönderildi/okundu | Kod bitti; CI bekleniyor. Yazıyor/çevrimiçi yok (D20) |
 | 8 | Bildirimler: uygulama içi + push | Bekliyor (push sağlayıcı kararı gerekli: Bölüm 0.12 FCM) |
 | 9 | Premium: Google Play Billing + sunucu doğrulaması + entitlement | Bekliyor |
 | 10 | Ayarlar, hesap silme, gizlilik, raporlama/engelleme | Bekliyor |
@@ -28,3 +28,4 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 - 2026-09-26 — Yerel: SQL 001–004 PASS; 004 cascade testi önce kırmızı (0/1/0) sonra yeşil doğrulandı.
 - 2026-09-26 — Yerel: SQL 001–005 PASS (pgvector 0.6), Deno check + 15 Edge Function testi PASS.
 - 2026-09-26 — Yerel: SQL 006 (eşleşme) PASS; kampüs filtresi mutasyonu yakalandı.
+- 2026-09-26 — Yerel: SQL 007 (sohbet) PASS; üyelik kontrolü mutasyonu yakalandı. CI `dfdaa4e` (faz 4–6 + test düzeltmeleri) bekleniyor.
