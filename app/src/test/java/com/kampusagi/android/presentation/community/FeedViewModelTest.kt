@@ -22,7 +22,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-private fun post(id: String, liked: Boolean = false, likes: Int = 0) = Post(
+private fun feedPost(id: String, liked: Boolean = false, likes: Int = 0) = Post(
     id = id, scope = PostScope.GENERAL, body = "gönderi $id", createdAt = "2026-09-26T12:00:00+00:00",
     likeCount = likes, commentCount = 0, likedByMe = liked, isMine = false,
     author = Author("a", "Ali Veli", "aliveli", "İTÜ"),
@@ -59,9 +59,9 @@ class FeedViewModelTest {
     @Test
     fun `loads the general feed first and pages with the cursor`() {
         val repository = ScriptedCommunityRepository().apply {
-            pages[null] = AppResult.Success(FeedPage(listOf(post("1"), post("2")), FeedCursor("t", "2")))
+            pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1"), feedPost("2")), FeedCursor("t", "2")))
             // The second page repeats a post (inserted meanwhile): it must not be duplicated.
-            pages["2"] = AppResult.Success(FeedPage(listOf(post("2"), post("3")), null))
+            pages["2"] = AppResult.Success(FeedPage(listOf(feedPost("2"), feedPost("3")), null))
         }
         val viewModel = FeedViewModel(repository)
         assertEquals(listOf("1", "2"), viewModel.state(PostScope.GENERAL).posts.map { it.id })
@@ -89,7 +89,7 @@ class FeedViewModelTest {
         assertEquals(AppError.NETWORK, viewModel.state(PostScope.GENERAL).error)
         assertFalse(viewModel.state(PostScope.GENERAL).loaded)
 
-        repository.pages[null] = AppResult.Success(FeedPage(listOf(post("1")), null))
+        repository.pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1")), null))
         viewModel.retry()
         assertEquals(listOf("1"), viewModel.state(PostScope.GENERAL).posts.map { it.id })
         assertNull(viewModel.state(PostScope.GENERAL).error)
@@ -98,7 +98,7 @@ class FeedViewModelTest {
     @Test
     fun `like uses the server count and is rolled back on failure`() {
         val repository = ScriptedCommunityRepository().apply {
-            pages[null] = AppResult.Success(FeedPage(listOf(post("1", likes = 4)), null))
+            pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1", likes = 4)), null))
             likeResult = AppResult.Success(7)
         }
         val viewModel = FeedViewModel(repository)
