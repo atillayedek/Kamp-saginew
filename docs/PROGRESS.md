@@ -18,7 +18,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 9 | Premium: Google Play Billing + sunucu doğrulaması + entitlement | Bitti — CI yeşil `ddeb8e7` (`5acb808`'deki lint hatası ContextCastToActivity `a41a6d2` ile düzeltildi). Play Console ürünleri + plan içeriği: dış yapılandırma / ürün kararı |
 | 10 | Ayarlar, hesap silme, gizlilik, raporlama/engelleme | Bitti — CI yeşil `ddeb8e7`. Gizlilik politikası URL'si ve web silme sayfası: dış yapılandırma |
 | 11 | Release sertleştirme: imza, AAB, R8, erişilebilirlik, son tarama | Kod bitti — CI yeşil `ddeb8e7` (R8 + kaynak küçültme, yedekleme kapalı, cleartext kapalı, CI'da keystore secret'ıyla imza + `jarsigner` doğrulaması, versionCode = CI çalıştırma no). Keystore secret'ları yok → AAB **imzasız**: dış yapılandırma |
-| 12 | Gözlemlenebilirlik: Supabase çökme raporları (D31), canlı backend CI kontrolü (D32) | Kod bitti; SQL 012 (4 mutasyon yakalandı), canlıya uygulandı; CI bekleniyor |
+| 12 | Gözlemlenebilirlik: Supabase çökme raporları (D31), canlı backend CI kontrolü (D32) | Bitti — CI yeşil `646e4e6` (DB, Edge Function, Android, canlı kontrol 10/10) |
 
 ## Son doğrulamalar
 
@@ -42,6 +42,8 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
   anon üniversiteleri göremez ve RPC çağıramaz; onaysız hesap `approved_student_required`, admin olmayan `admin_required` alır;
   tabloya doğrudan yazma RLS ile reddedilir.
 - Danışman bulguları: `handle_new_user` anon/authenticated'a açıktı ve `reports.resolved_by` indekssizdi → düzeltildi, SQL test 011 eklendi.
-- HTTP üzerinden uçtan uca test: **NOT RUN** — bu ortamın ağ politikası `*.supabase.co` bağlantısını reddediyor.
-- Auth yönlendirme URL'leri, OpenAI/FCM/Play secret'ları, webhook: **dış yapılandırma** (docs/DEPLOYMENT.md).
+- HTTP üzerinden salt-okunur kontrol: CI `live-smoke` job'ı, `646e4e6` → 10/10 PASS (istemci anahtarı, e-posta onayı zorunlu,
+  anon üniversite/RPC erişimi yok, tetikleyici fonksiyon açık değil, 5 Edge Function oturum ister).
+- Giriş yapmış kullanıcıyla uçtan uca akış (kayıt → belge → onay → ihtiyaç → eşleşme → sohbet): **NOT RUN** — gerçek cihaz/hesap gerekir.
+- Auth yönlendirme URL'leri, OpenAI/Play secret'ları, release keystore, `PRIVACY_POLICY_URL`, webhook: **dış yapılandırma** (docs/DEPLOYMENT.md).
 
