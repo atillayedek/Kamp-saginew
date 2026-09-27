@@ -14,16 +14,16 @@ import com.kampusagi.android.core.designsystem.icon.AppIcons
 import com.kampusagi.android.domain.model.PostCategory
 
 fun PostCategory.labelRes(): Int = when (this) {
-    PostCategory.GENERAL -> R.string.category_general
-    PostCategory.QUESTION -> R.string.category_question
-    PostCategory.STUDY -> R.string.category_study
-    PostCategory.EVENT -> R.string.category_event
-    PostCategory.ANNOUNCEMENT -> R.string.category_announcement
-    PostCategory.MARKETPLACE -> R.string.category_marketplace
-    PostCategory.HOUSING -> R.string.category_housing
-    PostCategory.LOST_FOUND -> R.string.category_lost_found
-    PostCategory.CAREER -> R.string.category_career
-    PostCategory.SPORTS -> R.string.category_sports
+    PostCategory.GENERAL -> R.string.post_category_general
+    PostCategory.QUESTION -> R.string.post_category_question
+    PostCategory.STUDY -> R.string.post_category_study
+    PostCategory.EVENT -> R.string.post_category_event
+    PostCategory.ANNOUNCEMENT -> R.string.post_category_announcement
+    PostCategory.MARKETPLACE -> R.string.post_category_marketplace
+    PostCategory.HOUSING -> R.string.post_category_housing
+    PostCategory.LOST_FOUND -> R.string.post_category_lost_found
+    PostCategory.CAREER -> R.string.post_category_career
+    PostCategory.SPORTS -> R.string.post_category_sports
 }
 
 val PostCategory.icon: ImageVector
