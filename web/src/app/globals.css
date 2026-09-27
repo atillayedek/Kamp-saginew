@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --surface-2: #f1f1ee;
+  --border: #e4e3de;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --text-3: #7a7974;
+  --brand: #2a78d6;
+  --brand-strong: #1f63b5;
+  --brand-soft: #e7f0fb;
+  --series-1: #2a78d6;
+  --good: #0f7b3f;
+  --good-soft: #e3f4ea;
+  --warn: #9a6200;
+  --warn-soft: #fbf0d9;
+  --bad: #c42b2b;
+  --bad-soft: #fbe6e6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --border: #2f2f2c;
+    --text: #ffffff;
+    --text-2: #c3c2b7;
+    --text-3: #93928a;
+    --brand: #3987e5;
+    --brand-strong: #5b9ceb;
+    --brand-soft: #1b2b40;
+    --series-1: #3987e5;
+    --good: #4cc47f;
+    --good-soft: #15291e;
+    --warn: #e0a93a;
+    --warn-soft: #2e2413;
+    --bad: #ef7171;
+    --bad-soft: #341818;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --border: #2f2f2c;
+  --text: #ffffff;
+  --text-2: #c3c2b7;
+  --text-3: #93928a;
+  --brand: #3987e5;
+  --brand-strong: #5b9ceb;
+  --brand-soft: #1b2b40;
+  --series-1: #3987e5;
+  --good: #4cc47f;
+  --good-soft: #15291e;
+  --warn: #e0a93a;
+  --warn-soft: #2e2413;
+  --bad: #ef7171;
+  --bad-soft: #341818;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-ink-3: var(--text-3);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}

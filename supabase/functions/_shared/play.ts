@@ -7,7 +7,15 @@ export const PLAY_SCOPE = "https://www.googleapis.com/auth/androidpublisher";
 const BASE = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications";
 
 export type PlayCheck =
-  | { ok: true; expiresAt: string; needsAcknowledge: boolean }
+  | {
+    ok: true;
+    expiresAt: string;
+    needsAcknowledge: boolean;
+    /** The Google Play order of the current period; each renewal has its own. */
+    orderId: string | null;
+    /** Recurring price Google reports for this line item; null when absent. */
+    price: { amountMicros: number; currency: string } | null;
+  }
   | { ok: false; code: "purchase_not_active" | "purchase_not_for_account" | "product_mismatch" };
 
 /**
@@ -20,7 +28,13 @@ export function evaluateSubscription(data: unknown, productId: string, userId: s
     subscriptionState?: string;
     acknowledgementState?: string;
     externalAccountIdentifiers?: { obfuscatedExternalAccountId?: string };
-    lineItems?: { productId?: string; expiryTime?: string }[];
+    latestOrderId?: string;
+    lineItems?: {
+      productId?: string;
+      expiryTime?: string;
+      latestSuccessfulOrderId?: string;
+      autoRenewingPlan?: { recurringPrice?: unknown };
+    }[];
   };
   if (sub.externalAccountIdentifiers?.obfuscatedExternalAccountId !== userId) {
     return { ok: false, code: "purchase_not_for_account" };
@@ -36,7 +50,21 @@ export function evaluateSubscription(data: unknown, productId: string, userId: s
     ok: true,
     expiresAt: new Date(expiry).toISOString(),
     needsAcknowledge: sub.acknowledgementState === "ACKNOWLEDGEMENT_STATE_PENDING",
+    orderId: item.latestSuccessfulOrderId ?? sub.latestOrderId ?? null,
+    price: moneyToMicros(item.autoRenewingPlan?.recurringPrice),
   };
+}
+
+/** google.type.Money → micros. Null for anything malformed rather than a guess. */
+export function moneyToMicros(money: unknown): { amountMicros: number; currency: string } | null {
+  const m = money as { currencyCode?: unknown; units?: unknown; nanos?: unknown } | null | undefined;
+  if (!m || typeof m.currencyCode !== "string" || !/^[A-Z]{3}$/.test(m.currencyCode)) return null;
+  const units = typeof m.units === "string" ? Number(m.units) : typeof m.units === "number" ? m.units : 0;
+  const nanos = typeof m.nanos === "number" ? m.nanos : 0;
+  if (!Number.isSafeInteger(units) || !Number.isInteger(nanos) || units < 0 || nanos < 0 || nanos >= 1e9) return null;
+  const micros = units * 1_000_000 + Math.round(nanos / 1000);
+  if (!Number.isSafeInteger(micros)) return null;
+  return { amountMicros: micros, currency: m.currencyCode };
 }
 
 export class PlayApiError extends Error {

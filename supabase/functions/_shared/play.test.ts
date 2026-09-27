@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import { acknowledgeSubscription, evaluateSubscription, fetchSubscription, PlayApiError } from "./play.ts";
+import { acknowledgeSubscription, evaluateSubscription, fetchSubscription, moneyToMicros, PlayApiError } from "./play.ts";
 
 const now = new Date("2026-09-26T12:00:00Z");
 const USER = "0b8e2f7c-3c1a-4a55-9d7e-2f1e4b6a9c10";
@@ -12,12 +12,42 @@ const active = {
 
 Deno.test("active subscription for this account and product is accepted", () => {
   assertEquals(evaluateSubscription(active, "kampusagi.plus", USER, now), {
-    ok: true, expiresAt: "2026-10-26T12:00:00.000Z", needsAcknowledge: true,
+    ok: true, expiresAt: "2026-10-26T12:00:00.000Z", needsAcknowledge: true, orderId: null, price: null,
   });
   const acknowledged = { ...active, acknowledgementState: "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED" };
   assertEquals(evaluateSubscription(acknowledged, "kampusagi.plus", USER, now).ok, true);
   const grace = { ...active, subscriptionState: "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" };
   assertEquals(evaluateSubscription(grace, "kampusagi.plus", USER, now).ok, true);
+});
+
+Deno.test("order id and recurring price are passed on for the revenue ledger", () => {
+  const priced = {
+    ...active,
+    latestOrderId: "GPA.old",
+    lineItems: [{
+      productId: "kampusagi.plus",
+      expiryTime: "2026-10-26T12:00:00Z",
+      latestSuccessfulOrderId: "GPA.1234-5678..1",
+      autoRenewingPlan: { recurringPrice: { currencyCode: "TRY", units: "49", nanos: 990000000 } },
+    }],
+  };
+  const check = evaluateSubscription(priced, "kampusagi.plus", USER, now);
+  assertEquals(check.ok && check.orderId, "GPA.1234-5678..1");
+  assertEquals(check.ok && check.price, { amountMicros: 49_990_000, currency: "TRY" });
+  const legacy = { ...active, latestOrderId: "GPA.legacy" };
+  const legacyCheck = evaluateSubscription(legacy, "kampusagi.plus", USER, now);
+  assertEquals(legacyCheck.ok && legacyCheck.orderId, "GPA.legacy");
+});
+
+Deno.test("malformed prices are dropped, never guessed", () => {
+  assertEquals(moneyToMicros({ currencyCode: "USD", units: "4", nanos: 500000000 }), { amountMicros: 4_500_000, currency: "USD" });
+  assertEquals(moneyToMicros({ currencyCode: "EUR", nanos: 990000000 }), { amountMicros: 990_000, currency: "EUR" });
+  assertEquals(moneyToMicros({ currencyCode: "usd", units: "4" }), null);
+  assertEquals(moneyToMicros({ currencyCode: "USD", units: "-4" }), null);
+  assertEquals(moneyToMicros({ currencyCode: "USD", units: "abc" }), null);
+  assertEquals(moneyToMicros({ currencyCode: "USD", units: "1", nanos: 1e9 }), null);
+  assertEquals(moneyToMicros({ units: "4" }), null);
+  assertEquals(moneyToMicros(null), null);
 });
 
 Deno.test("everything else is refused", () => {

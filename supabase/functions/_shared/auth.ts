@@ -6,6 +6,9 @@ import { requireEnv } from "./http.ts";
 
 export interface Caller {
   userId: string;
+  email: string | null;
+  /** app_metadata.role = 'admin'; only the service role can set it. */
+  isAdmin: boolean;
   admin: SupabaseClient;
 }
 
@@ -21,7 +24,7 @@ export async function authenticate(request: Request): Promise<Caller | null> {
   const { data, error } = await caller.auth.getUser();
   if (error || !data.user) return null;
   const admin = createClient(url, requireEnv("SUPABASE_SERVICE_ROLE_KEY"), { auth: { persistSession: false } });
-  return { userId: data.user.id, admin };
+  return { userId: data.user.id, email: data.user.email ?? null, isAdmin: data.user.app_metadata?.role === "admin", admin };
 }
 
 export async function readJson(request: Request): Promise<Record<string, unknown> | null> {

@@ -312,6 +312,8 @@
     <string name="settings_blocked_empty">Kimseyi engellemedin.</string>
     <string name="settings_privacy_title">Gizlilik</string>
     <string name="settings_privacy_open">Gizlilik politikasını aç</string>
+    <string name="settings_marketing_title">E-posta izinleri</string>
+    <string name="settings_marketing_summary">KampüsAğı kampanya ve yenilikleri hakkında e-posta almak istiyorum. İstediğin zaman kapatabilirsin; hizmet duyuruları bu ayardan bağımsızdır.</string>
     <string name="settings_privacy_not_configured">Gizlilik politikası bağlantısı bu sürümde tanımlı değil.</string>
     <string name="settings_no_browser">Bağlantıyı açacak bir tarayıcı bulunamadı.</string>
     <string name="delete_account_title">Hesabı sil</string>

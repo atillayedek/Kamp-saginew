@@ -54,6 +54,27 @@ jobs:
       - name: Tests
         run: deno test supabase/functions/
 
+  web:
+    name: Web (landing + admin) lint, types, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # Built without Supabase values: the admin page must show "kurulum gerekli", never fake data.
+      - run: npm run build
+
   live-smoke:
     name: Live Supabase checks (read-only)
     runs-on: ubuntu-latest

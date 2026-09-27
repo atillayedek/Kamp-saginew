@@ -105,3 +105,45 @@ class DeleteAccountViewModel @Inject constructor(
         }
     }
 }
+
+sealed interface ConsentState {
+    data object Loading : ConsentState
+    data class Loaded(val optIn: Boolean, val saving: Boolean = false, val error: AppError? = null) : ConsentState
+    data class Failed(val error: AppError) : ConsentState
+}
+
+/** Marketing e-mail consent (Turkish law 6563 / KVKK): off until the person turns it on. */
+@HiltViewModel
+class MarketingConsentViewModel @Inject constructor(
+    private val account: AccountRepository,
+) : ViewModel() {
+
+    var state by mutableStateOf<ConsentState>(ConsentState.Loading)
+        private set
+
+    init {
+        load()
+    }
+
+    fun load() {
+        state = ConsentState.Loading
+        viewModelScope.launch {
+            state = when (val result = account.marketingConsent()) {
+                is AppResult.Success -> ConsentState.Loaded(result.value)
+                is AppResult.Failure -> ConsentState.Failed(result.error)
+            }
+        }
+    }
+
+    fun set(optIn: Boolean) {
+        val current = state as? ConsentState.Loaded ?: return
+        if (current.saving) return
+        state = current.copy(saving = true, error = null)
+        viewModelScope.launch {
+            state = when (val result = account.setMarketingConsent(optIn)) {
+                is AppResult.Success -> ConsentState.Loaded(optIn)
+                is AppResult.Failure -> current.copy(saving = false, error = result.error)
+            }
+        }
+    }
+}

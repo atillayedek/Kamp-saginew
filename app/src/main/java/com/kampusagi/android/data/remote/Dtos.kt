@@ -223,3 +223,6 @@ data class OpenReportDto(
 
 @Serializable
 data class DeleteAccountRequestDto(val confirm: String)
+
+@Serializable
+data class MarketingConsentDto(@SerialName("marketing_opt_in") val marketingOptIn: Boolean)

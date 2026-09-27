@@ -66,6 +66,19 @@ Deno.serve(async (request) => {
     return errorResponse("server_error", 500);
   }
 
+  // Revenue ledger for the admin panel. The entitlement is already stored, so a
+  // failure here is logged and does not fail the purchase.
+  const { error: eventError } = await caller.admin.rpc("record_purchase_event", {
+    p_user_id: caller.userId,
+    p_product_id: productId,
+    p_purchase_token: purchaseToken,
+    p_order_id: check.orderId,
+    p_expires_at: check.expiresAt,
+    p_amount_micros: check.price?.amountMicros ?? null,
+    p_currency: check.price?.currency ?? null,
+  });
+  if (eventError) console.error("record_purchase_event failed", eventError.message);
+
   // Only after the entitlement is stored, so a failure here is retried by the next restore.
   if (check.needsAcknowledge) {
     try {

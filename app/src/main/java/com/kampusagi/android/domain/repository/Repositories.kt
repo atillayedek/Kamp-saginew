@@ -171,4 +171,9 @@ interface ModerationRepository {
 interface AccountRepository {
     /** Permanently deletes the signed-in account on the server, then ends the local session. */
     suspend fun deleteAccount(): AppResult<Unit>
+
+    /** Whether the signed-in person agreed to receive marketing e-mail. */
+    suspend fun marketingConsent(): AppResult<Boolean>
+
+    suspend fun setMarketingConsent(optIn: Boolean): AppResult<Unit>
 }

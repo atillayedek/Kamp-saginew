@@ -18,3 +18,20 @@ export function requireEnv(name: string): string {
   if (!value) throw new Error(`Missing environment variable ${name}`);
   return value;
 }
+
+// Browser callers (the web admin panel). Access is by bearer token, never
+// cookies, so any origin may call; the token decides what is allowed.
+export const CORS_HEADERS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+export function withCors(response: Response): Response {
+  for (const [name, value] of Object.entries(CORS_HEADERS)) response.headers.set(name, value);
+  return response;
+}
+
+export function preflight(): Response {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}

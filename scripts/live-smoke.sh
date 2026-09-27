@@ -51,7 +51,26 @@ check "rest: feed RPC refused for signed-out callers" 401 'permission denied' \
   -X POST "${SUPABASE_URL}/rest/v1/rpc/list_posts" "${anon[@]}" -d '{"p_scope":"GENERAL"}'
 check "rest: signup trigger not exposed" 404 'PGRST202' \
   -X POST "${SUPABASE_URL}/rest/v1/rpc/handle_new_user" "${anon[@]}" -d '{}'
-for fn in submit-student-document analyze-requirement publish-requirement verify-purchase delete-account; do
+check "rest: admin overview refused for signed-out callers" 401 'permission denied' \
+  -X POST "${SUPABASE_URL}/rest/v1/rpc/admin_overview" "${anon[@]}" -d '{}'
+check "rest: broadcast recipients not exposed to clients" 401 'permission denied' \
+  -X POST "${SUPABASE_URL}/rest/v1/rpc/broadcast_recipients" "${anon[@]}" -d '{"p_audience":"ALL","p_marketing":false}'
+# Forged unsubscribe links are refused. Before UNSUBSCRIBE_SECRET is set the function
+# answers email_not_configured, reported as NOT CONFIGURED rather than a pass.
+unsub_body="$(mktemp)"
+unsub_status="$(curl -sS -o "$unsub_body" -w '%{http_code}' -m 30 -X POST \
+  "${SUPABASE_URL}/functions/v1/email-unsubscribe?u=00000000-0000-0000-0000-000000000000&s=$(printf '0%.0s' {1..64})" \
+  "${anon[@]}" -d '{}')" || unsub_status="000"
+if [ "$unsub_status" = "400" ] && grep -q '"error":"invalid_link"' "$unsub_body"; then
+  echo "PASS function email-unsubscribe: forged link refused"
+elif [ "$unsub_status" = "503" ] && grep -q '"error":"email_not_configured"' "$unsub_body"; then
+  echo "::warning::email-unsubscribe NOT CONFIGURED (UNSUBSCRIBE_SECRET missing); forged-link check NOT RUN"
+else
+  echo "FAIL function email-unsubscribe: got HTTP $unsub_status: $(head -c 300 "$unsub_body")"
+  failures=$((failures + 1))
+fi
+rm -f "$unsub_body"
+for fn in submit-student-document analyze-requirement publish-requirement verify-purchase delete-account admin-broadcast; do
   check "function $fn: requires a signed-in user" 401 '"error":"not_authenticated"' \
     -X POST "${SUPABASE_URL}/functions/v1/${fn}" "${anon[@]}" -d '{}'
 done

@@ -22,6 +22,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -111,6 +112,9 @@ fun SettingsScreen(
             }
 
             HorizontalDivider()
+            MarketingConsentSection()
+
+            HorizontalDivider()
             DeleteAccountSection()
         }
     }
@@ -129,6 +133,31 @@ private fun BlockedRow(user: BlockedUser, busy: Boolean, enabled: Boolean, onUnb
             CircularProgressIndicator(modifier = Modifier.padding(Spacing.sm).size(24.dp))
         } else {
             TextButton(onClick = onUnblock, enabled = enabled) { Text(stringResource(R.string.action_unblock)) }
+        }
+    }
+}
+
+@Composable
+private fun MarketingConsentSection(viewModel: MarketingConsentViewModel = hiltViewModel()) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        Text(stringResource(R.string.settings_marketing_title), style = MaterialTheme.typography.titleMedium)
+        when (val state = viewModel.state) {
+            ConsentState.Loading -> CircularProgressIndicator(modifier = Modifier.padding(Spacing.sm))
+            is ConsentState.Failed -> {
+                ErrorText(stringResource(state.error.messageRes()))
+                SecondaryButton(text = stringResource(R.string.action_retry), onClick = viewModel::load)
+            }
+            is ConsentState.Loaded -> {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        stringResource(R.string.settings_marketing_summary),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f).padding(end = Spacing.sm),
+                    )
+                    Switch(checked = state.optIn, onCheckedChange = viewModel::set, enabled = !state.saving)
+                }
+                state.error?.let { ErrorText(stringResource(it.messageRes())) }
+            }
         }
     }
 }
