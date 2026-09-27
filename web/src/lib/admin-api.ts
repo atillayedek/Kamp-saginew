@@ -87,6 +87,18 @@ export interface Report {
   target_account_status: string;
 }
 
+export interface PendingVerification {
+  verification_id: string;
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  username: string | null;
+  university_name: string | null;
+  department: string | null;
+  document_path: string;
+  submitted_at: string;
+}
+
 export type ReportAction = "DISMISS" | "REMOVE_CONTENT" | "SUSPEND_USER";
 
 export interface BroadcastInput {
@@ -135,6 +147,15 @@ export const adminApi = {
   audienceSize: (c: SupabaseClient, audience: string, marketing: boolean) =>
     rpc<number>(c, "admin_broadcast_audience_size", { p_audience: audience, p_marketing: marketing }),
   sendBroadcast: (c: SupabaseClient, input: BroadcastInput) => invoke<BroadcastResult>(c, "admin-broadcast", input),
+  pendingVerifications: (c: SupabaseClient) => rpc<PendingVerification[]>(c, "list_pending_verifications"),
+  reviewVerification: (c: SupabaseClient, verificationId: string, approve: boolean, reason: string | null) =>
+    rpc<void>(c, "review_student_verification", { p_verification_id: verificationId, p_approve: approve, p_reason: reason }),
+  /** Short-lived link to the private PDF; storage RLS lets only the owner and admins read it. */
+  documentUrl: async (c: SupabaseClient, path: string): Promise<string> => {
+    const { data, error } = await c.storage.from("student-documents").createSignedUrl(path, 300);
+    if (error || !data) throw new Error(error?.message ?? "document_unavailable");
+    return data.signedUrl;
+  },
   openReports: (c: SupabaseClient) => rpc<Report[]>(c, "list_open_reports"),
   resolveReport: (c: SupabaseClient, reportId: string, action: ReportAction) =>
     rpc<void>(c, "resolve_report", { p_report_id: reportId, p_action: action }),

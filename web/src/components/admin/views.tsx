@@ -98,6 +98,12 @@ export function OverviewView({ client, onNavigate }: Props & { onNavigate: (tab:
             <Card title="Yapılacaklar">
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center justify-between gap-3">
+                  <span className="text-ink-2">İnceleme bekleyen belgeler</span>
+                  <Button variant="secondary" onClick={() => onNavigate("documents")}>
+                    {formatNumber(o.pending_verifications)} belgeyi incele
+                  </Button>
+                </li>
+                <li className="flex items-center justify-between gap-3">
                   <span className="text-ink-2">Açık şikayetler</span>
                   <Button variant="secondary" onClick={() => onNavigate("reports")}>
                     {formatNumber(o.open_reports)} şikayeti incele

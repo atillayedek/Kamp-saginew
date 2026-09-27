@@ -4,6 +4,7 @@ import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import {
   Building2,
   CreditCard,
+  FileCheck,
   Flag,
   GraduationCap,
   LayoutDashboard,
@@ -20,11 +21,13 @@ import { backendState } from "@/lib/config";
 import { errorMessage } from "@/lib/errors";
 import { supabase } from "@/lib/supabase";
 import { BroadcastView } from "./BroadcastView";
+import { DocumentsView } from "./DocumentsView";
 import { Button, ErrorBox, inputClass, Loading } from "./ui";
 import { OverviewView, PurchasesView, ReportsView, UniversitiesView, UsersView } from "./views";
 
 const TABS = [
   { id: "overview", label: "Genel bakış", icon: LayoutDashboard },
+  { id: "documents", label: "Belge onayları", icon: FileCheck },
   { id: "users", label: "Kullanıcılar", icon: Users },
   { id: "purchases", label: "Satın almalar", icon: CreditCard },
   { id: "email", label: "Toplu e-posta", icon: Mail },
@@ -258,6 +261,7 @@ function Shell({ client, email }: { client: SupabaseClient; email: string }) {
 
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
         {tab === "overview" ? <OverviewView client={client} onNavigate={go} /> : null}
+        {tab === "documents" ? <DocumentsView client={client} /> : null}
         {tab === "users" ? <UsersView client={client} /> : null}
         {tab === "purchases" ? <PurchasesView client={client} /> : null}
         {tab === "email" ? <BroadcastView client={client} adminEmail={email} /> : null}

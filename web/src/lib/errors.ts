@@ -10,6 +10,10 @@ const MESSAGES: Record<string, string> = {
   invalid_action: "Bu şikayet için bu işlem yapılamaz.",
   report_not_found: "Şikayet bulunamadı ya da zaten çözülmüş.",
   user_not_suspended: "Bu hesap askıda değil.",
+  rejection_reason_required: "Reddetmek için 3–500 karakterlik bir gerekçe yaz.",
+  verification_not_pending: "Bu belge zaten incelenmiş.",
+  invalid_decision: "Geçersiz karar.",
+  document_unavailable: "Belge açılamadı. Dosya silinmiş olabilir.",
   no_recipients: "Bu gruba uyan alıcı yok.",
   email_not_configured:
     "E-posta gönderimi yapılandırılmamış (RESEND_API_KEY / RESEND_FROM; pazarlama için PUBLIC_SITE_URL ve UNSUBSCRIBE_SECRET).",
