@@ -19,6 +19,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 10 | Ayarlar, hesap silme, gizlilik, raporlama/engelleme | Bitti — CI yeşil `ddeb8e7`. Gizlilik politikası URL'si ve web silme sayfası: dış yapılandırma |
 | 11 | Release sertleştirme: imza, AAB, R8, erişilebilirlik, son tarama | Kod bitti — CI yeşil `ddeb8e7` (R8 + kaynak küçültme, yedekleme kapalı, cleartext kapalı, CI'da keystore secret'ıyla imza + `jarsigner` doğrulaması, versionCode = CI çalıştırma no). Keystore secret'ları yok → AAB **imzasız**: dış yapılandırma |
 | 12 | Gözlemlenebilirlik: Supabase çökme raporları (D31), canlı backend CI kontrolü (D32) | Bitti — CI yeşil `646e4e6` (DB, Edge Function, Android, canlı kontrol 10/10) |
+| 13 | Web: landing page + `/admin` paneli, Resend toplu e-posta, gelir kaydı, pazarlama izni (D33–D35) | Kod bitti; SQL 013 + 34 Deno + 7 web testi yerelde yeşil, canlıya uygulandı. CI bekleniyor. Resend/abonelik secret'ları ve ilk admin: dış yapılandırma |
 
 ## Son doğrulamalar
 

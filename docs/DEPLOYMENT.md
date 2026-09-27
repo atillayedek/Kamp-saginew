@@ -76,12 +76,34 @@ FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push
    Politikada şikayet edilen mesajların yöneticilere gösterildiği belirtilmelidir.
 3. **Web'den hesap silme talebi:** Play Console, uygulamayı kurmadan da silme talebi yapılabilen bir web adresi ister (Veri güvenliği → Hesap silme). Bu repo bir web sayfası içermez; ürün sahibinin bu sayfayı sağlaması gerekir.
 
-## 3. İlk yönetici
+### Toplu e-posta (Resend) — admin paneli
+
+Supabase Dashboard → Edge Functions → Secrets:
+
+| Secret | Değer |
+|---|---|
+| `RESEND_API_KEY` | Resend API anahtarı (yalnızca gönderme izni yeterli) |
+| `RESEND_FROM` | Resend'de doğrulanmış bir alan adından gönderici, ör. `KampüsAğı <duyuru@alanadi>` |
+| `PUBLIC_SITE_URL` | Web sitesinin adresi (abonelikten çıkma sayfası `/abonelik-iptal` burada) |
+| `UNSUBSCRIBE_SECRET` | En az 32 karakterlik rastgele değer (`openssl rand -hex 32`); değişirse eski bağlantılar geçersiz olur |
+
+Eksikse `admin-broadcast` `email_not_configured` döner ve panel bunu açıkça yazar. Pazarlama gönderimi için dört secret da gerekir.
+Resend hesabında şu an doğrulanmış tek alan adı başka bir ürüne ait; KampüsAğı için kendi alan adını Resend'de doğrula.
+
+## 3. Web sitesi (Vercel)
+
+- Proje: `kampusagi` (Vercel), kök dizin `web`, framework Next.js.
+- Ortam değişkenleri: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (yalnızca `sb_publishable_…`; gizli anahtar
+  konursa site "kurulum gerekli" gösterir), isteğe bağlı `NEXT_PUBLIC_PLAY_STORE_URL`, `NEXT_PUBLIC_PRIVACY_POLICY_URL`.
+- Admin paneli `/admin`. Landing page'de bağlantısı yoktur, arama motorlarına kapalıdır.
+- Supabase Auth → URL Configuration'a site adresini ekle (şifre sıfırlama bağlantıları için).
+
+## 4. İlk yönetici
 
 Supabase Dashboard → Authentication → kullanıcı → **app_metadata**: `{"role": "admin"}` (yalnızca service role/Dashboard yazabilir).
 Kullanıcı yeniden giriş yaptığında (yeni JWT) uygulamada "Yönetim" ekranı (doğrulamalar + şikayetler) görünür.
 
-## 4. Android build
+## 5. Android build
 
 GitHub repo secret'ları (istemciye açık değerler): `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
 Yerelde aynı adlarla `local.properties` veya ortam değişkeni kullanılabilir.
