@@ -9,6 +9,7 @@
 import { authenticate, readJson } from "../_shared/auth.ts";
 import {
   broadcastStatus,
+  isValidSender,
   type OutgoingEmail,
   parseBroadcastRequest,
   type Recipient,
@@ -42,6 +43,11 @@ async function handle(request: Request): Promise<Response> {
   if (!apiKey || !from || (input.marketing && (!siteUrl || !unsubscribeSecret))) {
     console.error("E-mail is not configured (RESEND_API_KEY / RESEND_FROM, and PUBLIC_SITE_URL / UNSUBSCRIBE_SECRET for marketing)");
     return errorResponse("email_not_configured", 503);
+  }
+
+  if (!isValidSender(from)) {
+    console.error("RESEND_FROM is not `email@domain` or `Name <email@domain>`");
+    return errorResponse("email_sender_invalid", 503);
   }
 
   let recipients: Recipient[];

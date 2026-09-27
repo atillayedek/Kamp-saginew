@@ -54,6 +54,15 @@ export function renderText(body: string, unsubscribeUrl: string | null): string 
     : `${body}\n\n—\nBu bir KampüsAğı hizmet duyurusudur.`;
 }
 
+/** RESEND_FROM must be `email@domain` or `Name <email@domain>`, as Resend requires. */
+export function isValidSender(from: string): boolean {
+  const address = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+  const trimmed = from.trim();
+  if (address.test(trimmed)) return true;
+  const named = trimmed.match(/^(.+?)\s*<([^<>]+)>$/);
+  return named !== null && named[1].trim().length > 0 && !/[<>]/.test(named[1]) && address.test(named[2]);
+}
+
 // Unsubscribe signatures ---------------------------------------------------------------
 
 async function hmacKey(secret: string): Promise<CryptoKey> {

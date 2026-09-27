@@ -17,6 +17,8 @@ const MESSAGES: Record<string, string> = {
   no_recipients: "Bu gruba uyan alıcı yok.",
   email_not_configured:
     "E-posta gönderimi yapılandırılmamış (RESEND_API_KEY / RESEND_FROM; pazarlama için PUBLIC_SITE_URL ve UNSUBSCRIBE_SECRET).",
+  email_sender_invalid:
+    "RESEND_FROM geçersiz. Şu biçimde olmalı: KampüsAğı <duyuru@alanadi> ya da duyuru@alanadi (tırnak yok, alan adı Resend'de doğrulanmış olmalı).",
   email_send_failed: "E-posta gönderilemedi. Resend ayarlarını kontrol et.",
   invalid_link: "Bu bağlantı geçersiz ya da bozulmuş.",
   server_error: "Sunucu hatası. Biraz sonra tekrar dene.",

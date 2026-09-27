@@ -3,6 +3,7 @@ import {
   BATCH_SIZE,
   broadcastStatus,
   chunk,
+  isValidSender,
   type OutgoingEmail,
   parseBroadcastRequest,
   renderHtml,
@@ -94,4 +95,15 @@ Deno.test("status and chunking edge cases", async () => {
   const result = await sendBatches(failing, "key", [mail(1)], () => Promise.resolve(), (m) => errors.push(m));
   assertEquals(result, { sent: 0, failed: 1 });
   assertStringIncludes(errors[0], "network down");
+});
+
+Deno.test("the sender must be an address or Name <address>", () => {
+  assertEquals(isValidSender("duyuru@kapinda.site"), true);
+  assertEquals(isValidSender("KampüsAğı <duyuru@kapinda.site>"), true);
+  assertEquals(isValidSender("  KampüsAğı<duyuru@kapinda.site> "), true);
+  assertEquals(isValidSender("KampüsAğı"), false);
+  assertEquals(isValidSender("kapinda.site"), false);
+  assertEquals(isValidSender("<duyuru@kapinda.site>"), false);
+  assertEquals(isValidSender("\"KampüsAğı <duyuru@kapinda.site>\""), false);
+  assertEquals(isValidSender("KampüsAğı duyuru@kapinda.site"), false);
 });
