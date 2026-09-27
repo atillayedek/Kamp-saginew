@@ -26,18 +26,25 @@ echo "PASS SUPABASE_ANON_KEY is a client key"
 failures=0
 
 # check <name> <expected HTTP status> <text the body must contain> <curl args...>
+# Pushes to this branch deploy to the live project at the same time as CI runs
+# (Supabase GitHub integration), so a mismatch is retried for up to a minute
+# before it counts as a failure.
 check() {
   local name="$1" expected="$2" needle="$3"
   shift 3
-  local body status
+  local body status attempt
   body="$(mktemp)"
-  status="$(curl -sS -o "$body" -w '%{http_code}' -m 30 "$@")" || status="000"
-  if [ "$status" = "$expected" ] && grep -q -- "$needle" "$body"; then
-    echo "PASS $name"
-  else
-    echo "FAIL $name: expected HTTP $expected containing '$needle', got HTTP $status: $(head -c 300 "$body")"
-    failures=$((failures + 1))
-  fi
+  for attempt in 1 2 3 4; do
+    status="$(curl -sS -o "$body" -w '%{http_code}' -m 30 "$@")" || status="000"
+    if [ "$status" = "$expected" ] && grep -q -- "$needle" "$body"; then
+      echo "PASS $name"
+      rm -f "$body"
+      return
+    fi
+    [ "$attempt" -lt 4 ] && sleep 20
+  done
+  echo "FAIL $name: expected HTTP $expected containing '$needle', got HTTP $status: $(head -c 300 "$body")"
+  failures=$((failures + 1))
   rm -f "$body"
 }
 

@@ -188,12 +188,12 @@ select public.set_marketing_consent(false);
 select tests.reset_role();
 select tests.act_as_service();
 select tests.assert_equals(
-    (select string_agg(email, ',' order by email) from public.broadcast_recipients('ALL', true) where email like 'ap%'),
+    (select string_agg(email, ',' order by email collate "C") from public.broadcast_recipients('ALL', true) where email like 'ap%'),
     'ap1@example.edu.tr',
     'marketing only to people who opted in'
 );
 select tests.assert_equals(
-    (select string_agg(email, ',' order by email) from public.broadcast_recipients('ALL', false) where email like 'ap%'),
+    (select string_agg(email, ',' order by email collate "C") from public.broadcast_recipients('ALL', false) where email like 'ap%'),
     'ap-admin@example.edu.tr,ap1@example.edu.tr,ap2@example.edu.tr',
     'announcements skip suspended accounts'
 );
