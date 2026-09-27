@@ -9,10 +9,13 @@ import com.kampusagi.android.core.config.AppConfig
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.BlockedUser
+import com.kampusagi.android.data.settings.ThemeStore
+import com.kampusagi.android.domain.model.ThemeMode
 import com.kampusagi.android.domain.repository.AccountRepository
 import com.kampusagi.android.domain.repository.ModerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed interface BlockedListState {
@@ -146,4 +149,13 @@ class MarketingConsentViewModel @Inject constructor(
             }
         }
     }
+}
+
+@HiltViewModel
+class AppearanceViewModel @Inject constructor(
+    private val themeStore: ThemeStore,
+) : ViewModel() {
+    val themeMode: StateFlow<ThemeMode> = themeStore.themeMode
+
+    fun select(mode: ThemeMode) = themeStore.set(mode)
 }

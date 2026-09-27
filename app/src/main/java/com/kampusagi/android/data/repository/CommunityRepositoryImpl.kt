@@ -13,6 +13,7 @@ import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.repository.CommunityRepository
 import io.github.jan.supabase.SupabaseClient
@@ -29,7 +30,7 @@ class CommunityRepositoryImpl @Inject constructor(
     private val provider: SupabaseProvider,
 ) : CommunityRepository {
 
-    override suspend fun feed(scope: PostScope, cursor: FeedCursor?): AppResult<FeedPage> = call { client ->
+    override suspend fun feed(scope: PostScope, category: PostCategory?, cursor: FeedCursor?): AppResult<FeedPage> = call { client ->
         val posts = client.postgrest.rpc(
             "list_posts",
             buildJsonObject {
@@ -37,6 +38,7 @@ class CommunityRepositoryImpl @Inject constructor(
                 put("p_before_created_at", cursor?.createdAt)
                 put("p_before_id", cursor?.id)
                 put("p_limit", PAGE_SIZE)
+                put("p_category", category?.name)
             },
         ).decodeList<PostDto>().map { it.toDomain() }
         // A full page means there may be more; the last post is the next cursor.
@@ -66,12 +68,13 @@ class CommunityRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun createPost(scope: PostScope, body: String): AppResult<String> = call { client ->
+    override suspend fun createPost(scope: PostScope, category: PostCategory, body: String): AppResult<String> = call { client ->
         client.postgrest.rpc(
             "create_post",
             buildJsonObject {
                 put("p_scope", scope.name)
                 put("p_body", body)
+                put("p_category", category.name)
             },
         ).decodeAs<String>()
     }
@@ -128,6 +131,8 @@ class CommunityRepositoryImpl @Inject constructor(
         likedByMe = likedByMe,
         isMine = isMine,
         author = Author(authorId, authorFullName, authorUsername, authorUniversity),
+        // A category added on the server later shows as general until the app knows it.
+        category = PostCategory.entries.firstOrNull { it.name == category } ?: PostCategory.GENERAL,
     )
 
     private class PostMissingException : IllegalStateException("Post not returned")

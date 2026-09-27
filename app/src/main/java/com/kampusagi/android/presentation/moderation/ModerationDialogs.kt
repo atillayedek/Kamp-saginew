@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.moderation
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,8 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -51,7 +50,7 @@ fun OverflowMenu(actions: List<MenuAction>, enabled: Boolean = true) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }, enabled = enabled) {
-            Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.cd_more_actions))
+            Icon(AppIcons.MoreVert, contentDescription = stringResource(R.string.cd_more_actions))
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             actions.forEach { action ->

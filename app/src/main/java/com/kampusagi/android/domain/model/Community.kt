@@ -3,6 +3,9 @@ package com.kampusagi.android.domain.model
 /** Mirrors `public.post_scope`. */
 enum class PostScope { GENERAL, UNIVERSITY }
 
+/** Mirrors `public.post_category`; the author picks one when sharing. */
+enum class PostCategory { GENERAL, QUESTION, STUDY, EVENT, ANNOUNCEMENT, MARKETPLACE, HOUSING, LOST_FOUND, CAREER, SPORTS }
+
 data class Author(
     val id: String,
     val fullName: String?,
@@ -20,6 +23,7 @@ data class Post(
     val likedByMe: Boolean,
     val isMine: Boolean,
     val author: Author,
+    val category: PostCategory = PostCategory.GENERAL,
 )
 
 data class Comment(

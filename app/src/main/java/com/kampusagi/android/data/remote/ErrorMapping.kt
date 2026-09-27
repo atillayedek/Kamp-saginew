@@ -72,6 +72,7 @@ private fun knownCode(text: String): AppError? = when {
     "invalid_full_name" in text || "invalid_username" in text || "invalid_department" in text -> AppError.INVALID_INPUT
     "invalid_document_path" in text || "invalid_request" in text || "invalid_requirement" in text -> AppError.INVALID_INPUT
     "invalid_post_body" in text || "invalid_comment_body" in text || "invalid_scope" in text -> AppError.INVALID_INPUT
+    "invalid_bio" in text || "invalid_avatar_path" in text || "avatar_not_found" in text -> AppError.INVALID_INPUT
     "not_authenticated" in text -> AppError.SESSION_EXPIRED
     "approved_student_required" in text -> AppError.ACCOUNT_NOT_APPROVED
     "ai_not_configured" in text -> AppError.AI_NOT_CONFIGURED

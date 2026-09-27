@@ -121,6 +121,8 @@ class ProfileRepositoryImpl @Inject constructor(
         department = department,
         status = AccountStatus.entries.firstOrNull { it.name == accountStatus }
             ?: throw UnknownStatusException(accountStatus),
+        bio = bio,
+        avatarPath = avatarPath,
     )
 
     private companion object {

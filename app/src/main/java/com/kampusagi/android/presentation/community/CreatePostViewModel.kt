@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.usecase.CreatePostUseCase
 import com.kampusagi.android.domain.usecase.PostTextValidator
@@ -24,6 +25,9 @@ class CreatePostViewModel @Inject constructor(
 ) : ViewModel() {
 
     var scope by mutableStateOf(savedStateHandle.toRoute<CreatePostRoute>().scope)
+        private set
+
+    var category by mutableStateOf(PostCategory.GENERAL)
         private set
 
     var body by mutableStateOf("")
@@ -45,6 +49,10 @@ class CreatePostViewModel @Inject constructor(
         scope = value
     }
 
+    fun onCategoryChange(value: PostCategory) {
+        category = value
+    }
+
     fun onBodyChange(value: String) {
         if (value.length <= PostTextValidator.MAX_POST_LENGTH) body = value
         error = null
@@ -55,7 +63,7 @@ class CreatePostViewModel @Inject constructor(
         isSubmitting = true
         error = null
         viewModelScope.launch {
-            when (val result = createPost(scope, body)) {
+            when (val result = createPost(scope, category, body)) {
                 is AppResult.Success -> createdIn = scope
                 is AppResult.Failure -> error = result.error
             }

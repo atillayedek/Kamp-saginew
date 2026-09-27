@@ -1,14 +1,17 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,11 +31,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.kampusagi.android.R
 import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.usecase.PostTextValidator
 import com.kampusagi.android.presentation.common.messageRes
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun CreatePostScreen(
     onBack: () -> Unit,
@@ -47,14 +51,37 @@ fun CreatePostScreen(
             title = { Text(stringResource(R.string.create_post_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
         Column(
-            modifier = Modifier.padding(Spacing.md),
+            modifier = Modifier.verticalScroll(rememberScrollState()).padding(Spacing.md),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
+            OutlinedTextField(
+                value = viewModel.body,
+                onValueChange = viewModel::onBodyChange,
+                placeholder = { Text(stringResource(R.string.create_post_placeholder)) },
+                supportingText = { Text("${viewModel.body.length} / ${PostTextValidator.MAX_POST_LENGTH}") },
+                enabled = !viewModel.isSubmitting,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
+            )
+            Text(stringResource(R.string.create_post_category), style = MaterialTheme.typography.titleSmall)
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+            ) {
+                PostCategory.entries.forEach { option ->
+                    CategoryChip(
+                        category = option,
+                        selected = viewModel.category == option,
+                        onClick = { viewModel.onCategoryChange(option) },
+                        enabled = !viewModel.isSubmitting,
+                    )
+                }
+            }
+            Text(stringResource(R.string.create_post_audience), style = MaterialTheme.typography.titleSmall)
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                 PostScope.entries.forEachIndexed { index, option ->
                     SegmentedButton(
@@ -71,14 +98,6 @@ fun CreatePostScreen(
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            OutlinedTextField(
-                value = viewModel.body,
-                onValueChange = viewModel::onBodyChange,
-                placeholder = { Text(stringResource(R.string.create_post_placeholder)) },
-                supportingText = { Text("${viewModel.body.length} / ${PostTextValidator.MAX_POST_LENGTH}") },
-                enabled = !viewModel.isSubmitting,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
             )
             viewModel.error?.let { error ->
                 Text(

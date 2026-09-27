@@ -24,6 +24,7 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.DOCUMENT_TOO_LARGE -> R.string.error_document_too_large
     AppError.DOCUMENT_NOT_PDF -> R.string.error_document_not_pdf
     AppError.DOCUMENT_UNREADABLE -> R.string.error_document_unreadable
+    AppError.IMAGE_UNREADABLE -> R.string.error_image_unreadable
     AppError.VERIFICATION_NOT_ALLOWED -> R.string.error_verification_not_allowed
     AppError.ADMIN_REQUIRED -> R.string.error_admin_required
     AppError.REJECTION_REASON_REQUIRED -> R.string.error_rejection_reason_required

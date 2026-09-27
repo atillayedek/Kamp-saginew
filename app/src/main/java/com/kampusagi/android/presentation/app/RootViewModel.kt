@@ -12,6 +12,7 @@ import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ProfileRepository
 import com.kampusagi.android.data.crash.CrashReporter
+import com.kampusagi.android.presentation.common.avatar.AvatarLoader
 import com.kampusagi.android.presentation.notification.BackgroundNotifier
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,6 +58,7 @@ class RootViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val backgroundNotifier: BackgroundNotifier,
     private val crashReporter: CrashReporter,
+    private val avatarLoader: AvatarLoader,
 ) : ViewModel() {
 
     private val passwordRecovery = MutableStateFlow(false)
@@ -128,6 +130,7 @@ class RootViewModel @Inject constructor(
                         crashReporter.sendPending()
                     } else {
                         backgroundNotifier.stop()
+                        avatarLoader.clear()
                     }
                 }
         }

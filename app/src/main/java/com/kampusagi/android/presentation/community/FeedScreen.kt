@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,13 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Forum
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,12 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.kampusagi.android.R
 import com.kampusagi.android.core.designsystem.component.LoadingView
 import com.kampusagi.android.core.designsystem.component.MessageView
 import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.presentation.common.messageRes
 
@@ -47,6 +52,8 @@ fun FeedScreen(
     viewModel: FeedViewModel,
     onOpenPost: (Post) -> Unit,
     onCreatePost: (PostScope) -> Unit,
+    unreadNotifications: Int,
+    onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = viewModel.selectedScope
@@ -54,6 +61,32 @@ fun FeedScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                },
+                actions = {
+                    IconButton(onClick = onOpenNotifications) {
+                        BadgedBox(
+                            badge = {
+                                if (unreadNotifications > 0) {
+                                    Badge { Text(if (unreadNotifications > 99) "99+" else unreadNotifications.toString()) }
+                                }
+                            },
+                        ) {
+                            Icon(
+                                if (unreadNotifications > 0) AppIcons.NotificationsFilled else AppIcons.Notifications,
+                                contentDescription = stringResource(R.string.tab_notifications),
+                            )
+                        }
+                    }
+                },
+            )
             PrimaryTabRow(selectedTabIndex = scope.ordinal) {
                 PostScope.entries.forEach { tab ->
                     Tab(
@@ -63,6 +96,7 @@ fun FeedScreen(
                     )
                 }
             }
+            CategoryFilter(selected = viewModel.selectedCategory, onSelect = viewModel::selectCategory)
             viewModel.likeError?.let { error ->
                 Text(
                     stringResource(error.messageRes()),
@@ -73,7 +107,7 @@ fun FeedScreen(
             }
             when {
                 !state.loaded && state.error != null -> MessageView(
-                    icon = Icons.Outlined.CloudOff,
+                    icon = AppIcons.CloudOff,
                     title = stringResource(R.string.feed_load_failed),
                     body = stringResource(state.error.messageRes()),
                 ) {
@@ -87,10 +121,14 @@ fun FeedScreen(
                 ) {
                     if (state.isEmpty) {
                         MessageView(
-                            icon = Icons.Outlined.Forum,
+                            icon = AppIcons.Forum,
                             title = stringResource(R.string.feed_empty_title),
                             body = stringResource(
-                                if (scope == PostScope.GENERAL) R.string.feed_empty_general else R.string.feed_empty_university,
+                                when {
+                                    viewModel.selectedCategory != null -> R.string.feed_empty_category
+                                    scope == PostScope.GENERAL -> R.string.feed_empty_general
+                                    else -> R.string.feed_empty_university
+                                },
                             ),
                         )
                     } else {
@@ -101,7 +139,7 @@ fun FeedScreen(
         }
         ExtendedFloatingActionButton(
             onClick = { onCreatePost(scope) },
-            icon = { Icon(Icons.Outlined.Edit, contentDescription = null) },
+            icon = { Icon(AppIcons.Edit, contentDescription = null) },
             text = { Text(stringResource(R.string.action_new_post)) },
             modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.md),
         )
@@ -123,9 +161,8 @@ private fun PostList(state: FeedState, viewModel: FeedViewModel, onOpenPost: (Po
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         // Leaves room for the floating button over the last post.
-        contentPadding = PaddingValues(start = Spacing.md, end = Spacing.md, top = Spacing.sm, bottom = FAB_CLEARANCE),
+        contentPadding = PaddingValues(bottom = FAB_CLEARANCE),
     ) {
         items(state.posts, key = { it.id }) { post ->
             PostCard(post = post, onOpen = { onOpenPost(post) }, onToggleLike = { viewModel.toggleLike(post) })
@@ -144,6 +181,25 @@ private fun PostList(state: FeedState, viewModel: FeedViewModel, onOpenPost: (Po
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CategoryFilter(selected: PostCategory?, onSelect: (PostCategory?) -> Unit) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        contentPadding = PaddingValues(horizontal = Spacing.md, vertical = Spacing.sm),
+    ) {
+        item {
+            FilterChip(
+                selected = selected == null,
+                onClick = { onSelect(null) },
+                label = { Text(stringResource(R.string.category_all)) },
+            )
+        }
+        items(PostCategory.entries, key = { it.name }) { category ->
+            CategoryChip(category = category, selected = selected == category, onClick = { onSelect(category) })
         }
     }
 }

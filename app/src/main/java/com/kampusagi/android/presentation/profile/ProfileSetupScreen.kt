@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.profile
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -172,7 +171,7 @@ private fun UniversityField(
                 readOnly = true,
                 enabled = false,
                 label = { Text(stringResource(R.string.field_university)) },
-                trailingIcon = { Icon(Icons.Outlined.ExpandMore, contentDescription = null) },
+                trailingIcon = { Icon(AppIcons.KeyboardArrowDown, contentDescription = null) },
                 isError = error != null,
                 supportingText = error?.let { message -> { Text(message) } },
                 shape = MaterialTheme.shapes.small,

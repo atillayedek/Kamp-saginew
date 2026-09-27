@@ -12,12 +12,14 @@ data class ProfileDto(
     @SerialName("university_id") val universityId: String? = null,
     val department: String? = null,
     @SerialName("account_status") val accountStatus: String,
+    val bio: String? = null,
+    @SerialName("avatar_path") val avatarPath: String? = null,
     /** Embedded through the `university_id` foreign key. */
     val universities: UniversityNameDto? = null,
 ) {
     companion object {
         const val COLUMNS =
-            "id,email,full_name,username,university_id,department,account_status,universities(name)"
+            "id,email,full_name,username,university_id,department,account_status,bio,avatar_path,universities(name)"
     }
 }
 
@@ -56,6 +58,7 @@ data class PendingVerificationDto(
 data class PostDto(
     val id: String,
     val scope: String,
+    val category: String = "GENERAL",
     val body: String,
     @SerialName("created_at") val createdAt: String,
     @SerialName("like_count") val likeCount: Int,
@@ -226,3 +229,16 @@ data class DeleteAccountRequestDto(val confirm: String)
 
 @Serializable
 data class MarketingConsentDto(@SerialName("marketing_opt_in") val marketingOptIn: Boolean)
+
+@Serializable
+data class AvatarPathDto(
+    @SerialName("user_id") val userId: String,
+    @SerialName("avatar_path") val avatarPath: String,
+)
+
+@Serializable
+data class ProfileStatsDto(
+    @SerialName("post_count") val postCount: Int,
+    @SerialName("active_requirement_count") val activeRequirementCount: Int,
+    @SerialName("conversation_count") val conversationCount: Int,
+)

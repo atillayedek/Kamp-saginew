@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.premium
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,14 +43,14 @@ fun PremiumScreen(
             title = { Text(stringResource(R.string.premium_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
         when (val state = viewModel.state) {
             PremiumState.Loading -> LoadingView()
             is PremiumState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.premium_load_failed),
                 body = stringResource(state.error.messageRes()),
             ) {

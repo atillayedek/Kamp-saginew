@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.requirement
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,10 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -57,7 +54,7 @@ fun CreateRequirementScreen(
             title = { Text(stringResource(R.string.create_requirement_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
@@ -95,7 +92,7 @@ fun CreateRequirementScreen(
                     shape = MaterialTheme.shapes.small,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(Spacing.md)) {
-                        Icon(Icons.Outlined.AutoAwesome, contentDescription = null)
+                        Icon(AppIcons.Stars, contentDescription = null)
                         Text(
                             stringResource(R.string.ai_draft_note),
                             style = MaterialTheme.typography.bodyMedium,
@@ -167,7 +164,7 @@ fun CreateRequirementScreen(
                             modifier = Modifier.weight(1f),
                         )
                         IconButton(onClick = { viewModel.updateForm { it.copy(startsAt = null) } }) {
-                            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.cd_remove_time))
+                            Icon(AppIcons.Close, contentDescription = stringResource(R.string.cd_remove_time))
                         }
                     }
                 }

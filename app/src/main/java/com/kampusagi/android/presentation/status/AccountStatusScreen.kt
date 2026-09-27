@@ -1,17 +1,12 @@
 package com.kampusagi.android.presentation.status
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Block
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.HourglassTop
-import androidx.compose.material.icons.outlined.UploadFile
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -127,29 +122,30 @@ private const val PDF_MIME_TYPE = "application/pdf"
 
 private data class StatusContent(val icon: ImageVector, val title: Int, val body: Int)
 
+@Composable
 private fun AccountStatus.content(): StatusContent = when (this) {
     AccountStatus.PROFILE_INCOMPLETE, AccountStatus.DOCUMENT_REQUIRED -> StatusContent(
-        Icons.Outlined.UploadFile,
+        AppIcons.UploadFile,
         R.string.status_document_required_title,
         R.string.status_document_required_body,
     )
     AccountStatus.PENDING_REVIEW -> StatusContent(
-        Icons.Outlined.HourglassTop,
+        AppIcons.HourglassTop,
         R.string.status_pending_title,
         R.string.status_pending_body,
     )
     AccountStatus.APPROVED -> StatusContent(
-        Icons.Outlined.CheckCircle,
+        AppIcons.CheckCircle,
         R.string.status_approved_title,
         R.string.status_approved_body,
     )
     AccountStatus.REJECTED -> StatusContent(
-        Icons.Outlined.ErrorOutline,
+        AppIcons.Error,
         R.string.status_rejected_title,
         R.string.status_rejected_body,
     )
     AccountStatus.SUSPENDED -> StatusContent(
-        Icons.Outlined.Block,
+        AppIcons.Block,
         R.string.status_suspended_title,
         R.string.status_suspended_body,
     )

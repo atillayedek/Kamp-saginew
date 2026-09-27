@@ -15,3 +15,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object NotificationsRoute
 @Serializable data object PremiumRoute
 @Serializable data object SettingsRoute
+@Serializable data object MyMatchesRoute
+@Serializable data object EditProfileRoute

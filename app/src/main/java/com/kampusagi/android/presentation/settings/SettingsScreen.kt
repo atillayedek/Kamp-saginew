@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.settings
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -13,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kampusagi.android.domain.model.ThemeMode
 import com.kampusagi.android.R
 import com.kampusagi.android.core.designsystem.component.LinkButton
 import com.kampusagi.android.core.designsystem.component.SecondaryButton
@@ -59,7 +61,7 @@ fun SettingsScreen(
             title = { Text(stringResource(R.string.settings_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
@@ -67,6 +69,9 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.md),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
+            AppearanceSection()
+
+            HorizontalDivider()
             Text(stringResource(R.string.settings_blocked_title), style = MaterialTheme.typography.titleMedium)
             when (val blocked = viewModel.blocked) {
                 BlockedListState.Loading -> CircularProgressIndicator(modifier = Modifier.padding(Spacing.sm))
@@ -135,6 +140,40 @@ private fun BlockedRow(user: BlockedUser, busy: Boolean, enabled: Boolean, onUnb
             TextButton(onClick = onUnblock, enabled = enabled) { Text(stringResource(R.string.action_unblock)) }
         }
     }
+}
+
+@Composable
+private fun AppearanceSection(viewModel: AppearanceViewModel = hiltViewModel()) {
+    val mode by viewModel.themeMode.collectAsStateWithLifecycle()
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Text(stringResource(R.string.settings_appearance_title), style = MaterialTheme.typography.titleMedium)
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            ThemeMode.entries.forEach { option ->
+                FilterChip(
+                    selected = mode == option,
+                    onClick = { viewModel.select(option) },
+                    label = { Text(stringResource(option.labelRes())) },
+                    leadingIcon = {
+                        Icon(
+                            when (option) {
+                                ThemeMode.SYSTEM -> AppIcons.Contrast
+                                ThemeMode.LIGHT -> AppIcons.LightMode
+                                ThemeMode.DARK -> AppIcons.DarkMode
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    },
+                )
+            }
+        }
+    }
+}
+
+private fun ThemeMode.labelRes(): Int = when (this) {
+    ThemeMode.SYSTEM -> R.string.theme_system
+    ThemeMode.LIGHT -> R.string.theme_light
+    ThemeMode.DARK -> R.string.theme_dark
 }
 
 @Composable

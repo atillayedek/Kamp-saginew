@@ -21,6 +21,7 @@ object AppConfig {
     const val PASSWORD_RECOVERY_REDIRECT_URL = "$AUTH_REDIRECT_URL?type=recovery"
 
     const val STUDENT_DOCUMENTS_BUCKET = "student-documents"
+    const val AVATARS_BUCKET = "avatars"
     const val SUBMIT_STUDENT_DOCUMENT_FUNCTION = "submit-student-document"
     const val ANALYZE_REQUIREMENT_FUNCTION = "analyze-requirement"
     const val PUBLISH_REQUIREMENT_FUNCTION = "publish-requirement"

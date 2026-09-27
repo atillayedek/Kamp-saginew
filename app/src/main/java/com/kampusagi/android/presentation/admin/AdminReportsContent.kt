@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.admin
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -10,9 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,7 +48,7 @@ fun AdminReportsContent(modifier: Modifier = Modifier, viewModel: AdminReportsVi
         when (val list = viewModel.list) {
             ReportListState.Loading -> LoadingView()
             is ReportListState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.admin_reports_load_failed),
                 body = stringResource(list.error.messageRes()),
             ) {
@@ -58,7 +56,7 @@ fun AdminReportsContent(modifier: Modifier = Modifier, viewModel: AdminReportsVi
             }
             is ReportListState.Loaded -> if (list.reports.isEmpty()) {
                 MessageView(
-                    icon = Icons.Outlined.Inbox,
+                    icon = AppIcons.Inbox,
                     title = stringResource(R.string.admin_reports_empty_title),
                     body = stringResource(R.string.admin_reports_empty_body),
                 ) {

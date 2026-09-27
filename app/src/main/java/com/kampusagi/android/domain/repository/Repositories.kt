@@ -19,8 +19,10 @@ import com.kampusagi.android.domain.model.StoreOffer
 import com.kampusagi.android.domain.model.StorePurchase
 import com.kampusagi.android.domain.model.SubscriptionStatus
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.model.ProfileDraft
+import com.kampusagi.android.domain.model.ProfileStats
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.model.Requirement
 import com.kampusagi.android.domain.model.RequirementDraft
@@ -57,6 +59,24 @@ interface ProfileRepository {
     suspend fun completeProfile(draft: ProfileDraft): AppResult<Unit>
 }
 
+/** Bio, profile photo and stats of the signed-in person, and other people's photos. */
+interface ProfileMediaRepository {
+    suspend fun updateBio(bio: String): AppResult<Unit>
+
+    /** Uploads a JPEG (already resized), makes it the profile photo and removes the previous file. */
+    suspend fun uploadAvatar(jpeg: ByteArray): AppResult<Unit>
+
+    suspend fun removeAvatar(): AppResult<Unit>
+
+    suspend fun stats(): AppResult<ProfileStats>
+
+    /** Photo paths of the given people who have one (blocked people are left out by the server). */
+    suspend fun avatarPaths(userIds: Collection<String>): AppResult<Map<String, String>>
+
+    /** Downloads a photo with the signed-in session; the bucket is private. */
+    suspend fun downloadAvatar(path: String): AppResult<ByteArray>
+}
+
 interface UniversityRepository {
     suspend fun getActiveUniversities(): AppResult<List<University>>
 }
@@ -70,6 +90,11 @@ interface VerificationRepository {
 }
 
 /** Reads a document the person picked with the system file picker. */
+interface ImageEncoder {
+    /** Decodes the picked image, crops it square and returns a small JPEG for the profile photo. */
+    suspend fun avatarJpeg(uri: String): AppResult<ByteArray>
+}
+
 interface DocumentReader {
     suspend fun read(uri: String, maxBytes: Int): AppResult<ByteArray>
 }
@@ -84,10 +109,11 @@ interface AdminRepository {
 }
 
 interface CommunityRepository {
-    suspend fun feed(scope: PostScope, cursor: FeedCursor?): AppResult<FeedPage>
+    /** [category] null means every category. */
+    suspend fun feed(scope: PostScope, category: PostCategory?, cursor: FeedCursor?): AppResult<FeedPage>
     suspend fun post(postId: String): AppResult<Post>
     suspend fun comments(postId: String): AppResult<List<Comment>>
-    suspend fun createPost(scope: PostScope, body: String): AppResult<String>
+    suspend fun createPost(scope: PostScope, category: PostCategory, body: String): AppResult<String>
     suspend fun deletePost(postId: String): AppResult<Unit>
     suspend fun addComment(postId: String, body: String): AppResult<Unit>
     suspend fun deleteComment(commentId: String): AppResult<Unit>

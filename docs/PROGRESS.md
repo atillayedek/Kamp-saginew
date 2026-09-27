@@ -20,6 +20,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 11 | Release sertleştirme: imza, AAB, R8, erişilebilirlik, son tarama | Kod bitti — CI yeşil `ddeb8e7` (R8 + kaynak küçültme, yedekleme kapalı, cleartext kapalı, CI'da keystore secret'ıyla imza + `jarsigner` doğrulaması, versionCode = CI çalıştırma no). Keystore secret'ları yok → AAB **imzasız**: dış yapılandırma |
 | 12 | Gözlemlenebilirlik: Supabase çökme raporları (D31), canlı backend CI kontrolü (D32) | Bitti — CI yeşil `646e4e6` (DB, Edge Function, Android, canlı kontrol 10/10) |
 | 13 | Web: landing page + `/admin` paneli, Resend toplu e-posta, gelir kaydı, pazarlama izni (D33–D35) | Bitti — CI yeşil `a658e31` (DB 13 test dosyası, Edge Function, web, Android, canlı kontrol). Canlı: migration + 2 fonksiyon + Vercel `kampusagi-nine.vercel.app`. İlk admin atandı (2026-09-27). E-posta secret'ları girildi; sahte abonelik bağlantısı canlıda reddediliyor (CI run 36299964951). Gerçek Resend gönderimi doğrulandı: panelden test e-postası yöneticinin gelen kutusuna ulaştı (2026-09-27) |
+| 14 | Görsel yenileme (D37), gönderi kategorileri (D38), profil fotoğrafı/biyografi/otomatik avatar (D39), Eşleşmeler sekmesi (D40) | Kod bitti; SQL 014 (6 mutasyon yakalandı) yerelde yeşil. Android CI bekleniyor |
 
 ## Son doğrulamalar
 

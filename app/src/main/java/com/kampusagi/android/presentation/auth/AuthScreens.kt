@@ -1,10 +1,9 @@
 package com.kampusagi.android.presentation.auth
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MarkEmailRead
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -146,7 +145,7 @@ fun VerifyEmailScreen(
         state.error?.let { append("\n\n").append(stringResource(it.messageRes())) }
     }
     MessageView(
-        icon = Icons.Outlined.MarkEmailRead,
+        icon = AppIcons.MarkEmailRead,
         title = stringResource(R.string.verify_email_title),
         body = body,
         modifier = modifier,
@@ -169,7 +168,7 @@ fun ForgotPasswordScreen(
     val state = viewModel.state
     if (viewModel.sent) {
         MessageView(
-            icon = Icons.Outlined.MarkEmailRead,
+            icon = AppIcons.MarkEmailRead,
             title = stringResource(R.string.forgot_password_sent_title),
             body = stringResource(R.string.forgot_password_sent_body, state.email.trim()),
             modifier = modifier,

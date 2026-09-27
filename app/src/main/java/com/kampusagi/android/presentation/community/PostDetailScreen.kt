@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,11 +10,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -81,14 +77,14 @@ fun PostDetailScreen(
             title = { Text(stringResource(R.string.post_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
             actions = {
                 val post = loaded?.post
                 if (post?.isMine == true) {
                     IconButton(onClick = { confirmDelete = true }, enabled = !viewModel.isWorking) {
-                        Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete_post))
+                        Icon(AppIcons.Delete, contentDescription = stringResource(R.string.action_delete_post))
                     }
                 } else if (post != null) {
                     OverflowMenu(
@@ -104,7 +100,7 @@ fun PostDetailScreen(
         when (val state = viewModel.state) {
             PostDetailState.Loading -> LoadingView()
             is PostDetailState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.post_load_failed),
                 body = stringResource(state.error.messageRes()),
             ) {
@@ -121,6 +117,7 @@ fun PostDetailScreen(
                             verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                         ) {
                             AuthorLine(state.post.author, state.post.createdAt)
+                            CategoryLabel(state.post.category)
                             Text(state.post.body, style = MaterialTheme.typography.bodyLarge)
                             PostActions(state.post, onToggleLike = viewModel::toggleLike, onOpenComments = null)
                             HorizontalDivider()
@@ -174,7 +171,7 @@ fun PostDetailScreen(
                         modifier = Modifier.weight(1f),
                     )
                     IconButton(onClick = viewModel::sendComment, enabled = viewModel.canSendComment) {
-                        Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = stringResource(R.string.action_send_comment))
+                        Icon(AppIcons.Send, contentDescription = stringResource(R.string.action_send_comment))
                     }
                 }
             }
@@ -225,7 +222,7 @@ private fun CommentRow(comment: Comment, enabled: Boolean, onDelete: () -> Unit,
         }
         if (comment.isMine) {
             IconButton(onClick = onDelete, enabled = enabled) {
-                Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete_comment))
+                Icon(AppIcons.Delete, contentDescription = stringResource(R.string.action_delete_comment))
             }
         } else {
             OverflowMenu(

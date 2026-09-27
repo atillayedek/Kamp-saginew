@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.requirement
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -47,7 +44,7 @@ fun RequirementsScreen(
         when (val state = viewModel.state) {
             RequirementsState.Loading -> LoadingView()
             is RequirementsState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.requirements_load_failed),
                 body = stringResource(state.error.messageRes()),
             ) {
@@ -55,7 +52,7 @@ fun RequirementsScreen(
             }
             is RequirementsState.Loaded -> if (state.items.isEmpty()) {
                 MessageView(
-                    icon = Icons.Outlined.Lightbulb,
+                    icon = AppIcons.Lightbulb,
                     title = stringResource(R.string.requirements_empty_title),
                     body = stringResource(R.string.requirements_empty_body),
                 )
@@ -88,7 +85,7 @@ fun RequirementsScreen(
         }
         ExtendedFloatingActionButton(
             onClick = onCreate,
-            icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
+            icon = { Icon(AppIcons.Add, contentDescription = null) },
             text = { Text(stringResource(R.string.action_new_requirement)) },
             modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.md),
         )

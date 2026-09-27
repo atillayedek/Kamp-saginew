@@ -11,14 +11,18 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kampusagi.android.core.config.AppConfig
 import com.kampusagi.android.core.designsystem.theme.KampusAgiTheme
+import com.kampusagi.android.data.settings.ThemeStore
 import com.kampusagi.android.presentation.app.KampusAgiApp
 import com.kampusagi.android.presentation.app.RootViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: RootViewModel by viewModels()
+
+    @Inject lateinit var themeStore: ThemeStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -29,7 +33,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
-            KampusAgiTheme {
+            val themeMode by themeStore.themeMode.collectAsStateWithLifecycle()
+            KampusAgiTheme(themeMode = themeMode) {
                 KampusAgiApp(state = state, viewModel = viewModel)
             }
         }

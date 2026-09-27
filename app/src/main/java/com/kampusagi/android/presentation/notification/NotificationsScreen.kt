@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.notification
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,12 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,14 +31,24 @@ import com.kampusagi.android.domain.model.NotificationKind
 import com.kampusagi.android.presentation.common.messageRes
 import com.kampusagi.android.presentation.common.relativeTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
     viewModel: NotificationsViewModel,
     notificationsAllowed: Boolean,
     onOpen: (AppNotification) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text(stringResource(R.string.tab_notifications)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                }
+            },
+        )
         if (!notificationsAllowed) {
             Text(
                 stringResource(R.string.push_permission_denied),
@@ -48,7 +60,7 @@ fun NotificationsScreen(
         when (val state = viewModel.state) {
             NotificationsState.Loading -> LoadingView()
             is NotificationsState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.notifications_load_failed),
                 body = stringResource(state.error.messageRes()),
             ) {
@@ -56,7 +68,7 @@ fun NotificationsScreen(
             }
             is NotificationsState.Loaded -> if (state.items.isEmpty()) {
                 MessageView(
-                    icon = Icons.Outlined.NotificationsNone,
+                    icon = AppIcons.Notifications,
                     title = stringResource(R.string.notifications_empty_title),
                     body = stringResource(R.string.notifications_empty_body),
                 )

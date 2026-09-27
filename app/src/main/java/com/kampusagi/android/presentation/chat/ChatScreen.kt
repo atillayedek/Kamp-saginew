@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.chat
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,10 +15,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,7 +60,7 @@ fun ChatScreen(
             title = { Text(viewModel.title) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
             actions = {
@@ -79,7 +76,7 @@ fun ChatScreen(
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             when {
                 !state.loaded && state.error != null -> MessageView(
-                    icon = Icons.Outlined.CloudOff,
+                    icon = AppIcons.CloudOff,
                     title = stringResource(R.string.chat_load_failed),
                     body = stringResource(state.error.messageRes()),
                 ) {
@@ -87,7 +84,7 @@ fun ChatScreen(
                 }
                 !state.loaded -> LoadingView()
                 state.messages.isEmpty() && state.outgoing.isEmpty() -> MessageView(
-                    icon = Icons.AutoMirrored.Outlined.Send,
+                    icon = AppIcons.Send,
                     title = stringResource(R.string.chat_empty_title),
                     body = stringResource(R.string.chat_empty_body),
                 )
@@ -119,7 +116,7 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f),
             )
             IconButton(onClick = viewModel::send, enabled = viewModel.draft.isNotBlank()) {
-                Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = stringResource(R.string.action_send_message))
+                Icon(AppIcons.Send, contentDescription = stringResource(R.string.action_send_message))
             }
         }
     }

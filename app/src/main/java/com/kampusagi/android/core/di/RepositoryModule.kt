@@ -1,6 +1,8 @@
 package com.kampusagi.android.core.di
 
 import com.kampusagi.android.data.document.ContentResolverDocumentReader
+import com.kampusagi.android.data.image.ContentResolverImageEncoder
+import com.kampusagi.android.data.repository.ProfileMediaRepositoryImpl
 import com.kampusagi.android.data.repository.AccountRepositoryImpl
 import com.kampusagi.android.data.repository.AdminRepositoryImpl
 import com.kampusagi.android.data.repository.AuthRepositoryImpl
@@ -19,6 +21,8 @@ import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ChatRepository
 import com.kampusagi.android.domain.repository.CommunityRepository
 import com.kampusagi.android.domain.repository.DocumentReader
+import com.kampusagi.android.domain.repository.ImageEncoder
+import com.kampusagi.android.domain.repository.ProfileMediaRepository
 import com.kampusagi.android.domain.repository.ModerationRepository
 import com.kampusagi.android.domain.repository.NotificationRepository
 import com.kampusagi.android.domain.repository.PremiumRepository
@@ -36,6 +40,8 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryModule {
     @Binds abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
     @Binds abstract fun bindProfileRepository(impl: ProfileRepositoryImpl): ProfileRepository
+    @Binds abstract fun bindProfileMediaRepository(impl: ProfileMediaRepositoryImpl): ProfileMediaRepository
+    @Binds abstract fun bindImageEncoder(impl: ContentResolverImageEncoder): ImageEncoder
     @Binds abstract fun bindUniversityRepository(impl: UniversityRepositoryImpl): UniversityRepository
     @Binds abstract fun bindVerificationRepository(impl: VerificationRepositoryImpl): VerificationRepository
     @Binds abstract fun bindAdminRepository(impl: AdminRepositoryImpl): AdminRepository

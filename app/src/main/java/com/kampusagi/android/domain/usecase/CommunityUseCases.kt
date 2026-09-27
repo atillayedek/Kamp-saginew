@@ -2,6 +2,7 @@ package com.kampusagi.android.domain.usecase
 
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.repository.CommunityRepository
 import javax.inject.Inject
@@ -17,9 +18,9 @@ object PostTextValidator {
 }
 
 class CreatePostUseCase @Inject constructor(private val repository: CommunityRepository) {
-    suspend operator fun invoke(scope: PostScope, body: String): AppResult<String> {
+    suspend operator fun invoke(scope: PostScope, category: PostCategory, body: String): AppResult<String> {
         if (!PostTextValidator.isValidPost(body)) return AppResult.Failure(AppError.INVALID_INPUT)
-        return repository.createPost(scope, body.trim())
+        return repository.createPost(scope, category, body.trim())
     }
 }
 

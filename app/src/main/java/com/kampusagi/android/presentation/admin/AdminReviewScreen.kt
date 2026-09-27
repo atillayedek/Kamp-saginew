@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.admin
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.util.Log
@@ -11,10 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -84,7 +81,7 @@ fun AdminReviewScreen(
             title = { Text(stringResource(R.string.admin_panel_title)) },
             navigationIcon = {
                 IconButton(onClick = onClose) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
@@ -107,7 +104,7 @@ fun AdminReviewScreen(
             when (val list = viewModel.list) {
                 PendingListState.Loading -> LoadingView()
                 is PendingListState.Failed -> MessageView(
-                    icon = Icons.Outlined.CloudOff,
+                    icon = AppIcons.CloudOff,
                     title = stringResource(R.string.admin_load_failed),
                     body = stringResource(list.error.messageRes()),
                 ) {
@@ -115,7 +112,7 @@ fun AdminReviewScreen(
                 }
                 is PendingListState.Loaded -> if (list.items.isEmpty()) {
                     MessageView(
-                        icon = Icons.Outlined.Inbox,
+                        icon = AppIcons.Inbox,
                         title = stringResource(R.string.admin_empty_title),
                         body = stringResource(R.string.admin_empty_body),
                     ) {

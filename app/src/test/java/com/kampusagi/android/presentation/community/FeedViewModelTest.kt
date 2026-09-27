@@ -7,6 +7,7 @@ import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.repository.CommunityRepository
 import kotlinx.coroutines.Dispatchers
@@ -33,14 +34,16 @@ private class ScriptedCommunityRepository : CommunityRepository {
     val pages = mutableMapOf<String?, AppResult<FeedPage>>()
     var likeResult: AppResult<Int> = AppResult.Success(1)
     val feedCalls = mutableListOf<Pair<PostScope, FeedCursor?>>()
+    val categoryCalls = mutableListOf<PostCategory?>()
 
-    override suspend fun feed(scope: PostScope, cursor: FeedCursor?): AppResult<FeedPage> {
+    override suspend fun feed(scope: PostScope, category: PostCategory?, cursor: FeedCursor?): AppResult<FeedPage> {
         feedCalls += scope to cursor
+        categoryCalls += category
         return pages[cursor?.id] ?: AppResult.Success(FeedPage(emptyList(), null))
     }
     override suspend fun post(postId: String): AppResult<Post> = AppResult.Failure(AppError.NOT_FOUND)
     override suspend fun comments(postId: String): AppResult<List<Comment>> = AppResult.Success(emptyList())
-    override suspend fun createPost(scope: PostScope, body: String): AppResult<String> = AppResult.Success("new")
+    override suspend fun createPost(scope: PostScope, category: PostCategory, body: String): AppResult<String> = AppResult.Success("new")
     override suspend fun deletePost(postId: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun addComment(postId: String, body: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun deleteComment(commentId: String): AppResult<Unit> = AppResult.Success(Unit)
@@ -72,6 +75,24 @@ class FeedViewModelTest {
         assertTrue(state.endReached)
         viewModel.loadMore()
         assertEquals(2, repository.feedCalls.size)
+    }
+
+    @Test
+    fun `choosing a category reloads the feed with that filter`() {
+        val repository = ScriptedCommunityRepository().apply {
+            pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1")), null))
+        }
+        val viewModel = FeedViewModel(repository)
+        viewModel.selectCategory(PostCategory.MARKETPLACE)
+        assertEquals(listOf(null, PostCategory.MARKETPLACE), repository.categoryCalls)
+        assertEquals(PostCategory.MARKETPLACE, viewModel.selectedCategory)
+
+        // The same filter again does nothing; a new post clears the filter so it is visible.
+        viewModel.selectCategory(PostCategory.MARKETPLACE)
+        assertEquals(2, repository.categoryCalls.size)
+        viewModel.onPostCreated(PostScope.GENERAL)
+        assertNull(viewModel.selectedCategory)
+        assertEquals(null, repository.categoryCalls.last())
     }
 
     @Test

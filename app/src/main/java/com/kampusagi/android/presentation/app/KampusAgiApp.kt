@@ -1,12 +1,10 @@
 package com.kampusagi.android.presentation.app
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -51,7 +49,7 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
         when (state.destination) {
             RootDestination.LOADING -> LoadingView(modifier)
             RootDestination.SETUP_REQUIRED -> MessageView(
-                icon = Icons.Outlined.SettingsSuggest,
+                icon = AppIcons.Tune,
                 title = stringResource(R.string.setup_required_title),
                 body = stringResource(R.string.setup_required_body),
                 modifier = modifier,
@@ -62,7 +60,7 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
                 modifier = modifier,
             )
             RootDestination.PROFILE_ERROR -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.profile_error_title),
                 body = stringResource((state.profileError ?: AppError.UNKNOWN).messageRes()),
                 modifier = modifier,

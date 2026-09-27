@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.requirement
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,10 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.PersonSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kampusagi.android.R
@@ -36,6 +34,7 @@ import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.component.SecondaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
 import com.kampusagi.android.domain.model.Match
+import com.kampusagi.android.presentation.common.avatar.UserAvatar
 import com.kampusagi.android.presentation.common.messageRes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,14 +66,14 @@ fun MatchesScreen(
             },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    Icon(AppIcons.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                 }
             },
         )
         when (val state = viewModel.state) {
             MatchesState.Loading -> LoadingView()
             is MatchesState.Failed -> MessageView(
-                icon = Icons.Outlined.CloudOff,
+                icon = AppIcons.CloudOff,
                 title = stringResource(R.string.matches_load_failed),
                 body = stringResource(state.error.messageRes()),
             ) {
@@ -82,7 +81,7 @@ fun MatchesScreen(
             }
             is MatchesState.Loaded -> if (state.matches.isEmpty()) {
                 MessageView(
-                    icon = Icons.Outlined.PersonSearch,
+                    icon = AppIcons.PersonSearch,
                     title = stringResource(R.string.matches_empty_title),
                     body = stringResource(R.string.matches_empty_body),
                 ) {
@@ -125,11 +124,12 @@ fun MatchesScreen(
 }
 
 @Composable
-private fun MatchCard(match: Match, starting: Boolean, enabled: Boolean, onMessage: () -> Unit) {
+internal fun MatchCard(match: Match, starting: Boolean, enabled: Boolean, onMessage: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
+                UserAvatar(match.owner.id, match.owner.fullName, match.owner.username, size = 44.dp)
+                Column(modifier = Modifier.weight(1f).padding(start = Spacing.sm + Spacing.xs)) {
                     Text(match.title, style = MaterialTheme.typography.titleMedium)
                     Text(
                         listOfNotNull(

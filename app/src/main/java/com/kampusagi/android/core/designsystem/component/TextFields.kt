@@ -1,11 +1,9 @@
 package com.kampusagi.android.core.designsystem.component
 
+import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -85,7 +83,7 @@ fun PasswordField(
         trailingIcon = {
             IconButton(onClick = { visible = !visible }) {
                 Icon(
-                    imageVector = if (visible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                    imageVector = if (visible) AppIcons.VisibilityOff else AppIcons.Visibility,
                     contentDescription = stringResource(
                         if (visible) R.string.cd_hide_password else R.string.cd_show_password,
                     ),

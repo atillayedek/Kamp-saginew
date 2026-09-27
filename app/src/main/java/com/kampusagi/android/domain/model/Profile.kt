@@ -19,6 +19,15 @@ data class Profile(
     val universityName: String?,
     val department: String?,
     val status: AccountStatus,
+    val bio: String? = null,
+    /** Path in the private `avatars` bucket; null shows the initials avatar. */
+    val avatarPath: String? = null,
+)
+
+data class ProfileStats(
+    val postCount: Int,
+    val activeRequirementCount: Int,
+    val conversationCount: Int,
 )
 
 data class ProfileDraft(

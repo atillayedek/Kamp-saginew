@@ -10,6 +10,7 @@ import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.domain.repository.CommunityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +39,10 @@ class FeedViewModel @Inject constructor(
     var selectedScope by mutableStateOf(PostScope.GENERAL)
         private set
 
+    /** Category filter shared by both scopes; null shows every category. */
+    var selectedCategory by mutableStateOf<PostCategory?>(null)
+        private set
+
     private val feeds = mutableStateMapOf<PostScope, FeedState>()
 
     /** Transient error from a like that could not be saved. */
@@ -53,6 +58,14 @@ class FeedViewModel @Inject constructor(
     fun selectScope(scope: PostScope) {
         selectedScope = scope
         if (!state(scope).loaded && !state(scope).isLoading) loadFirstPage(scope)
+    }
+
+    /** A new filter starts both feeds over; the selected one loads now, the other when opened. */
+    fun selectCategory(category: PostCategory?) {
+        if (category == selectedCategory) return
+        selectedCategory = category
+        feeds.clear()
+        loadFirstPage(selectedScope)
     }
 
     fun retry() = loadFirstPage(selectedScope)
@@ -72,7 +85,7 @@ class FeedViewModel @Inject constructor(
         if (current.isLoadingMore || current.isLoading || current.isRefreshing) return
         feeds[scope] = current.copy(isLoadingMore = true, error = null)
         viewModelScope.launch {
-            feeds[scope] = when (val result = repository.feed(scope, cursor)) {
+            feeds[scope] = when (val result = repository.feed(scope, selectedCategory, cursor)) {
                 is AppResult.Success -> {
                     val known = state(scope).posts.map { it.id }.toSet()
                     state(scope).copy(
@@ -86,9 +99,13 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    /** Reloads the scope the new post was shared in, so it appears on top. */
+    /** Reloads the scope the new post was shared in, so it appears on top (the filter is cleared so it is visible). */
     fun onPostCreated(scope: PostScope) {
         selectedScope = scope
+        if (selectedCategory != null) {
+            selectedCategory = null
+            feeds.clear()
+        }
         loadFirstPage(scope)
     }
 
@@ -136,7 +153,7 @@ class FeedViewModel @Inject constructor(
     }
 
     private suspend fun fetchFirst(scope: PostScope, current: FeedState): FeedState =
-        when (val result = repository.feed(scope, cursor = null)) {
+        when (val result = repository.feed(scope, selectedCategory, cursor = null)) {
             is AppResult.Success -> FeedState(
                 posts = result.value.posts,
                 nextCursor = result.value.nextCursor,
