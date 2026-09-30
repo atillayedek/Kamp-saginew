@@ -6,8 +6,7 @@ import { Button, ErrorBox, inputClass } from "@/components/admin/ui";
 import { invoke } from "@/lib/admin-api";
 import { backendState, config } from "@/lib/config";
 import { errorMessage } from "@/lib/errors";
-
-const CONFIRM_WORD = "SİL";
+import { CONFIRM_WORD, isDeleteConfirmation } from "./confirm";
 
 /**
  * Signs in with a throw-away client (no stored session), calls the same
@@ -39,7 +38,7 @@ export function DeleteAccountForm() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (confirmText.trim().toLocaleUpperCase("tr-TR") !== CONFIRM_WORD) {
+    if (!isDeleteConfirmation(confirmText)) {
       setError(errorMessage("confirmation_required"));
       return;
     }

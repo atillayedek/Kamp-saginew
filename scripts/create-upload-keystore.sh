@@ -28,13 +28,20 @@ if [ "$store_password" != "$store_password_again" ] || [ "${#store_password}" -l
   exit 1
 fi
 read -r -p "Ad soyad veya şirket adı (sertifikada görünür): " owner_name
+owner_name="$(printf '%s' "$owner_name" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+if [ -z "$owner_name" ]; then
+  echo "Ad boş olamaz." >&2
+  exit 1
+fi
+# Distinguished-name special characters are escaped so "Acme, Ltd." stays one CN value.
+escaped_owner="$(printf '%s' "$owner_name" | sed -e 's/[\\,+"<>;=#]/\\&/g')"
 
 # PKCS12 keystores use the store password for the key as well.
 keytool -genkeypair -v \
   -keystore "$keystore" -storetype PKCS12 \
   -alias "$alias_name" -keyalg RSA -keysize 4096 -validity 10000 \
   -storepass "$store_password" -keypass "$store_password" \
-  -dname "CN=${owner_name}, O=KampusAgi, C=TR" >/dev/null
+  -dname "CN=${escaped_owner}, O=KampusAgi, C=TR" >/dev/null
 chmod 600 "$keystore"
 
 base64_file="$out_dir/keystore.base64.txt"
