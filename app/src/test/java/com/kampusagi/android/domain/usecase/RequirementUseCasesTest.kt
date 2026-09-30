@@ -84,10 +84,11 @@ class RequirementUseCasesTest {
     fun `create trims the draft and never sends an invalid one`() = runTest {
         val repository = RecordingRequirementRepository()
         val useCase = CreateRequirementUseCase(repository)
-        assertEquals(FormResult.Invalid(setOf(DraftInputError.TITLE_INVALID)), useCase(draft.copy(title = "")))
+        // The use case validates against the real clock, so the time must be in the future.
+        val future = draft.copy(startsAt = Instant.now().plusSeconds(3600).toString())
+        assertEquals(FormResult.Invalid(setOf(DraftInputError.TITLE_INVALID)), useCase(future.copy(title = "")))
         assertNull(repository.created)
 
-        val future = draft.copy(startsAt = Instant.now().plusSeconds(3600).toString())
         assertEquals(FormResult.Success("id-1"), useCase(future))
         val sent = repository.created!!
         assertEquals("Basketbol maçı", sent.title)
