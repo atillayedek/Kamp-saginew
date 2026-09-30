@@ -598,4 +598,9 @@
     <string name="error_promo_code_invalid">Bu kod geçerli değil ya da süresi dolmuş.</string>
     <string name="error_promo_code_used">Bu kodu daha önce kullandın.</string>
     <string name="error_promo_code_exhausted">Bu kodun kullanım hakkı dolmuş.</string>
+
+    <!-- Sign-up consent -->
+    <string name="sign_up_consent">18 yaşından büyüğüm; Kullanım Koşulları\'nı ve Gizlilik Politikası\'nı okudum, kabul ediyorum.</string>
+    <string name="terms_of_use">Kullanım koşulları</string>
+    <string name="privacy_policy">Gizlilik politikası</string>
 </resources>

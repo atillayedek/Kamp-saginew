@@ -30,6 +30,8 @@ const MESSAGES: Record<string, string> = {
   invalid_promo_code: "Kod 4–32 karakter (A–Z, 0–9, -), süre 1–365 gün, kullanım 1–100.000 olmalı; bitiş gelecekte olmalı.",
   promo_code_taken: "Bu kod zaten var.",
   promo_code_not_found: "Kod bulunamadı ya da zaten kapatılmış.",
+  confirmation_required: "Silmeyi onaylamak için kutuya SİL yaz.",
+  account_deletion_failed: "Hesap silinemedi. Biraz sonra tekrar dene; sorun sürerse bize yaz.",
   server_error: "Sunucu hatası. Biraz sonra tekrar dene.",
   "Invalid login credentials": "E-posta ya da şifre hatalı.",
   "Email not confirmed": "Bu e-posta adresi henüz onaylanmamış.",

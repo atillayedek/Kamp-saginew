@@ -13,7 +13,6 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
@@ -64,6 +63,8 @@ class BillingGateway @Inject constructor(
     private val client: BillingClient = BillingClient.newBuilder(context)
         .setListener(listener)
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+        // Billing 8 reconnects on its own when Play's service restarts.
+        .enableAutoServiceReconnection()
         .build()
 
     private val connection = Mutex()
@@ -83,12 +84,17 @@ class BillingGateway @Inject constructor(
                 },
             )
             .build()
-        val result = client.queryProductDetails(params)
-        if (result.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-            Log.w(TAG, "queryProductDetails failed: ${result.billingResult.debugMessage}")
+        // Billing 8 reports found and unknown products separately.
+        val (billingResult, found) = suspendCancellableCoroutine { continuation ->
+            client.queryProductDetailsAsync(params) { billingResult, result ->
+                if (continuation.isActive) continuation.resume(billingResult to result.productDetailsList)
+            }
+        }
+        if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+            Log.w(TAG, "queryProductDetails failed: ${billingResult.debugMessage}")
             return AppResult.Failure(AppError.BILLING_UNAVAILABLE)
         }
-        val offers = result.productDetailsList.orEmpty().mapNotNull { details ->
+        val offers = found.mapNotNull { details ->
             productCache[details.productId] = details
             val phase = details.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.lastOrNull()
                 ?: return@mapNotNull null

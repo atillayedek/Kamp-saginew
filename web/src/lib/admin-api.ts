@@ -185,7 +185,7 @@ async function rpc<T>(client: SupabaseClient, name: string, args: Record<string,
 }
 
 /** Edge Function errors carry {"error": "<code>"}; surface that code. */
-async function invoke<T>(client: SupabaseClient, name: string, body: unknown, query = ""): Promise<T> {
+export async function invoke<T>(client: SupabaseClient, name: string, body: unknown, query = ""): Promise<T> {
   const { data, error } = await client.functions.invoke(`${name}${query}`, { body: body as Record<string, unknown> });
   if (error) {
     if (error instanceof FunctionsHttpError) {

@@ -35,4 +35,7 @@ object AppConfig {
 
     /** Public privacy policy page required by Google Play; empty when the build was made without it. */
     val privacyPolicyUrl: String = BuildConfig.PRIVACY_POLICY_URL.takeIf { it.startsWith("https://") }.orEmpty()
+
+    /** Terms of use accepted at sign-up; empty when the build was made without the website address. */
+    val termsUrl: String = BuildConfig.TERMS_URL.takeIf { it.startsWith("https://") }.orEmpty()
 }

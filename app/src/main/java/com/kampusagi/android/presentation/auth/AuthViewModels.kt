@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kampusagi.android.core.config.AppConfig
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.SignUpResult
@@ -65,6 +66,17 @@ class SignUpViewModel @Inject constructor(private val signUp: SignUpUseCase) : V
     var verificationSentTo by mutableStateOf<String?>(null)
         private set
 
+    /** The person confirms being 18+ and accepts the terms and privacy policy before an account is created. */
+    var acceptedTerms by mutableStateOf(false)
+        private set
+
+    val termsUrl: String = AppConfig.termsUrl
+    val privacyPolicyUrl: String = AppConfig.privacyPolicyUrl
+
+    fun onAcceptedTermsChange(value: Boolean) {
+        acceptedTerms = value
+    }
+
     fun onEmailChange(value: String) {
         state = state.copy(email = value, inputErrors = state.inputErrors - AuthInputError.EMAIL_INVALID, error = null)
     }
@@ -82,7 +94,7 @@ class SignUpViewModel @Inject constructor(private val signUp: SignUpUseCase) : V
     }
 
     fun submit() {
-        if (state.isSubmitting) return
+        if (state.isSubmitting || !acceptedTerms) return
         state = state.copy(isSubmitting = true, error = null)
         viewModelScope.launch {
             when (val result = signUp(state.email, state.password, state.confirmation)) {

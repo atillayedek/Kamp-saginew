@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -122,9 +124,17 @@ fun SignUpScreen(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        TermsConsent(
+            accepted = viewModel.acceptedTerms,
+            onAcceptedChange = viewModel::onAcceptedTermsChange,
+            termsUrl = viewModel.termsUrl,
+            privacyPolicyUrl = viewModel.privacyPolicyUrl,
+            enabled = !state.isSubmitting,
+        )
         PrimaryButton(
             text = stringResource(R.string.action_create_account),
             onClick = viewModel::submit,
+            enabled = viewModel.acceptedTerms,
             loading = state.isSubmitting,
         )
         LinkButton(stringResource(R.string.action_have_account), onBackToSignIn, enabled = !state.isSubmitting)
@@ -241,5 +251,42 @@ fun PasswordRecoveryScreen(
             loading = state.isSubmitting,
         )
         LinkButton(stringResource(R.string.action_cancel), { onFinished(false) }, enabled = !state.isSubmitting)
+    }
+}
+
+/** Required before sign-up: age (18+) and acceptance of the terms and privacy policy, each openable. */
+@Composable
+private fun TermsConsent(
+    accepted: Boolean,
+    onAcceptedChange: (Boolean) -> Unit,
+    termsUrl: String,
+    privacyPolicyUrl: String,
+    enabled: Boolean,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    fun open(url: String) {
+        try {
+            context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
+        } catch (e: android.content.ActivityNotFoundException) {
+            android.util.Log.w("SignUp", "No browser to open $url", e)
+        }
+    }
+    androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.Top) {
+        androidx.compose.material3.Checkbox(checked = accepted, onCheckedChange = onAcceptedChange, enabled = enabled)
+        androidx.compose.foundation.layout.Column {
+            Text(
+                text = stringResource(R.string.sign_up_consent),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+            androidx.compose.foundation.layout.Row {
+                if (termsUrl.isNotEmpty()) {
+                    androidx.compose.material3.TextButton(onClick = { open(termsUrl) }) { Text(stringResource(R.string.terms_of_use)) }
+                }
+                if (privacyPolicyUrl.isNotEmpty()) {
+                    androidx.compose.material3.TextButton(onClick = { open(privacyPolicyUrl) }) { Text(stringResource(R.string.privacy_policy)) }
+                }
+            }
+        }
     }
 }

@@ -56,7 +56,10 @@ if (supabaseAnonKey.isNotEmpty() && !isClientKey(supabaseAnonKey)) {
     )
 }
 
-val privacyPolicyUrl = config("PRIVACY_POLICY_URL")
+// The public website hosts the legal pages Google Play asks for; each can also be given on its own.
+val websiteUrl = config("WEBSITE_URL").trimEnd('/')
+val privacyPolicyUrl = config("PRIVACY_POLICY_URL").ifEmpty { if (websiteUrl.isEmpty()) "" else "$websiteUrl/gizlilik" }
+val termsUrl = if (websiteUrl.isEmpty()) "" else "$websiteUrl/kullanim-kosullari"
 
 val releaseStoreFile = config("KAMPUSAGI_KEYSTORE_FILE", keystoreProperties)
 val hasReleaseSigning = releaseStoreFile.isNotEmpty() && rootProject.file(releaseStoreFile).exists()
@@ -76,6 +79,7 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"$privacyPolicyUrl\"")
+        buildConfigField("String", "TERMS_URL", "\"$termsUrl\"")
     }
 
     signingConfigs {

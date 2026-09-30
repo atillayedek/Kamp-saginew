@@ -19,7 +19,7 @@ describe("client key guard", () => {
   });
 
   it("reports why the backend is unavailable", () => {
-    const base = { playStoreUrl: "", privacyPolicyUrl: "" };
+    const base = { playStoreUrl: "", privacyPolicyUrl: "", legalName: "", contactEmail: "" };
     expect(backendState({ ...base, supabaseUrl: "", supabaseAnonKey: "" })).toBe("missing");
     expect(backendState({ ...base, supabaseUrl: "https://x.supabase.co", supabaseAnonKey: "sb_secret_x" })).toBe("unsafe_key");
     expect(backendState({ ...base, supabaseUrl: "https://x.supabase.co", supabaseAnonKey: "sb_publishable_x" })).toBe("ready");

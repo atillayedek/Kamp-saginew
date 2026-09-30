@@ -111,6 +111,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           PRIVACY_POLICY_URL: ${{ vars.PRIVACY_POLICY_URL }}
+          WEBSITE_URL: ${{ vars.WEBSITE_URL }}
         # Prints only whether the values are present, never the values.
         run: |
           if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
@@ -118,10 +119,12 @@ jobs:
           else
             echo "::warning::Supabase secrets missing: this build shows the 'not configured' screen."
           fi
-          if [ -n "$PRIVACY_POLICY_URL" ]; then
-            echo "::notice::Privacy policy URL configured."
+          if [ -n "$WEBSITE_URL" ]; then
+            echo "::notice::Website URL configured: privacy policy and terms links are in the app."
+          elif [ -n "$PRIVACY_POLICY_URL" ]; then
+            echo "::warning::WEBSITE_URL variable missing: the terms of use link is not in the app."
           else
-            echo "::warning::PRIVACY_POLICY_URL variable missing: the app states that the policy is not available."
+            echo "::warning::WEBSITE_URL variable missing: the app states that the privacy policy and terms are not available."
           fi
 
       - name: Prepare release signing
@@ -147,6 +150,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           PRIVACY_POLICY_URL: ${{ vars.PRIVACY_POLICY_URL }}
+          WEBSITE_URL: ${{ vars.WEBSITE_URL }}
         run: ./gradlew --no-daemon --stacktrace testDebugUnitTest lintRelease assembleDebug bundleRelease
 
       - name: Check release bundle signature

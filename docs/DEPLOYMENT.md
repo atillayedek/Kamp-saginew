@@ -72,10 +72,15 @@ FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push
 ### Hesap silme ve gizlilik (Google Play zorunlulukları)
 
 1. `delete-account` Edge Function'ı deploy edilmiş olmalı (yukarıda). Ek secret gerekmez; `SUPABASE_SERVICE_ROLE_KEY` Supabase tarafından sağlanır.
-2. **Gizlilik politikası:** herkese açık bir `https://` sayfası yayınla ve adresini `PRIVACY_POLICY_URL` olarak ver
-   (GitHub → Settings → Variables → Actions → `PRIVACY_POLICY_URL`, yerelde `local.properties`). Aynı adres Play Console → Uygulama içeriği → Gizlilik politikası alanına girilir.
-   Politikada şikayet edilen mesajların yöneticilere gösterildiği belirtilmelidir.
-3. **Web'den hesap silme talebi:** Play Console, uygulamayı kurmadan da silme talebi yapılabilen bir web adresi ister (Veri güvenliği → Hesap silme). Bu repo bir web sayfası içermez; ürün sahibinin bu sayfayı sağlaması gerekir.
+2. **Yasal sayfalar web sitesindedir** (`web/`): `/gizlilik` (KVKK aydınlatma + gizlilik politikası), `/kullanim-kosullari`,
+   `/cocuk-guvenligi` (CSAE standartları), `/hesap-silme` (uygulamasız silme: e-posta + şifre ile giriş, `delete-account` çağrısı,
+   oturum tarayıcıda saklanmaz). Vercel'de `NEXT_PUBLIC_LEGAL_NAME` (veri sorumlusu adı) ve `NEXT_PUBLIC_CONTACT_EMAIL` tanımlanmazsa
+   sayfalar bunu açıkça uyarı olarak gösterir; Play'e göndermeden önce ikisi de dolu olmalı.
+3. **Uygulamadaki bağlantılar:** GitHub → Settings → Variables → Actions → `WEBSITE_URL` (ör. `https://kampusagi-nine.vercel.app`).
+   Build bundan `PRIVACY_POLICY_URL` (`/gizlilik`, ayrıca verilirse o kazanır) ve `TERMS_URL` (`/kullanim-kosullari`) üretir;
+   kayıt ekranındaki 18 yaş / koşullar onay kutusu bu sayfaları açar. Yerelde `local.properties` → `WEBSITE_URL=...`.
+4. Play Console'a girilecek tüm metinler, Veri güvenliği / içerik derecelendirmesi yanıtları ve yayın sırası: `docs/play-store/STORE_LISTING.md`.
+   Simge ve öne çıkan grafik aynı klasörde. Ekran görüntüleri gerçek cihazdan alınır.
 
 ### Toplu e-posta (Resend) — admin paneli
 
@@ -95,7 +100,7 @@ Resend hesabında şu an doğrulanmış tek alan adı başka bir ürüne ait; Ka
 
 - Proje: `kampusagi` (Vercel), kök dizin `web`, framework Next.js.
 - Ortam değişkenleri: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (yalnızca `sb_publishable_…`; gizli anahtar
-  konursa site "kurulum gerekli" gösterir), isteğe bağlı `NEXT_PUBLIC_PLAY_STORE_URL`, `NEXT_PUBLIC_PRIVACY_POLICY_URL`.
+  konursa site "kurulum gerekli" gösterir), `NEXT_PUBLIC_LEGAL_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL` (yasal sayfalar için gerekli), isteğe bağlı `NEXT_PUBLIC_PLAY_STORE_URL`.
 - Admin paneli `/admin`. Landing page'de bağlantısı yoktur, arama motorlarına kapalıdır.
 - Supabase Auth → URL Configuration'a site adresini ekle (şifre sıfırlama bağlantıları için).
 
@@ -113,7 +118,8 @@ Release imzası: `keystore.properties` veya ortam değişkenleri
 `KAMPUSAGI_KEYSTORE_FILE`, `KAMPUSAGI_KEYSTORE_PASSWORD`, `KAMPUSAGI_KEY_ALIAS`, `KAMPUSAGI_KEY_PASSWORD`.
 Sağlanmazsa release AAB imzasız üretilir ve Play'e yüklenemez.
 
-CI'da imzalı AAB için GitHub repo secret'ları: `KAMPUSAGI_KEYSTORE_BASE64` (`base64 -w0 upload.jks` çıktısı),
+Yükleme anahtarını kendi bilgisayarında `bash scripts/create-upload-keystore.sh` ile oluştur; betik secret değerlerini
+nereye gireceğini yazar, hiçbir şeyi repoya koymaz. CI'da imzalı AAB için GitHub repo secret'ları: `KAMPUSAGI_KEYSTORE_BASE64` (`base64 -w0 upload.jks` çıktısı),
 `KAMPUSAGI_KEYSTORE_PASSWORD`, `KAMPUSAGI_KEY_ALIAS`, `KAMPUSAGI_KEY_PASSWORD`. İş akışı keystore'u yalnızca
 runner'ın geçici dizinine açar, varlığını raporlar, içeriğini yazdırmaz ve `jarsigner -verify` ile imzayı doğrular.
 Play App Signing kullanılır: bu anahtar yükleme anahtarıdır. `versionCode` CI'da iş akışı çalıştırma numarasıdır

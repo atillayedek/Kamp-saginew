@@ -7,6 +7,10 @@ export interface PublicConfig {
   supabaseAnonKey: string;
   playStoreUrl: string;
   privacyPolicyUrl: string;
+  /** Data controller shown on the legal pages (person or company name). */
+  legalName: string;
+  /** Where users and Google Play reach the team. */
+  contactEmail: string;
 }
 
 export const config: PublicConfig = {
@@ -14,6 +18,8 @@ export const config: PublicConfig = {
   supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "",
   playStoreUrl: process.env.NEXT_PUBLIC_PLAY_STORE_URL?.trim() ?? "",
   privacyPolicyUrl: process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL?.trim() ?? "",
+  legalName: process.env.NEXT_PUBLIC_LEGAL_NAME?.trim() ?? "",
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ?? "",
 };
 
 /** True for sb_publishable_ keys and JWTs whose role claim is anon. */

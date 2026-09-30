@@ -7,6 +7,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+import { LegalFooter } from "@/components/legal/LegalPage";
 import { config } from "@/lib/config";
 
 const FEATURES = [
@@ -131,16 +132,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <span>© {new Date().getFullYear()} KampüsAğı</span>
-          {config.privacyPolicyUrl ? (
-            <a href={config.privacyPolicyUrl} className="hover:text-ink">
-              Gizlilik politikası
-            </a>
-          ) : null}
-        </div>
-      </footer>
+      <LegalFooter />
     </div>
   );
 }
