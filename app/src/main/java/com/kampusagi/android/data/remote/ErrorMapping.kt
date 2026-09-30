@@ -99,6 +99,13 @@ private fun knownCode(text: String): AppError? = when {
     "user_not_found" in text || "report_target_not_found" in text || "report_not_found" in text -> AppError.NOT_FOUND
     "invalid_report" in text || "invalid_action" in text || "confirmation_required" in text -> AppError.INVALID_INPUT
     "account_deletion_failed" in text -> AppError.SERVER
+    "premium_required" in text -> AppError.PREMIUM_REQUIRED
+    "too_many_groups" in text -> AppError.TOO_MANY_GROUPS
+    "group_full" in text -> AppError.GROUP_FULL
+    "owner_cannot_leave" in text -> AppError.OWNER_CANNOT_LEAVE
+    "group_not_allowed" in text -> AppError.GROUP_NOT_ALLOWED
+    "group_not_found" in text || "message_not_found" in text || "note_not_found" in text -> AppError.NOT_FOUND
+    "invalid_group" in text || "invalid_note" in text -> AppError.INVALID_INPUT
     "poll_closed" in text -> AppError.POLL_CLOSED
     "event_ended" in text -> AppError.EVENT_ENDED
     "too_many_saved_posts" in text -> AppError.TOO_MANY_SAVED

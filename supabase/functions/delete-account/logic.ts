@@ -6,7 +6,7 @@ export type ListPage = (folder: string, offset: number, limit: number) => Promis
 export const PAGE_SIZE = 100;
 
 /** Buckets where a person uploads into a folder named after their user id. */
-export const USER_BUCKETS = ["student-documents", "avatars", "post-media"] as const;
+export const USER_BUCKETS = ["student-documents", "avatars", "post-media", "group-media", "course-notes"] as const;
 
 /** The body must say {"confirm": "DELETE"}; an accidental call deletes nothing. */
 export function isConfirmed(body: Record<string, unknown> | null): boolean {

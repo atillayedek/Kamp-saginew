@@ -142,4 +142,7 @@ fun ReportTarget.titleRes(): Int = when (this) {
     ReportTarget.COMMENT -> R.string.report_comment
     ReportTarget.USER -> R.string.report_user
     ReportTarget.MESSAGE -> R.string.report_message
+    ReportTarget.GROUP_MESSAGE -> R.string.report_group_message
+    ReportTarget.GROUP -> R.string.report_group
+    ReportTarget.NOTE -> R.string.report_note
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <!-- Only the review cache folder is shareable (see AdminRepositoryImpl.REVIEW_DIRECTORY). -->
+    <!-- Only these cache folders are shareable (AdminRepositoryImpl.REVIEW_DIRECTORY, NoteRepositoryImpl.NOTES_DIRECTORY). -->
     <cache-path name="review" path="review/" />
+    <cache-path name="notes" path="notes/" />
 </paths>

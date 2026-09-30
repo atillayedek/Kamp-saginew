@@ -1,6 +1,8 @@
 // Pure validation rules for student documents, shared by the Edge Function
 // and its tests. The database repeats the path check (defence in depth).
 
+import { checkPdf, type PdfCheck } from "../_shared/pdf.ts";
+
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 
 const PATH = /^([0-9a-f-]{36})\/[0-9a-f-]{36}\.pdf$/;
@@ -12,22 +14,11 @@ export function isOwnDocumentPath(path: unknown, userId: string): path is string
   return match !== null && match[1] === userId;
 }
 
-export type DocumentCheck = "ok" | "empty" | "too_large" | "not_pdf";
+export type DocumentCheck = PdfCheck;
 
-/**
- * Checks the stored bytes, not the declared MIME type: a real PDF starts with
- * "%PDF-" (optionally after a UTF-8 BOM or whitespace in the first KB, which
- * PDF readers accept).
- */
+/** A real PDF of at most [MAX_DOCUMENT_BYTES]. */
 export function checkDocument(bytes: Uint8Array): DocumentCheck {
-  if (bytes.length === 0) return "empty";
-  if (bytes.length > MAX_DOCUMENT_BYTES) return "too_large";
-  const head = new TextDecoder("latin1").decode(bytes.subarray(0, 1024));
-  const index = head.indexOf("%PDF-");
-  if (index < 0) return "not_pdf";
-  // Only whitespace or a BOM may precede the header.
-  const before = head.slice(0, index).replace(/^﻿|^\xEF\xBB\xBF/, "");
-  return before.trim() === "" ? "ok" : "not_pdf";
+  return checkPdf(bytes, MAX_DOCUMENT_BYTES);
 }
 
 /** Maps the database's P0001 messages to HTTP responses. */

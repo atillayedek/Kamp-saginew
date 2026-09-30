@@ -1,8 +1,8 @@
 // POST /functions/v1/delete-account  {"confirm": "DELETE"}
 //
 // Permanently deletes the caller's account. Everything the person uploaded
-// (student documents, profile photos, post photos) is removed from storage
-// first, then the auth user is deleted; everything in the database that
+// (student documents, profile/post/group photos, course notes) is removed
+// from storage first, then the auth user is deleted; everything in the database that
 // belongs to the person (profile, posts, comments, likes, requirements, chats,
 // notifications, blocks, reports, entitlements) goes with it through ON DELETE
 // CASCADE. A Google Play subscription is billed by Google and must be

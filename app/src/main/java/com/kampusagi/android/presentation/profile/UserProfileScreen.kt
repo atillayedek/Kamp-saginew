@@ -357,6 +357,7 @@ private fun ProfileHeader(profile: UserProfile, viewModel: UserProfileViewModel,
             Text(school, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         profile.bio?.let { Text(it, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = Spacing.xs)) }
+        ReputationSection(profile.id, modifier = Modifier.padding(top = Spacing.xs))
         if (viewModel.reportSent) {
             Text(stringResource(R.string.report_sent), color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall)
         }

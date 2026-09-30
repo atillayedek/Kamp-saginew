@@ -61,6 +61,7 @@ fun PremiumScreen(
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
                 CurrentStatus(state.subscription)
+                PremiumPerks()
                 viewModel.message?.let { Text(stringResource(it.textRes()), style = MaterialTheme.typography.bodyMedium) }
                 viewModel.error?.let {
                     Text(stringResource(it.messageRes()), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
@@ -116,6 +117,23 @@ fun PremiumScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+/** What Premium unlocks besides the plan's limits; each is enforced by the server. */
+@Composable
+private fun PremiumPerks() {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Text(stringResource(R.string.premium_perks_title), style = MaterialTheme.typography.titleMedium)
+            listOf(
+                R.string.premium_perk_channels,
+                R.string.premium_perk_channel_photo,
+                R.string.premium_perk_channel_polls,
+                R.string.premium_perk_badge,
+                R.string.premium_perk_ai,
+            ).forEach { Text("• " + stringResource(it), style = MaterialTheme.typography.bodyMedium) }
         }
     }
 }

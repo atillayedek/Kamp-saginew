@@ -27,6 +27,9 @@ verify_jwt = true
 [functions.admin-broadcast]
 verify_jwt = true
 
+[functions.submit-course-note]
+verify_jwt = true
+
 # Opened from e-mail links and mail clients without a session; the HMAC signature is the check.
 [functions.email-unsubscribe]
 verify_jwt = false

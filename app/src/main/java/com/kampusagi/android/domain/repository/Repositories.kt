@@ -34,6 +34,18 @@ import com.kampusagi.android.domain.model.ReportReason
 import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.model.University
+import com.kampusagi.android.domain.model.CourseNote
+import com.kampusagi.android.domain.model.GroupDetail
+import com.kampusagi.android.domain.model.GroupKind
+import com.kampusagi.android.domain.model.GroupMember
+import com.kampusagi.android.domain.model.GroupMessage
+import com.kampusagi.android.domain.model.GroupRole
+import com.kampusagi.android.domain.model.GroupSummary
+import com.kampusagi.android.domain.model.NewCourseNote
+import com.kampusagi.android.domain.model.NewGroup
+import com.kampusagi.android.domain.model.NewGroupMessage
+import com.kampusagi.android.domain.model.NoteCourse
+import com.kampusagi.android.domain.model.Reputation
 import com.kampusagi.android.domain.model.UserProfile
 import com.kampusagi.android.domain.model.Verification
 import java.io.File
@@ -230,3 +242,59 @@ interface AccountRepository {
 
     suspend fun setMarketingConsent(optIn: Boolean): AppResult<Unit>
 }
+
+/** Channels (Premium) and study groups. */
+interface GroupRepository {
+    suspend fun isPremium(): AppResult<Boolean>
+    suspend fun myGroups(kind: GroupKind): AppResult<List<GroupSummary>>
+    suspend fun discover(kind: GroupKind, query: String?): AppResult<List<GroupSummary>>
+    suspend fun group(groupId: String): AppResult<GroupDetail>
+    suspend fun members(groupId: String): AppResult<List<GroupMember>>
+    suspend fun create(group: NewGroup): AppResult<String>
+    suspend fun update(groupId: String, name: String, description: String?, courseCode: String?): AppResult<Unit>
+
+    /** Uploads the JPEG and makes it the group photo; null removes the photo. */
+    suspend fun setPhoto(groupId: String, jpeg: ByteArray?): AppResult<Unit>
+    suspend fun delete(groupId: String): AppResult<Unit>
+    suspend fun join(groupId: String): AppResult<Unit>
+    suspend fun leave(groupId: String): AppResult<Unit>
+    suspend fun setRole(groupId: String, userId: String, role: GroupRole): AppResult<Unit>
+    suspend fun removeMember(groupId: String, userId: String): AppResult<Unit>
+
+    /** Newest first; [before] pages towards older messages. */
+    suspend fun messages(groupId: String, before: MessageCursor?): AppResult<List<GroupMessage>>
+
+    /** Idempotent for the same [messageId]. */
+    suspend fun send(groupId: String, messageId: String, message: NewGroupMessage): AppResult<Unit>
+    suspend fun deleteMessage(messageId: String): AppResult<Unit>
+
+    /** Returns the like count after the change. */
+    suspend fun setLiked(messageId: String, liked: Boolean): AppResult<Int>
+
+    /** [messageId] null unpins. */
+    suspend fun pin(groupId: String, messageId: String?): AppResult<Unit>
+    suspend fun markRead(groupId: String): AppResult<Unit>
+
+    /** Emits when a message arrives in [groupId], or in any of the person's groups when null (Supabase Realtime). */
+    fun changes(groupId: String?): Flow<Unit>
+
+    suspend fun downloadPhoto(path: String): AppResult<ByteArray>
+}
+
+/** Course notes shared with the person's university. */
+interface NoteRepository {
+    suspend fun notes(courseCode: String?, query: String?): AppResult<List<CourseNote>>
+    suspend fun courses(): AppResult<List<NoteCourse>>
+
+    /** Uploads the PDF; the backend checks it is a real PDF before listing it. */
+    suspend fun upload(note: NewCourseNote): AppResult<Unit>
+
+    /** Counts the opening and downloads the PDF into the app's private cache. */
+    suspend fun open(noteId: String): AppResult<File>
+    suspend fun delete(noteId: String): AppResult<Unit>
+}
+
+interface ReputationRepository {
+    suspend fun reputation(userId: String): AppResult<Reputation>
+}
+

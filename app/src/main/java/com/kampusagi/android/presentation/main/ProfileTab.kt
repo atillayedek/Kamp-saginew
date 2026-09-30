@@ -36,6 +36,7 @@ import com.kampusagi.android.core.designsystem.theme.Spacing
 import com.kampusagi.android.domain.model.Profile
 import com.kampusagi.android.presentation.common.avatar.UserAvatar
 import com.kampusagi.android.presentation.profile.ProfileStatsViewModel
+import com.kampusagi.android.presentation.profile.ReputationSection
 import com.kampusagi.android.presentation.profile.StatsState
 
 /** Instagram-style profile: photo and counts, name, bio, then the account menu. */
@@ -50,6 +51,7 @@ fun ProfileTab(
     onEditProfile: () -> Unit,
     onOpenSaved: () -> Unit,
     onOpenMyPosts: () -> Unit,
+    onOpenNotes: () -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
     statsViewModel: ProfileStatsViewModel = hiltViewModel(),
@@ -113,6 +115,7 @@ fun ProfileTab(
                 } else {
                     Text(profile.bio, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = Spacing.xs))
                 }
+                ReputationSection(profile.id, modifier = Modifier.padding(top = Spacing.sm))
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
@@ -130,6 +133,7 @@ fun ProfileTab(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             MenuRow(AppIcons.GridView, stringResource(R.string.profile_my_posts), onClick = onOpenMyPosts)
             MenuRow(AppIcons.Bookmark, stringResource(R.string.saved_title), onClick = onOpenSaved)
+            MenuRow(AppIcons.MenuBook, stringResource(R.string.notes_title), onClick = onOpenNotes)
             MenuRow(AppIcons.Mail, profile.email, onClick = null)
             MenuRow(AppIcons.Settings, stringResource(R.string.settings_title), onClick = onOpenSettings)
             if (isAdmin) MenuRow(AppIcons.AdminPanelSettings, stringResource(R.string.action_open_admin), onClick = onOpenAdmin)

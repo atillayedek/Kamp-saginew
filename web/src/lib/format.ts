@@ -65,4 +65,7 @@ export const REPORT_TARGET_LABELS: Record<string, string> = {
   COMMENT: "Yorum",
   MESSAGE: "Mesaj",
   USER: "Kullanıcı",
+  GROUP_MESSAGE: "Kanal/grup mesajı",
+  GROUP: "Kanal/grup",
+  NOTE: "Ders notu",
 };

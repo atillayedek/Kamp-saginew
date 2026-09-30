@@ -21,16 +21,21 @@ import com.kampusagi.android.core.designsystem.icon.AppIcons
 /** Provided by the signed-in part of the app. */
 val LocalPostPhotoLoader = staticCompositionLocalOf<PostPhotoLoader?> { null }
 
-/** One post photo from the private bucket; a failed download can be retried with a tap. */
+/** One post or group photo from its private bucket; a failed download can be retried with a tap. */
 @Composable
-fun PostPhoto(path: String, modifier: Modifier = Modifier, contentScale: ContentScale = ContentScale.Crop) {
+fun PostPhoto(
+    path: String,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    source: PhotoSource = PhotoSource.POST,
+) {
     val loader = LocalPostPhotoLoader.current
-    LaunchedEffect(loader, path) { loader?.request(path) }
+    LaunchedEffect(loader, source, path) { loader?.request(source, path) }
     Box(
         modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
-        when (val state = loader?.state(path) ?: PhotoState.Failed) {
+        when (val state = loader?.state(source, path) ?: PhotoState.Failed) {
             PhotoState.Loading -> CircularProgressIndicator()
             is PhotoState.Loaded -> Image(
                 state.image,
@@ -39,7 +44,7 @@ fun PostPhoto(path: String, modifier: Modifier = Modifier, contentScale: Content
                 modifier = Modifier.fillMaxSize(),
             )
             PhotoState.Failed -> Box(
-                modifier = Modifier.fillMaxSize().clickable(enabled = loader != null) { loader?.retry(path) },
+                modifier = Modifier.fillMaxSize().clickable(enabled = loader != null) { loader?.retry(source, path) },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

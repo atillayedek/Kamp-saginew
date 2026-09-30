@@ -10,6 +10,7 @@ import com.kampusagi.android.data.remote.SupabaseProvider
 import com.kampusagi.android.data.remote.UnknownStatusException
 import com.kampusagi.android.data.remote.UserProfileDto
 import com.kampusagi.android.data.remote.safeCall
+import com.kampusagi.android.data.remote.toDomain
 import com.kampusagi.android.data.remote.toAppError
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
@@ -21,7 +22,6 @@ import com.kampusagi.android.domain.model.Listing
 import com.kampusagi.android.domain.model.NewPost
 import com.kampusagi.android.domain.model.PersonSummary
 import com.kampusagi.android.domain.model.Poll
-import com.kampusagi.android.domain.model.PollOption
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostEvent
@@ -285,14 +285,6 @@ class CommunityRepositoryImpl @Inject constructor(
         poll = poll?.toDomain(),
         event = event?.let { PostEvent(it.startsAt, it.endsAt, it.location, it.attendeeCount, it.attending) },
         listing = listing?.let { Listing(it.priceKurus, it.sold) },
-    )
-
-    private fun PollDto.toDomain() = Poll(
-        id = id,
-        options = options.map { PollOption(it.id, it.label, it.votes) },
-        totalVotes = totalVotes,
-        myOptionId = myOptionId,
-        closesAt = closesAt,
     )
 
     private class PostMissingException : IllegalStateException("Post not returned")

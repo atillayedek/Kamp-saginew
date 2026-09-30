@@ -54,6 +54,14 @@ import com.kampusagi.android.presentation.community.EventsScreen
 import com.kampusagi.android.presentation.community.SavedPostsScreen
 import com.kampusagi.android.presentation.community.SearchScreen
 import com.kampusagi.android.presentation.profile.UserProfileScreen
+import com.kampusagi.android.presentation.group.CreateGroupScreen
+import com.kampusagi.android.presentation.group.DiscoverGroupsScreen
+import com.kampusagi.android.presentation.group.GroupChatScreen
+import com.kampusagi.android.presentation.group.GroupInfoScreen
+import com.kampusagi.android.presentation.group.GroupsViewModel
+import com.kampusagi.android.presentation.group.InboxScreen
+import com.kampusagi.android.presentation.notes.NotesScreen
+import com.kampusagi.android.presentation.notes.UploadNoteScreen
 import com.kampusagi.android.presentation.profile.EditProfileScreen
 import com.kampusagi.android.presentation.requirement.MyMatchesScreen
 import com.kampusagi.android.domain.model.Profile
@@ -110,6 +118,7 @@ fun MainScreen(
     val requirementsViewModel: RequirementsViewModel = hiltViewModel(key = "requirements-${profile.id}")
     val conversationsViewModel: ConversationsViewModel = hiltViewModel(key = "conversations-${profile.id}")
     val notificationsViewModel: NotificationsViewModel = hiltViewModel(key = "notifications-${profile.id}")
+    val groupsViewModel: GroupsViewModel = hiltViewModel(key = "groups-${profile.id}")
     val mediaHost = hiltViewModel<AvatarHostViewModel>()
 
     // Android 13+ asks once for permission to show system notifications.
@@ -158,7 +167,7 @@ fun MainScreen(
                                 }
                             },
                             icon = {
-                                val unread = if (tab == Tab.CHAT) conversationsViewModel.unreadTotal else 0
+                                val unread = if (tab == Tab.CHAT) conversationsViewModel.unreadTotal + groupsViewModel.unreadTotal else 0
                                 when {
                                     // The profile tab shows the person's own photo or initials, as on Instagram.
                                     tab == Tab.PROFILE -> UserAvatar(
@@ -273,12 +282,72 @@ fun MainScreen(
                 )
             }
             composable<ConversationsRoute> {
-                TabPage(title = R.string.tab_chat) {
-                    ConversationsScreen(
-                        viewModel = conversationsViewModel,
-                        onOpen = { navController.navigate(ChatRoute(it.id, it.other.displayName())) },
-                    )
-                }
+                InboxScreen(
+                    groupsViewModel = groupsViewModel,
+                    unreadMessages = conversationsViewModel.unreadTotal,
+                    messages = {
+                        ConversationsScreen(
+                            viewModel = conversationsViewModel,
+                            onOpen = { navController.navigate(ChatRoute(it.id, it.other.displayName())) },
+                        )
+                    },
+                    onOpenGroup = { navController.navigate(GroupRoute(it)) },
+                    onDiscover = { navController.navigate(DiscoverGroupsRoute(it)) },
+                    onCreate = { navController.navigate(CreateGroupRoute(it)) },
+                )
+            }
+            composable<DiscoverGroupsRoute> {
+                DiscoverGroupsScreen(
+                    onBack = { navController.popBackStack() },
+                    onJoined = {
+                        groupsViewModel.load()
+                        navController.navigate(GroupRoute(it)) { popUpTo<DiscoverGroupsRoute> { inclusive = true } }
+                    },
+                )
+            }
+            composable<CreateGroupRoute> {
+                CreateGroupScreen(
+                    onBack = { navController.popBackStack() },
+                    onCreated = {
+                        groupsViewModel.load()
+                        navController.navigate(GroupRoute(it)) { popUpTo<CreateGroupRoute> { inclusive = true } }
+                    },
+                    onOpenPremium = { navController.navigate(PremiumRoute) },
+                )
+            }
+            composable<GroupRoute> {
+                GroupChatScreen(
+                    onBack = {
+                        groupsViewModel.load()
+                        navController.popBackStack()
+                    },
+                    onOpenInfo = { navController.navigate(GroupInfoRoute(it)) },
+                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                    onOpenPremium = { navController.navigate(PremiumRoute) },
+                )
+            }
+            composable<GroupInfoRoute> {
+                GroupInfoScreen(
+                    onBack = { navController.popBackStack() },
+                    onClosed = {
+                        groupsViewModel.load()
+                        navController.popBackStack(ConversationsRoute, inclusive = false)
+                    },
+                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                )
+            }
+            composable<NotesRoute> {
+                NotesScreen(
+                    onBack = { navController.popBackStack() },
+                    onUpload = { navController.navigate(UploadNoteRoute) },
+                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                )
+            }
+            composable<UploadNoteRoute> {
+                UploadNoteScreen(
+                    onBack = { navController.popBackStack() },
+                    onUploaded = { navController.popBackStack() },
+                )
             }
             composable<ChatRoute> {
                 ChatScreen(
@@ -327,6 +396,7 @@ fun MainScreen(
                     onEditProfile = { navController.navigate(EditProfileRoute) },
                     onOpenSaved = { navController.navigate(SavedPostsRoute) },
                     onOpenMyPosts = { navController.navigate(UserProfileRoute(profile.id)) },
+                    onOpenNotes = { navController.navigate(NotesRoute) },
                     onSignOut = onSignOut,
                 )
             }

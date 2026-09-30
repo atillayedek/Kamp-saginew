@@ -296,3 +296,89 @@ data class ProfileStatsDto(
     @SerialName("active_requirement_count") val activeRequirementCount: Int,
     @SerialName("conversation_count") val conversationCount: Int,
 )
+
+@Serializable
+data class GroupSummaryDto(
+    @SerialName("group_id") val groupId: String,
+    val kind: String,
+    val name: String,
+    val description: String? = null,
+    @SerialName("course_code") val courseCode: String? = null,
+    @SerialName("photo_path") val photoPath: String? = null,
+    @SerialName("member_count") val memberCount: Int,
+    @SerialName("is_global") val isGlobal: Boolean,
+    @SerialName("my_role") val myRole: String? = null,
+    @SerialName("last_message_body") val lastMessageBody: String? = null,
+    @SerialName("last_message_at") val lastMessageAt: String? = null,
+    @SerialName("unread_count") val unreadCount: Int = 0,
+    @SerialName("owner_full_name") val ownerFullName: String? = null,
+)
+
+@Serializable
+data class GroupDetailDto(
+    @SerialName("group_id") val groupId: String,
+    val kind: String,
+    val name: String,
+    val description: String? = null,
+    @SerialName("course_code") val courseCode: String? = null,
+    @SerialName("photo_path") val photoPath: String? = null,
+    @SerialName("member_count") val memberCount: Int,
+    @SerialName("is_global") val isGlobal: Boolean,
+    @SerialName("owner_id") val ownerId: String,
+    @SerialName("owner_full_name") val ownerFullName: String? = null,
+    @SerialName("my_role") val myRole: String? = null,
+    @SerialName("can_post") val canPost: Boolean,
+    @SerialName("owner_is_premium") val ownerIsPremium: Boolean,
+    @SerialName("pinned_message_id") val pinnedMessageId: String? = null,
+    @SerialName("pinned_message_body") val pinnedMessageBody: String? = null,
+)
+
+@Serializable
+data class GroupMemberDto(
+    @SerialName("user_id") val userId: String,
+    @SerialName("full_name") val fullName: String? = null,
+    val username: String? = null,
+    val role: String,
+    @SerialName("joined_at") val joinedAt: String,
+)
+
+@Serializable
+data class GroupMessageDto(
+    val id: String,
+    @SerialName("sender_id") val senderId: String,
+    @SerialName("sender_full_name") val senderFullName: String? = null,
+    @SerialName("sender_username") val senderUsername: String? = null,
+    val body: String? = null,
+    @SerialName("media_path") val mediaPath: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("like_count") val likeCount: Int,
+    @SerialName("liked_by_me") val likedByMe: Boolean,
+    @SerialName("is_mine") val isMine: Boolean,
+    val poll: PollDto? = null,
+)
+
+@Serializable
+data class CourseNoteDto(
+    @SerialName("note_id") val noteId: String,
+    @SerialName("course_code") val courseCode: String,
+    @SerialName("course_name") val courseName: String,
+    val title: String,
+    val description: String? = null,
+    @SerialName("file_size") val fileSize: Long,
+    @SerialName("download_count") val downloadCount: Int,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("is_mine") val isMine: Boolean,
+    @SerialName("author_id") val authorId: String,
+    @SerialName("author_full_name") val authorFullName: String? = null,
+    @SerialName("author_username") val authorUsername: String? = null,
+)
+
+@Serializable
+data class NoteCourseDto(
+    @SerialName("course_code") val courseCode: String,
+    @SerialName("course_name") val courseName: String,
+    @SerialName("note_count") val noteCount: Int,
+)
+
+@Serializable
+data class ReputationDto(val points: Int, val badges: List<String> = emptyList())

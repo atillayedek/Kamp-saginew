@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.main
 
+import com.kampusagi.android.domain.model.GroupKind
 import com.kampusagi.android.domain.model.PostScope
 import kotlinx.serialization.Serializable
 
@@ -21,3 +22,9 @@ import kotlinx.serialization.Serializable
 @Serializable data object SavedPostsRoute
 @Serializable data object EventsRoute
 @Serializable data class UserProfileRoute(val userId: String)
+@Serializable data class DiscoverGroupsRoute(val kind: GroupKind)
+@Serializable data class CreateGroupRoute(val kind: GroupKind)
+@Serializable data class GroupRoute(val groupId: String)
+@Serializable data class GroupInfoRoute(val groupId: String)
+@Serializable data object NotesRoute
+@Serializable data object UploadNoteRoute

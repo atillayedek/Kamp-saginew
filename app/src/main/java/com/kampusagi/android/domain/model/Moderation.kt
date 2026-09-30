@@ -1,7 +1,7 @@
 package com.kampusagi.android.domain.model
 
 /** Mirrors `public.report_target`. */
-enum class ReportTarget { POST, COMMENT, USER, MESSAGE }
+enum class ReportTarget { POST, COMMENT, USER, MESSAGE, GROUP_MESSAGE, GROUP, NOTE }
 
 /** Mirrors `public.report_reason`. */
 enum class ReportReason { SPAM, HARASSMENT, INAPPROPRIATE, FAKE_PROFILE, OTHER }

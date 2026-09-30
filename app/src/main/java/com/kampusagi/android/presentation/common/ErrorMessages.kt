@@ -45,6 +45,11 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.POLL_CLOSED -> R.string.error_poll_closed
     AppError.EVENT_ENDED -> R.string.error_event_ended
     AppError.TOO_MANY_SAVED -> R.string.error_too_many_saved
+    AppError.PREMIUM_REQUIRED -> R.string.error_premium_required
+    AppError.TOO_MANY_GROUPS -> R.string.error_too_many_groups
+    AppError.GROUP_FULL -> R.string.error_group_full
+    AppError.OWNER_CANNOT_LEAVE -> R.string.error_owner_cannot_leave
+    AppError.GROUP_NOT_ALLOWED -> R.string.error_group_not_allowed
     AppError.NOT_FOUND -> R.string.error_not_found
     AppError.SERVER -> R.string.error_server
     AppError.UNKNOWN -> R.string.error_unknown

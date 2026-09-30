@@ -8,12 +8,16 @@ import androidx.compose.ui.graphics.asImageBitmap
 import com.kampusagi.android.core.di.ApplicationScope
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.repository.CommunityRepository
+import com.kampusagi.android.domain.repository.GroupRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+/** Which private bucket a photo lives in. */
+enum class PhotoSource { POST, GROUP }
 
 sealed interface PhotoState {
     data object Loading : PhotoState
@@ -22,12 +26,13 @@ sealed interface PhotoState {
 }
 
 /**
- * Downloads post photos with the signed-in session (the bucket is private) and
- * keeps the most recently shown ones in memory, up to [MAX_BYTES].
+ * Downloads post and group photos with the signed-in session (the buckets are
+ * private) and keeps the most recently shown ones in memory, up to [MAX_BYTES].
  */
 @Singleton
 class PostPhotoLoader @Inject constructor(
-    private val repository: CommunityRepository,
+    private val posts: CommunityRepository,
+    private val groups: GroupRepository,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
     private val states = mutableStateMapOf<String, PhotoState>()
@@ -35,20 +40,24 @@ class PostPhotoLoader @Inject constructor(
     private var loadedBytes = 0L
 
     /** Loading until [request] finishes. Must be called on the main thread. */
-    fun state(path: String): PhotoState = states[path] ?: PhotoState.Loading
+    fun state(source: PhotoSource, path: String): PhotoState = states[cacheKey(source, path)] ?: PhotoState.Loading
 
-    fun request(path: String) {
-        if (states[path] != null) return
-        states[path] = PhotoState.Loading
-        scope.launch(Dispatchers.Main) { load(path) }
+    fun request(source: PhotoSource, path: String) {
+        val key = cacheKey(source, path)
+        if (states[key] != null) return
+        states[key] = PhotoState.Loading
+        scope.launch(Dispatchers.Main) { load(source, path, key) }
     }
 
-    fun retry(path: String) {
-        if (states[path] == PhotoState.Failed) {
-            states.remove(path)
-            request(path)
+    fun retry(source: PhotoSource, path: String) {
+        val key = cacheKey(source, path)
+        if (states[key] == PhotoState.Failed) {
+            states.remove(key)
+            request(source, path)
         }
     }
+
+    private fun cacheKey(source: PhotoSource, path: String) = "${source.name}:$path"
 
     /** On sign-out, so the next person starts clean. */
     fun clear() {
@@ -57,22 +66,26 @@ class PostPhotoLoader @Inject constructor(
         loadedBytes = 0
     }
 
-    private suspend fun load(path: String) {
-        when (val result = repository.downloadPhoto(path)) {
+    private suspend fun load(source: PhotoSource, path: String, key: String) {
+        val download = when (source) {
+            PhotoSource.POST -> posts.downloadPhoto(path)
+            PhotoSource.GROUP -> groups.downloadPhoto(path)
+        }
+        when (val result = download) {
             is AppResult.Success -> {
                 val image = withContext(Dispatchers.Default) {
                     BitmapFactory.decodeByteArray(result.value, 0, result.value.size)?.asImageBitmap()
                 }
                 if (image == null) {
                     Log.w(TAG, "Photo $path is not a valid image")
-                    states[path] = PhotoState.Failed
-                } else if (states.containsKey(path)) {
-                    remember(path, image)
+                    states[key] = PhotoState.Failed
+                } else if (states.containsKey(key)) {
+                    remember(key, image)
                 }
             }
             is AppResult.Failure -> {
                 Log.w(TAG, "Photo $path could not be downloaded: ${result.error}")
-                if (states.containsKey(path)) states[path] = PhotoState.Failed
+                if (states.containsKey(key)) states[key] = PhotoState.Failed
             }
         }
     }

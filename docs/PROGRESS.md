@@ -21,7 +21,8 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 12 | Gözlemlenebilirlik: Supabase çökme raporları (D31), canlı backend CI kontrolü (D32) | Bitti — CI yeşil `646e4e6` (DB, Edge Function, Android, canlı kontrol 10/10) |
 | 13 | Web: landing page + `/admin` paneli, Resend toplu e-posta, gelir kaydı, pazarlama izni (D33–D35) | Bitti — CI yeşil `a658e31` (DB 13 test dosyası, Edge Function, web, Android, canlı kontrol). Canlı: migration + 2 fonksiyon + Vercel `kampusagi-nine.vercel.app`. İlk admin atandı (2026-09-27). E-posta secret'ları girildi; sahte abonelik bağlantısı canlıda reddediliyor (CI run 36299964951). Gerçek Resend gönderimi doğrulandı: panelden test e-postası yöneticinin gelen kutusuna ulaştı (2026-09-27) |
 | 14 | Görsel yenileme (D37), gönderi kategorileri (D38), profil fotoğrafı/biyografi/otomatik avatar (D39), Eşleşmeler sekmesi (D40) | Bitti — CI yeşil `2f0290b` (DB 14 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol). Cihazda görsel doğrulama: kullanıcı tarafından yapılacak |
-| 15 | Akış: gönderiye fotoğraf (D42), anket, etkinlik, pazar yeri ilanı (D43), kaydedilenler, arama, kişi profili (D44) | CI bekleniyor |
+| 15 | Akış: gönderiye fotoğraf (D42), anket, etkinlik, pazar yeri ilanı (D43), kaydedilenler, arama, kişi profili (D44) | Bitti — CI yeşil `eed1174` (DB 15 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol) |
+| 16 | Premium kanallar (D46), çalışma grupları (D47), ders notu arşivi (D48), rozetler (D49) | CI bekleniyor |
 
 ## Son doğrulamalar
 
