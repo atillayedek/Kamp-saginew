@@ -26,8 +26,6 @@ object AppConfig {
     const val GROUP_MEDIA_BUCKET = "group-media"
     const val COURSE_NOTES_BUCKET = "course-notes"
     const val SUBMIT_STUDENT_DOCUMENT_FUNCTION = "submit-student-document"
-    const val ANALYZE_REQUIREMENT_FUNCTION = "analyze-requirement"
-    const val PUBLISH_REQUIREMENT_FUNCTION = "publish-requirement"
     const val VERIFY_PURCHASE_FUNCTION = "verify-purchase"
     const val DELETE_ACCOUNT_FUNCTION = "delete-account"
     const val SUBMIT_COURSE_NOTE_FUNCTION = "submit-course-note"

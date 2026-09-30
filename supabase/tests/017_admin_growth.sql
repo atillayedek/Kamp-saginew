@@ -7,9 +7,9 @@ select tests.approved_student('ag1@example.edu.tr', 'ag_bir', 'İSTANBUL TEKNİK
        tests.create_user('ag-pending@example.edu.tr') as pending;
 grant select on ag to authenticated, anon, service_role;
 
-insert into public.subscription_plans (play_product_id, name, description, is_active, ai_analyze_daily, ai_publish_daily, max_active_requirements)
-values ('kampusagi.ag.premium', 'Premium', 'Test planı', true, 200, 80, 60),
-       ('kampusagi.ag.old', 'Eski plan', 'Pasif', false, 5, 5, 5);
+insert into public.subscription_plans (play_product_id, name, description, is_active, max_active_requirements)
+values ('kampusagi.ag.premium', 'Premium', 'Test planı', true, 60),
+       ('kampusagi.ag.old', 'Eski plan', 'Pasif', false, 5);
 create temp table ap as
 select (select id from public.subscription_plans where play_product_id = 'kampusagi.ag.premium') as active,
        (select id from public.subscription_plans where play_product_id = 'kampusagi.ag.old') as inactive;
@@ -46,8 +46,8 @@ select tests.assert_equals(
 select tests.act_as((select a from ag));
 select tests.assert_equals(public.am_i_premium(), true, 'gift makes premium');
 select tests.assert_equals(
-    (select source || '|' || ai_analyze_daily::text || '|' || max_active_requirements::text from public.my_subscription()),
-    'ADMIN|200|60',
+    (select source || '|' || max_active_requirements::text from public.my_subscription()),
+    'ADMIN|60',
     'plan limits apply'
 );
 select public.create_group('CHANNEL', 'Hediye kanalı');
@@ -59,7 +59,7 @@ select tests.reset_role();
 select tests.act_as((select a from ag));
 select tests.assert_equals(public.am_i_premium(), false, 'revoked');
 select tests.assert_equals(
-    (select coalesce(source, '-') || '|' || ai_analyze_daily::text from public.my_subscription()), '-|30', 'free limits again'
+    (select coalesce(source, '-') || '|' || max_active_requirements::text from public.my_subscription()), '-|20', 'free limits again'
 );
 rollback;
 

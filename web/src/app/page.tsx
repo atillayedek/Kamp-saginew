@@ -18,8 +18,8 @@ const FEATURES = [
   },
   {
     icon: Sparkles,
-    title: "Yapay zekâ ile ihtiyaç eşleştirme",
-    text: "Ne aradığını kendi cümlelerinle yaz; KampüsAğı ihtiyacını analiz eder ve sana en uygun öğrencileri bulur.",
+    title: "Etiketle ihtiyaç eşleştirme",
+    text: "Kategori ve etiket seç, ne aradığını yaz; KampüsAğı ortak etiket, kelime, zaman ve yere göre sana en uygun öğrencileri bulur.",
   },
   {
     icon: Users,
@@ -82,7 +82,7 @@ export default function Home() {
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-2">
               Ders çalışma arkadaşı, proje ortağı, maç için eksik oyuncu, yol ya da ev arkadaşı — neye ihtiyacın varsa
-              KampüsAğı seni doğru öğrenciyle buluşturur. Yapay zekâ ihtiyacını anlar, eşleştirir; gerisini sohbet halleder.
+              KampüsAğı seni aynı şeyi arayan öğrenciyle eşleştirir; gerisini sohbet halleder.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               {store ? (

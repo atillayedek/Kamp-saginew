@@ -65,11 +65,8 @@
     <string name="error_rejection_reason_required">Ret nedeni 3–500 karakter olmalı.</string>
     <string name="error_verification_not_pending">Bu başvuru zaten sonuçlandırılmış.</string>
     <string name="error_account_not_approved">Bu özellik yalnızca doğrulanmış öğrenciler içindir.</string>
-    <string name="error_ai_not_configured">Yapay zekâ analizi şu an kullanılamıyor. Daha sonra tekrar dene.</string>
-    <string name="error_ai_quota_exceeded">Bugünlük yapay zekâ kullanım sınırına ulaştın. Yarın tekrar dene.</string>
-    <string name="error_ai_failed">Yapay zekâ analizi tamamlanamadı. Tekrar dene.</string>
-    <string name="error_ai_refused">Bu metin analiz edilemedi. İhtiyacını farklı bir şekilde yaz.</string>
-    <string name="error_too_many_active_requirements">En fazla 20 aktif ilanın olabilir. Önce eski bir ilanı kapat.</string>
+    <string name="error_requirement_daily_limit">Bugün çok fazla ilan açtın. Yarın tekrar dene.</string>
+    <string name="error_too_many_active_requirements">Aktif ilan sınırına ulaştın. Önce eski bir ilanı kapat.</string>
     <string name="error_recipient_not_available">Bu öğrenciye şu an mesaj gönderilemiyor.</string>
     <string name="error_billing_unavailable">Google Play ödeme hizmetine ulaşılamadı. Tekrar dene.</string>
     <string name="error_billing_not_configured">Satın alma doğrulaması henüz yapılandırılmamış.</string>
@@ -206,18 +203,19 @@
     <string name="requirement_starts_at">Zaman: %1$s</string>
     <string name="requirement_location">Yer: %1$s</string>
     <string name="create_requirement_title">İhtiyaç oluştur</string>
-    <string name="create_requirement_intro">Neye ihtiyacın var? Zamanı, yeri ve kaç kişi aradığını da yazabilirsin.</string>
-    <string name="create_requirement_placeholder">Örneğin: Cuma akşamı kampüste basketbol oynayacak iki kişi arıyorum.</string>
-    <string name="ai_privacy_note">Metnin, ilanı düzenlemek için sunucumuz üzerinden OpenAI\'ye gönderilir. Telefon numarası gibi kişisel bilgileri yazma.</string>
-    <string name="ai_draft_note">Yapay zekâ taslağı hazırladı. Kontrol et, gerekirse düzenle, sonra yayınla.</string>
-    <string name="action_analyze">Analiz et</string>
+    <string name="create_requirement_intro">Neye ihtiyacın var? Kategori ve etiket seç; aynı etiketi seçen öğrencilerle eşleşirsin.</string>
     <string name="action_publish_requirement">Yayınla</string>
-    <string name="action_edit_text">Metni düzenle</string>
     <string name="field_requirement_title">Başlık</string>
-    <string name="field_requirement_description">Açıklama</string>
+    <string name="field_requirement_description">Açıklama (isteğe bağlı)</string>
     <string name="field_requirement_category">Kategori</string>
-    <string name="field_requirement_tags">Etiketler</string>
-    <string name="field_requirement_tags_hint">Virgülle ayır, en fazla 8 etiket.</string>
+    <string name="field_requirement_tags">Etiketler (en fazla 8)</string>
+    <string name="field_requirement_custom_tag">Başka etiket</string>
+    <string name="action_add_tag">Ekle</string>
+    <string name="cd_remove_tag">%1$s etiketini kaldır</string>
+    <string name="requirement_pick_date">Tarih (isteğe bağlı)</string>
+    <string name="requirement_pick_time">Saat</string>
+    <string name="error_requirement_time_invalid">Tarih en fazla bir yıl sonrası olabilir.</string>
+    <string name="match_shared_tags">Ortak: %1$s</string>
     <string name="field_requirement_location">Yer (isteğe bağlı)</string>
     <string name="field_requirement_participants">Kaç kişi (isteğe bağlı, 1–50)</string>
     <string name="cd_remove_time">Zamanı kaldır</string>
@@ -235,8 +233,8 @@
     <string name="matches_load_failed">Eşleşmeler yüklenemedi</string>
     <string name="matches_empty_title">Henüz eşleşme bulunamadı.</string>
     <string name="matches_empty_body">Üniversitende benzer bir ihtiyaç paylaşıldığında burada görünecek.</string>
-    <string name="matches_score_explained">Benzerlik, ilanların anlamına göre hesaplanır; yalnızca üniversitendeki aktif ilanlar gösterilir.</string>
-    <string name="match_score">%%%1$d benzer</string>
+    <string name="matches_score_explained" formatted="false">Uyum; ortak etiketlere (%50), başlık ve açıklamadaki ortak kelimelere (%25), zamanın yakınlığına (%15) ve yere (%10) göre hesaplanır. Yalnızca üniversitendeki aynı kategorideki aktif ilanlar gösterilir.</string>
+    <string name="match_score">%%%1$d uyum</string>
     <!-- Chat -->
     <string name="tab_chat">Sohbet</string>
     <string name="action_message">Mesaj gönder</string>
@@ -273,7 +271,7 @@
     <string name="premium_status_free">Ücretsiz plan</string>
     <string name="premium_status_active">%1$s aktif</string>
     <string name="premium_renews_or_ends">Geçerlilik: %1$s</string>
-    <string name="premium_limits">Günlük %1$d yapay zekâ analizi · günlük %2$d yayın · en fazla %3$d aktif ilan</string>
+    <string name="premium_limits">En fazla %1$d aktif ilan</string>
     <string name="premium_no_plans">Premium şu an sunulmuyor.</string>
     <string name="premium_store_unavailable">Google Play\'e ulaşılamadı; fiyatlar ve satın alma şu an kullanılamıyor.</string>
     <string name="premium_product_unavailable">Bu plan Google Play\'de şu an satın alınamıyor.</string>
@@ -580,7 +578,7 @@
     <string name="premium_perk_channel_photo">Kanal fotoğrafı ve sabitlenen duyurular</string>
     <string name="premium_perk_channel_polls">Kanalda anket paylaş</string>
     <string name="premium_perk_badge">Profilinde Premium rozeti</string>
-    <string name="premium_perk_ai">Daha yüksek yapay zekâ ve ilan limitleri</string>
+    <string name="premium_perk_requirements">Daha fazla aktif ihtiyaç ilanı</string>
 
     <string name="error_premium_required">Bu özellik Premium üyelere özel.</string>
     <string name="error_too_many_groups">Grup veya kanal sınırına ulaştın.</string>

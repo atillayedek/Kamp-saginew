@@ -77,7 +77,7 @@ else
   failures=$((failures + 1))
 fi
 rm -f "$unsub_body"
-for fn in submit-student-document analyze-requirement publish-requirement verify-purchase delete-account admin-broadcast submit-course-note; do
+for fn in submit-student-document verify-purchase delete-account admin-broadcast submit-course-note; do
   check "function $fn: requires a signed-in user" 401 '"error":"not_authenticated"' \
     -X POST "${SUPABASE_URL}/functions/v1/${fn}" "${anon[@]}" -d '{}'
 done

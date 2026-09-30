@@ -6,40 +6,53 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kampusagi.android.domain.model.AppError
-import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.RequirementCategory
 import com.kampusagi.android.domain.model.RequirementDraft
-import com.kampusagi.android.domain.usecase.AnalyzeRequirementUseCase
+import com.kampusagi.android.domain.usecase.CreateRequirementUseCase
 import com.kampusagi.android.domain.usecase.DraftInputError
 import com.kampusagi.android.domain.usecase.FormResult
-import com.kampusagi.android.domain.usecase.PublishRequirementUseCase
+import com.kampusagi.android.domain.usecase.RequirementTags
 import com.kampusagi.android.domain.usecase.RequirementValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-/** The editable form of a draft; numbers and tags are kept as typed until publishing. */
-data class DraftForm(
-    val title: String,
-    val description: String,
-    val category: RequirementCategory,
-    val tagsText: String,
-    val locationText: String,
-    val startsAt: String?,
-    val participantsText: String,
-)
-
+/** The requirement form: the student picks a category and tags; matching is done by rules in the database. */
 @HiltViewModel
 class CreateRequirementViewModel @Inject constructor(
-    private val analyzeRequirement: AnalyzeRequirementUseCase,
-    private val publishRequirement: PublishRequirementUseCase,
+    private val createRequirement: CreateRequirementUseCase,
 ) : ViewModel() {
 
-    var text by mutableStateOf("")
+    var category by mutableStateOf<RequirementCategory?>(null)
         private set
 
-    /** Null until the AI analysis succeeded. */
-    var form by mutableStateOf<DraftForm?>(null)
+    var title by mutableStateOf("")
+        private set
+
+    var description by mutableStateOf("")
+        private set
+
+    var tags by mutableStateOf<List<String>>(emptyList())
+        private set
+
+    var customTag by mutableStateOf("")
+        private set
+
+    var date by mutableStateOf<LocalDate?>(null)
+        private set
+
+    /** Only with a date; noon is used when the date has no time. */
+    var time by mutableStateOf<LocalTime?>(null)
+        private set
+
+    var location by mutableStateOf("")
+        private set
+
+    var participantsText by mutableStateOf("")
         private set
 
     var inputErrors by mutableStateOf<Set<DraftInputError>>(emptySet())
@@ -54,63 +67,70 @@ class CreateRequirementViewModel @Inject constructor(
     var publishedId by mutableStateOf<String?>(null)
         private set
 
-    val canAnalyze: Boolean get() = !isWorking && RequirementValidator.isValidText(text)
+    val suggestions: List<String> get() = category?.let(RequirementTags::suggestions).orEmpty()
 
-    fun onTextChange(value: String) {
-        if (value.length <= RequirementValidator.TEXT_LENGTH.last) text = value
-        error = null
-    }
+    /** Tags the student typed that are not among the suggestions, shown as removable chips. */
+    val customTags: List<String> get() = tags.filterNot { it in suggestions }
 
-    fun analyze() {
-        if (!canAnalyze) return
-        isWorking = true
-        error = null
-        viewModelScope.launch {
-            when (val result = analyzeRequirement(text)) {
-                is AppResult.Success -> {
-                    form = result.value.toForm()
-                    inputErrors = emptySet()
-                }
-                is AppResult.Failure -> error = result.error
-            }
-            isWorking = false
+    val canPublish: Boolean
+        get() = !isWorking && category != null && title.trim().length in RequirementValidator.TITLE_LENGTH
+
+    fun onCategoryChange(value: RequirementCategory) = edit { category = value }
+
+    fun onTitleChange(value: String) = edit { title = value.take(RequirementValidator.TITLE_LENGTH.last) }
+
+    fun onDescriptionChange(value: String) = edit { description = value.take(RequirementValidator.MAX_DESCRIPTION_LENGTH) }
+
+    fun toggleTag(tag: String) = edit {
+        tags = when {
+            tag in tags -> tags - tag
+            tags.size < RequirementValidator.MAX_TAGS -> tags + tag
+            else -> tags.also { inputErrors = setOf(DraftInputError.TAGS_INVALID) }
         }
     }
 
-    /** Back to the text, keeping it, to analyse again. */
-    fun editText() {
-        form = null
-        inputErrors = emptySet()
-        error = null
+    fun onCustomTagChange(value: String) = edit { customTag = value.take(RequirementValidator.MAX_TAG_LENGTH + 1) }
+
+    /** Adds what was typed (comma-separated allowed); too long or too many tags are reported, not cut. */
+    fun addCustomTag() = edit {
+        val added = RequirementValidator.parseTags(customTag)
+        val merged = (tags + added).distinct()
+        if (added.any { it.length > RequirementValidator.MAX_TAG_LENGTH } || merged.size > RequirementValidator.MAX_TAGS) {
+            inputErrors = setOf(DraftInputError.TAGS_INVALID)
+        } else {
+            tags = merged
+            customTag = ""
+        }
     }
 
-    fun updateForm(change: (DraftForm) -> DraftForm) {
-        form = form?.let(change)
-        inputErrors = emptySet()
-        error = null
+    fun onDateChange(value: LocalDate?) = edit {
+        date = value
+        if (value == null) time = null
     }
 
-    fun publish() {
-        val current = form ?: return
+    fun onTimeChange(value: LocalTime?) = edit { time = value }
+
+    fun onLocationChange(value: String) = edit { location = value.take(RequirementValidator.MAX_LOCATION_LENGTH) }
+
+    fun onParticipantsChange(value: String) = edit { participantsText = value.filter(Char::isDigit).take(2) }
+
+    fun publish(zone: ZoneId = ZoneId.systemDefault()) {
+        val chosen = category ?: return
         if (isWorking) return
-        val participants = current.participantsText.trim().let { if (it.isEmpty()) null else it.toIntOrNull() }
-        if (current.participantsText.isNotBlank() && participants == null) {
-            inputErrors = setOf(DraftInputError.PARTICIPANTS_INVALID)
-            return
-        }
+        val participants = participantsText.trim().let { if (it.isEmpty()) null else it.toIntOrNull() }
         val draft = RequirementDraft(
-            title = current.title,
-            description = current.description,
-            category = current.category,
-            tags = RequirementValidator.parseTags(current.tagsText),
-            locationText = current.locationText.ifBlank { null },
-            startsAt = current.startsAt,
+            title = title,
+            description = description,
+            category = chosen,
+            tags = tags,
+            locationText = location.ifBlank { null },
+            startsAt = date?.let { ZonedDateTime.of(it, time ?: LocalTime.NOON, zone).toInstant().toString() },
             participantsNeeded = participants,
         )
         isWorking = true
         error = null
         viewModelScope.launch {
-            when (val result = publishRequirement(text, draft)) {
+            when (val result = createRequirement(draft)) {
                 is FormResult.Invalid -> inputErrors = result.errors
                 is FormResult.Failed -> error = result.error
                 is FormResult.Success -> publishedId = result.value
@@ -119,13 +139,9 @@ class CreateRequirementViewModel @Inject constructor(
         }
     }
 
-    private fun RequirementDraft.toForm() = DraftForm(
-        title = title,
-        description = description,
-        category = category,
-        tagsText = tags.joinToString(", "),
-        locationText = locationText.orEmpty(),
-        startsAt = startsAt,
-        participantsText = participantsNeeded?.toString().orEmpty(),
-    )
+    private inline fun edit(change: () -> Unit) {
+        inputErrors = emptySet()
+        error = null
+        change()
+    }
 }

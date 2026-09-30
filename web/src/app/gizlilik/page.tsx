@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         items={[
           "Hesabını açmak ve hizmeti sunmak (KVKK m.5/2-c, sözleşmenin kurulması ve ifası).",
           "Yalnızca gerçek üniversite öğrencilerinin katılabilmesi için öğrenci belgeni incelemek (m.5/2-c ve m.5/2-f, meşru menfaat: topluluğun güvenliği).",
-          "Yapay zekâ ile ihtiyaç ilanını düzenlemek ve benzer ilanlarla eşleştirmek (m.5/2-c).",
+          "İhtiyaç ilanını, üniversitendeki benzer ilanlarla (kategori, etiket, kelime, zaman ve yer kurallarıyla) eşleştirmek (m.5/2-c).",
           "Kötüye kullanımı önlemek, şikayetleri incelemek, hesapları askıya almak (m.5/2-f ve hukuki yükümlülükler, m.5/2-ç).",
           "Premium satın alımlarını doğrulamak ve muhasebe kayıtlarını tutmak (m.5/2-c, m.5/2-ç).",
           "Hataları düzeltmek ve hizmetin nasıl kullanıldığını toplu olarak görmek (m.5/2-f).",
@@ -59,7 +59,6 @@ export default function PrivacyPage() {
       <List
         items={[
           <><strong>Supabase</strong> — veritabanı, kimlik doğrulama, dosya depolama ve sunucu fonksiyonları (tüm hesap ve içerik verileri).</>,
-          <><strong>OpenAI</strong> — yazdığın ihtiyaç metni analiz ve eşleştirme için gönderilir; adın, e-postan veya belgen gönderilmez.</>,
           <><strong>Google (Google Play)</strong> — Premium ödemeleri ve satın alma doğrulaması.</>,
           <><strong>Resend</strong> — hizmet ve (rızan varsa) pazarlama e-postalarının gönderimi; e-posta adresin ve mesaj içeriği.</>,
           <><strong>Vercel</strong> — web sitesi ve yönetim panelinin barındırılması.</>,

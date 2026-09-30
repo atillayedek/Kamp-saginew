@@ -163,17 +163,14 @@ interface CommunityRepository {
 }
 
 interface RequirementRepository {
-    /** Asks the backend (OpenAI) to structure the student's text. Nothing is stored. */
-    suspend fun analyze(text: String): AppResult<RequirementDraft>
-
-    /** Stores the edited draft; the backend embeds it for matching. Returns the new id. */
-    suspend fun publish(originalText: String, draft: RequirementDraft): AppResult<String>
+    /** Stores the requirement through `create_requirement`. Returns the new id. */
+    suspend fun create(draft: RequirementDraft): AppResult<String>
 
     suspend fun myRequirements(): AppResult<List<Requirement>>
 
     suspend fun close(requirementId: String): AppResult<Unit>
 
-    /** Other students' active requirements ranked by similarity to one of ours. */
+    /** Other students' active requirements ranked by the rule-based score (`find_matches`). */
     suspend fun matches(requirementId: String): AppResult<List<Match>>
 }
 

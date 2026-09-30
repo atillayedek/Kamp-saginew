@@ -86,12 +86,7 @@ fun PremiumScreen(
                             Text(item.plan.name, style = MaterialTheme.typography.titleMedium)
                             Text(item.plan.description, style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                stringResource(
-                                    R.string.premium_limits,
-                                    item.plan.aiAnalyzeDaily,
-                                    item.plan.aiPublishDaily,
-                                    item.plan.maxActiveRequirements,
-                                ),
+                                stringResource(R.string.premium_limits, item.plan.maxActiveRequirements),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                             val offer = item.offer
@@ -160,7 +155,7 @@ private fun PremiumPerks() {
                 R.string.premium_perk_channel_photo,
                 R.string.premium_perk_channel_polls,
                 R.string.premium_perk_badge,
-                R.string.premium_perk_ai,
+                R.string.premium_perk_requirements,
             ).forEach { Text("• " + stringResource(it), style = MaterialTheme.typography.bodyMedium) }
         }
     }
@@ -184,12 +179,7 @@ private fun CurrentStatus(subscription: SubscriptionStatus) {
                 Text(stringResource(R.string.premium_renews_or_ends, it), style = MaterialTheme.typography.bodySmall)
             }
             Text(
-                stringResource(
-                    R.string.premium_limits,
-                    subscription.aiAnalyzeDaily,
-                    subscription.aiPublishDaily,
-                    subscription.maxActiveRequirements,
-                ),
+                stringResource(R.string.premium_limits, subscription.maxActiveRequirements),
                 style = MaterialTheme.typography.bodySmall,
             )
         }

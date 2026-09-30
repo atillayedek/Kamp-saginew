@@ -136,30 +136,6 @@ data class CommentDto(
     @SerialName("author_username") val authorUsername: String? = null,
 )
 
-/** Draft exchanged with the analyze/publish Edge Functions (snake_case like the backend). */
-@Serializable
-data class RequirementDraftDto(
-    val title: String,
-    val description: String,
-    val category: String,
-    val tags: List<String>,
-    @SerialName("location_text") val locationText: String? = null,
-    @SerialName("starts_at") val startsAt: String? = null,
-    @SerialName("participants_needed") val participantsNeeded: Int? = null,
-)
-
-@Serializable
-data class AnalyzeResponseDto(val draft: RequirementDraftDto)
-
-@Serializable
-data class PublishRequestDto(
-    @SerialName("original_text") val originalText: String,
-    val draft: RequirementDraftDto,
-)
-
-@Serializable
-data class PublishResponseDto(val id: String)
-
 @Serializable
 data class RequirementDto(
     val id: String,
@@ -186,6 +162,7 @@ data class MatchDto(
     @SerialName("participants_needed") val participantsNeeded: Int? = null,
     @SerialName("created_at") val createdAt: String,
     val score: Int,
+    @SerialName("shared_tags") val sharedTags: List<String> = emptyList(),
     @SerialName("owner_id") val ownerId: String,
     @SerialName("owner_full_name") val ownerFullName: String? = null,
     @SerialName("owner_username") val ownerUsername: String? = null,
@@ -233,8 +210,6 @@ data class PlanDto(
     @SerialName("play_product_id") val playProductId: String,
     val name: String,
     val description: String,
-    @SerialName("ai_analyze_daily") val aiAnalyzeDaily: Int,
-    @SerialName("ai_publish_daily") val aiPublishDaily: Int,
     @SerialName("max_active_requirements") val maxActiveRequirements: Int,
 )
 
@@ -245,8 +220,6 @@ data class SubscriptionDto(
     @SerialName("expires_at") val expiresAt: String? = null,
     /** PLAY, ADMIN (gift) or PROMO (promo code); null without Premium. */
     val source: String? = null,
-    @SerialName("ai_analyze_daily") val aiAnalyzeDaily: Int,
-    @SerialName("ai_publish_daily") val aiPublishDaily: Int,
     @SerialName("max_active_requirements") val maxActiveRequirements: Int,
 )
 

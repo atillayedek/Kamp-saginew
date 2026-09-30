@@ -31,14 +31,14 @@ class PremiumRepositoryImpl @Inject constructor(
 
     override suspend fun plans(): AppResult<List<Plan>> = call { client ->
         client.postgrest.rpc("list_plans", JsonObject(emptyMap())).decodeList<PlanDto>().map {
-            Plan(it.id, it.playProductId, it.name, it.description, it.aiAnalyzeDaily, it.aiPublishDaily, it.maxActiveRequirements)
+            Plan(it.id, it.playProductId, it.name, it.description, it.maxActiveRequirements)
         }
     }
 
     override suspend fun subscription(): AppResult<SubscriptionStatus> = call { client ->
         val row = client.postgrest.rpc("my_subscription", JsonObject(emptyMap())).decodeList<SubscriptionDto>().firstOrNull()
             ?: throw MissingRowException()
-        SubscriptionStatus(row.planName, row.playProductId, row.expiresAt, row.aiAnalyzeDaily, row.aiPublishDaily, row.maxActiveRequirements, row.source)
+        SubscriptionStatus(row.planName, row.playProductId, row.expiresAt, row.maxActiveRequirements, row.source)
     }
 
     override suspend fun verify(purchase: StorePurchase): AppResult<Unit> = call { client ->

@@ -152,7 +152,16 @@ internal fun MatchCard(match: Match, starting: Boolean, enabled: Boolean, onMess
                     )
                 }
             }
-            Text(match.description, style = MaterialTheme.typography.bodyMedium)
+            if (match.sharedTags.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.match_shared_tags, match.sharedTags.joinToString(", ")),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (match.description.isNotBlank()) {
+                Text(match.description, style = MaterialTheme.typography.bodyMedium)
+            }
             formatStartsAt(match.startsAt)?.let {
                 Text(stringResource(R.string.requirement_starts_at, it), style = MaterialTheme.typography.bodySmall)
             }

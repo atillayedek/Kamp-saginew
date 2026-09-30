@@ -18,9 +18,9 @@ create function tests.mod_req(p_owner uuid, p_title text)
 returns uuid language plpgsql security definer set search_path = '' as $$
 declare v_id uuid;
 begin
-    insert into public.requirements (owner_id, university_id, original_text, title, description, category, embedding, embedding_model)
-    values (p_owner, (select university_id from public.profiles where id = p_owner), 'on karakterden uzun metin', p_title,
-            'açıklama', 'SPORTS', ('[1' || repeat(',0', 1535) || ']')::extensions.vector, 'test-model')
+    insert into public.requirements (owner_id, university_id, title, description, category, tags, tag_keys, terms)
+    values (p_owner, (select university_id from public.profiles where id = p_owner), p_title,
+            'açıklama', 'SPORTS', '{basketbol}', '{basketbol}', public.requirement_terms(p_title, 'açıklama'))
     returning id into v_id;
     return v_id;
 end;

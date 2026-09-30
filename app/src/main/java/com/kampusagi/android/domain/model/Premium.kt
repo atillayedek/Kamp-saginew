@@ -6,8 +6,6 @@ data class Plan(
     val productId: String,
     val name: String,
     val description: String,
-    val aiAnalyzeDaily: Int,
-    val aiPublishDaily: Int,
     val maxActiveRequirements: Int,
 )
 
@@ -16,8 +14,6 @@ data class SubscriptionStatus(
     val planName: String?,
     val productId: String?,
     val expiresAt: String?,
-    val aiAnalyzeDaily: Int,
-    val aiPublishDaily: Int,
     val maxActiveRequirements: Int,
     /** PLAY for a Google Play subscription; ADMIN or PROMO for Premium given without payment. */
     val source: String? = null,

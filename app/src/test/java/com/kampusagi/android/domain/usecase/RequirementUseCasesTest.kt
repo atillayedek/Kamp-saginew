@@ -1,15 +1,16 @@
 package com.kampusagi.android.domain.usecase
 
-import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.model.Requirement
 import com.kampusagi.android.domain.model.RequirementCategory
 import com.kampusagi.android.domain.model.RequirementDraft
 import com.kampusagi.android.domain.repository.RequirementRepository
+import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 private val draft = RequirementDraft(
@@ -24,12 +25,9 @@ private val draft = RequirementDraft(
 
 /** Test-only repository that records what would be sent to the backend. */
 private class RecordingRequirementRepository : RequirementRepository {
-    var analyzed: String? = null
-    var published: Pair<String, RequirementDraft>? = null
-    override suspend fun analyze(text: String): AppResult<RequirementDraft> =
-        AppResult.Success(draft).also { analyzed = text }
-    override suspend fun publish(originalText: String, draft: RequirementDraft): AppResult<String> =
-        AppResult.Success("id-1").also { published = originalText to draft }
+    var created: RequirementDraft? = null
+    override suspend fun create(draft: RequirementDraft): AppResult<String> =
+        AppResult.Success("id-1").also { created = draft }
     override suspend fun myRequirements(): AppResult<List<Requirement>> = AppResult.Success(emptyList())
     override suspend fun close(requirementId: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun matches(requirementId: String): AppResult<List<Match>> = AppResult.Success(emptyList())
@@ -37,49 +35,61 @@ private class RecordingRequirementRepository : RequirementRepository {
 
 class RequirementUseCasesTest {
 
+    private val now = Instant.parse("2026-09-26T12:00:00Z")
+
     @Test
-    fun `tags are split, trimmed, lowercased in Turkish and deduplicated`() {
-        assertEquals(listOf("spor", "ıslak", "istanbul"), RequirementValidator.parseTags("Spor, ISLAK , spor,, İstanbul"))
+    fun `tags are split, trimmed, single-spaced, lowercased in Turkish and deduplicated`() {
+        assertEquals(
+            listOf("spor", "ıslak", "istanbul", "ev arkadaşı"),
+            RequirementValidator.parseTags("Spor, ISLAK , spor,, İstanbul, EV   ARKADAŞI"),
+        )
     }
 
     @Test
     fun `draft limits match the backend`() {
-        assertEquals(emptySet<DraftInputError>(), RequirementValidator.validate(draft))
-        assertEquals(setOf(DraftInputError.TITLE_INVALID), RequirementValidator.validate(draft.copy(title = "ab")))
-        assertEquals(setOf(DraftInputError.PARTICIPANTS_INVALID), RequirementValidator.validate(draft.copy(participantsNeeded = 51)))
-        assertEquals(setOf(DraftInputError.LOCATION_INVALID), RequirementValidator.validate(draft.copy(locationText = " ")))
+        assertEquals(emptySet<DraftInputError>(), RequirementValidator.validate(draft, now))
+        assertEquals(emptySet<DraftInputError>(), RequirementValidator.validate(draft.copy(description = ""), now))
+        assertEquals(setOf(DraftInputError.TITLE_INVALID), RequirementValidator.validate(draft.copy(title = "ab"), now))
+        assertEquals(setOf(DraftInputError.PARTICIPANTS_INVALID), RequirementValidator.validate(draft.copy(participantsNeeded = 51), now))
+        assertEquals(setOf(DraftInputError.LOCATION_INVALID), RequirementValidator.validate(draft.copy(locationText = " "), now))
         assertEquals(
             setOf(DraftInputError.TAGS_INVALID),
-            RequirementValidator.validate(draft.copy(tags = List(9) { "etiket$it" })),
+            RequirementValidator.validate(draft.copy(tags = List(9) { "etiket$it" }), now),
         )
         assertEquals(
             setOf(DraftInputError.DESCRIPTION_INVALID),
-            RequirementValidator.validate(draft.copy(description = "a".repeat(1001))),
+            RequirementValidator.validate(draft.copy(description = "a".repeat(1001)), now),
         )
-    }
-
-    @Test
-    fun `short text is not sent for analysis`() = runTest {
-        val repository = RecordingRequirementRepository()
-        assertEquals(AppResult.Failure(AppError.INVALID_INPUT), AnalyzeRequirementUseCase(repository)("  kısa  "))
-        assertNull(repository.analyzed)
-        AnalyzeRequirementUseCase(repository)("  Basketbol oynayacak iki kişi arıyorum  ")
-        assertEquals("Basketbol oynayacak iki kişi arıyorum", repository.analyzed)
-    }
-
-    @Test
-    fun `publish trims the edited draft and never sends an invalid one`() = runTest {
-        val repository = RecordingRequirementRepository()
-        val useCase = PublishRequirementUseCase(repository)
         assertEquals(
-            FormResult.Invalid(setOf(DraftInputError.TITLE_INVALID)),
-            useCase("Basketbol oynayacak iki kişi", draft.copy(title = "")),
+            setOf(DraftInputError.TIME_INVALID),
+            RequirementValidator.validate(draft.copy(startsAt = "2026-09-24T12:00:00Z"), now),
         )
-        assertNull(repository.published)
+        assertEquals(
+            setOf(DraftInputError.TIME_INVALID),
+            RequirementValidator.validate(draft.copy(startsAt = "2027-10-01T12:00:00Z"), now),
+        )
+        assertEquals(setOf(DraftInputError.TIME_INVALID), RequirementValidator.validate(draft.copy(startsAt = "yarın"), now))
+    }
 
-        assertEquals(FormResult.Success("id-1"), useCase(" Basketbol oynayacak iki kişi ", draft))
-        val (text, sent) = repository.published!!
-        assertEquals("Basketbol oynayacak iki kişi", text)
+    @Test
+    fun `every category offers tags that fit the backend limits`() {
+        RequirementCategory.entries.forEach { category ->
+            val tags = RequirementTags.suggestions(category)
+            assertTrue(tags.isNotEmpty())
+            assertTrue(tags.all { it == RequirementValidator.normalizeTag(it) && it.length <= RequirementValidator.MAX_TAG_LENGTH })
+        }
+    }
+
+    @Test
+    fun `create trims the draft and never sends an invalid one`() = runTest {
+        val repository = RecordingRequirementRepository()
+        val useCase = CreateRequirementUseCase(repository)
+        assertEquals(FormResult.Invalid(setOf(DraftInputError.TITLE_INVALID)), useCase(draft.copy(title = "")))
+        assertNull(repository.created)
+
+        val future = draft.copy(startsAt = Instant.now().plusSeconds(3600).toString())
+        assertEquals(FormResult.Success("id-1"), useCase(future))
+        val sent = repository.created!!
         assertEquals("Basketbol maçı", sent.title)
         assertEquals("Kampüs sahasında maç", sent.description)
         assertEquals("Kampüs sahası", sent.locationText)

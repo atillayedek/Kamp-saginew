@@ -21,8 +21,8 @@ select tests.ap_student('ap1@example.edu.tr', 'apbir', 'APPROVED') as a,
        tests.create_user('ap-admin@example.edu.tr') as admin;
 grant select on ap to authenticated, service_role, anon;
 
-insert into public.subscription_plans (play_product_id, name, description, is_active, ai_analyze_daily, ai_publish_daily, max_active_requirements)
-values ('kampusagi.admin_test', 'Admin Test', 'Panel testi için plan', true, 10, 10, 10);
+insert into public.subscription_plans (play_product_id, name, description, is_active, max_active_requirements)
+values ('kampusagi.admin_test', 'Admin Test', 'Panel testi için plan', true, 10);
 
 -- 1. Purchase events are recorded only by the service role, once per order (or token + period).
 begin;

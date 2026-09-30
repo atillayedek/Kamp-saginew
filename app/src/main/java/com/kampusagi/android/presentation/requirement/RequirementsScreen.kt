@@ -114,7 +114,9 @@ private fun RequirementCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Text(requirement.description, style = MaterialTheme.typography.bodyMedium)
+            if (requirement.description.isNotBlank()) {
+                Text(requirement.description, style = MaterialTheme.typography.bodyMedium)
+            }
             formatStartsAt(requirement.startsAt)?.let {
                 Text(stringResource(R.string.requirement_starts_at, it), style = MaterialTheme.typography.bodySmall)
             }

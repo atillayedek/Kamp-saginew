@@ -22,7 +22,7 @@ private fun requirement(id: String, status: RequirementStatus = RequirementStatu
 private fun match(id: String, score: Int) = Match(
     requirementId = id, title = "Eşleşme $id", description = "d", category = RequirementCategory.STUDY, tags = emptyList(),
     locationText = null, startsAt = null, participantsNeeded = null, createdAt = "2026-09-27T10:00:00Z", score = score,
-    owner = MatchOwner("u-$id", "Öğrenci $id", "ogrenci$id", "Hukuk"),
+    sharedTags = emptyList(), owner = MatchOwner("u-$id", "Öğrenci $id", "ogrenci$id", "Hukuk"),
 )
 
 /** Test-only repository with scripted requirements and matches. */
@@ -31,8 +31,7 @@ private class ScriptedRequirements(
     private val matchesById: Map<String, AppResult<List<Match>>>,
 ) : RequirementRepository {
     val matchCalls = mutableListOf<String>()
-    override suspend fun analyze(text: String): AppResult<RequirementDraft> = AppResult.Failure(AppError.UNKNOWN)
-    override suspend fun publish(originalText: String, draft: RequirementDraft): AppResult<String> = AppResult.Failure(AppError.UNKNOWN)
+    override suspend fun create(draft: RequirementDraft): AppResult<String> = AppResult.Failure(AppError.UNKNOWN)
     override suspend fun myRequirements(): AppResult<List<Requirement>> = mine
     override suspend fun close(requirementId: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun matches(requirementId: String): AppResult<List<Match>> {

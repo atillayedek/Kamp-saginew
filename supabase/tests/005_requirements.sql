@@ -1,10 +1,4 @@
--- Requirements: service-role-only writes, embedding shape, AI quota, ownership.
-
-create function tests.vector_literal(p_first real, p_dims integer default 1536) returns text
-language sql immutable as $$
-    select '[' || p_first::text || repeat(',0', p_dims - 1) || ']'
-$$;
-grant execute on function tests.vector_literal(real, integer) to authenticated, service_role;
+-- Requirements: written by the student through create_requirement(); validation, synonyms, limits, ownership.
 
 create function tests.approved(p_email text, p_username text) returns uuid
 language plpgsql security definer set search_path = '' as $$
@@ -19,7 +13,6 @@ begin
     return v_id;
 end;
 $$;
-grant execute on function tests.approved(text, text) to service_role;
 
 create temp table people as
 select tests.approved('r1@example.edu.tr', 'rbir') as a,
@@ -27,80 +20,84 @@ select tests.approved('r1@example.edu.tr', 'rbir') as a,
        tests.create_user('r3@example.edu.tr') as pending;
 grant select on people to authenticated, service_role;
 
--- Inserts a valid requirement for p_user as the service role.
-create function tests.insert_req(p_user uuid, p_title text default 'Basketbol', p_tags text[] default '{Spor, spor ,  basket}')
+-- A valid requirement for the signed-in student.
+create function tests.new_req(p_title text default 'Basketbol', p_tags text[] default '{Spor, spor ,  Basket, HALI SAHA}')
 returns uuid language sql as $$
-    select public.insert_requirement(
-        p_user, 'Yarın akşam basketbol oynayacak iki kişi arıyorum', p_title, 'Kampüs sahasında maç',
-        'SPORTS', p_tags, ' Kampüs sahası ', timestamptz '2026-09-27 18:00+03', 2,
-        tests.vector_literal(1), 'text-embedding-3-small'
+    select public.create_requirement(
+        p_title, '  Kampüs sahasında maç  ', 'SPORTS', p_tags, ' Kampüs sahası ', now() + interval '1 day', 2
     )
 $$;
-grant execute on function tests.insert_req(uuid, text, text[]) to service_role, authenticated;
+grant execute on function tests.new_req(text, text[]) to authenticated;
 
--- 1. Only the service role writes; values are normalised; university comes from the profile.
+-- 1. Students write their own; values are normalised; tags go through synonyms; keys are stored.
 begin;
 select tests.act_as((select a from people));
-select tests.expect_error(
-    format($$select tests.insert_req(%L)$$, (select a from people)),
-    'permission denied for function insert_requirement'
-);
+create temp table r as select tests.new_req() as id;
 select tests.expect_error(
     format(
-        $$insert into public.requirements (owner_id, university_id, original_text, title, description, category, embedding, embedding_model)
-          values (%L, (select id from public.universities limit 1), 'uzun bir metin burada', 'Başlık', 'x', 'OTHER', %L, 'm')$$,
-        (select a from people), tests.vector_literal(1)
+        $$insert into public.requirements (owner_id, university_id, title, description, category)
+          values (%L, (select id from public.universities limit 1), 'Başlık', 'x', 'OTHER')$$,
+        (select a from people)
     ),
     'new row violates row-level security policy for table "requirements"'
 );
 select tests.reset_role();
-select tests.act_as_service();
-create temp table r as select tests.insert_req((select a from people)) as id;
-select tests.reset_role();
 select tests.assert_equals(
-    (select array_to_string(tags, ',') || '|' || location_text || '|' || u.name
+    (select array_to_string(tags, ',') || '|' || array_to_string(tag_keys, ',') || '|' || description || '|' || location_text || '|' || u.name
      from public.requirements q join public.universities u on u.id = q.university_id),
-    'basket,spor|Kampüs sahası|İSTANBUL TEKNİK ÜNİVERSİTESİ',
+    'basketbol,futbol,spor|basketbol,futbol,spor|Kampüs sahasında maç|Kampüs sahası|İSTANBUL TEKNİK ÜNİVERSİTESİ',
     'normalised'
 );
+select tests.assert_equals((select terms from public.requirements), '{basketbol,kampus,mac,saha}'::text[], 'terms');
 rollback;
 
--- 2. Invalid content, wrong embedding size and unapproved owners are refused.
+-- 2. Invalid content and unapproved owners are refused.
 begin;
-select tests.act_as_service();
-select tests.expect_error(format($$select tests.insert_req(%L, 'x')$$, (select a from people)), 'invalid_requirement');
+select tests.act_as((select a from people));
+select tests.expect_error($$select tests.new_req('x')$$, 'invalid_requirement');
+select tests.expect_error($$select tests.new_req('Basketbol', array['a','b','c','d','e','f','g','h','i'])$$, 'invalid_requirement');
+select tests.expect_error($$select tests.new_req('Basketbol', array[repeat('a', 31)])$$, 'invalid_requirement');
 select tests.expect_error(
-    format($$select tests.insert_req(%L, 'Basketbol', array['a','b','c','d','e','f','g','h','i'])$$, (select a from people)),
-    'invalid_requirement'
+    $$select public.create_requirement('Basketbol', '', 'SPORTS', '{}', null, null, 99)$$, 'invalid_requirement'
 );
 select tests.expect_error(
-    format(
-        $$select public.insert_requirement(%L, 'Yarın akşam basketbol oynayacak iki kişi', 'Basketbol', 'Maç', 'SPORTS', '{}', null, null, null, %L, 'm')$$,
-        (select a from people), tests.vector_literal(1, 3)
-    ),
-    'invalid_requirement'
+    $$select public.create_requirement('Basketbol', '', 'SPORTS', '{}', null, now() - interval '2 days', null)$$, 'invalid_requirement'
 );
 select tests.expect_error(
-    format(
-        $$select public.insert_requirement(%L, 'Yarın akşam basketbol oynayacak iki kişi', 'Basketbol', 'Maç', 'SPORTS', '{}', null, null, 99, %L, 'm')$$,
-        (select a from people), tests.vector_literal(1)
-    ),
-    'invalid_requirement'
+    $$select public.create_requirement('Basketbol', repeat('x', 1001), 'SPORTS', '{}', null, null, null)$$, 'invalid_requirement'
 );
-select tests.expect_error(format($$select tests.insert_req(%L)$$, (select pending from people)), 'approved_student_required');
+select tests.expect_error($$select public.create_requirement('Basketbol', '', null, '{}', null, null, null)$$, 'invalid_requirement');
+-- Description, tags, place, time and people are optional.
+select tests.assert_equals(
+    (select public.create_requirement('Sadece başlık', null, 'OTHER', null, '  ', null, null) is not null), true, 'minimal'
+);
+select tests.reset_role();
+select tests.act_as((select pending from people));
+select tests.expect_error($$select tests.new_req()$$, 'approved_student_required');
+select tests.reset_role();
+select tests.act_as_anon();
+select tests.expect_error($$select public.create_requirement('Basketbol', '', 'SPORTS', '{}', null, null, null)$$,
+    'permission denied for function create_requirement');
 rollback;
 
--- 3. At most 20 active requirements per person.
+-- 3. At most 20 active requirements (free), and at most 30 new ones in 24 hours.
 begin;
-select tests.act_as_service();
-select tests.insert_req((select a from people)) from generate_series(1, 20);
-select tests.expect_error(format($$select tests.insert_req(%L)$$, (select a from people)), 'too_many_active_requirements');
+select tests.act_as((select a from people));
+select tests.new_req() from generate_series(1, 20);
+select tests.expect_error($$select tests.new_req()$$, 'too_many_active_requirements');
+select public.close_requirement(r.id) from public.list_my_requirements() r;
+select tests.new_req() from generate_series(1, 10);
+select tests.expect_error($$select tests.new_req()$$, 'requirement_daily_limit');
+select tests.reset_role();
+update public.requirements set created_at = now() - interval '25 hours' where owner_id = (select a from people);
+select tests.act_as((select a from people));
+select tests.assert_equals((select tests.new_req() is not null), true, 'older ones no longer count');
 rollback;
 
 -- 4. Owners list and close their own; nobody else can see or close them.
 begin;
-select tests.act_as_service();
-create temp table r as select tests.insert_req((select a from people)) as id;
+select tests.act_as((select a from people));
+create temp table r as select tests.new_req() as id;
 select tests.reset_role();
 grant select on r to authenticated;
 select tests.act_as((select b from people));
@@ -118,39 +115,13 @@ select tests.act_as((select pending from people));
 select tests.expect_error($$select * from public.list_my_requirements()$$, 'approved_student_required');
 rollback;
 
--- 5. AI quota: service role only, approved students only, 30 analyses / 24 h.
+-- 5. Synonyms are not readable by students; account deletion removes requirements.
 begin;
 select tests.act_as((select a from people));
-select tests.expect_error(
-    format($$select public.consume_ai_quota(%L, 'analyze')$$, (select a from people)),
-    'permission denied for function consume_ai_quota'
-);
-select tests.reset_role();
-select tests.act_as_service();
-select public.consume_ai_quota((select a from people), 'analyze') from generate_series(1, 30);
-select tests.expect_error(format($$select public.consume_ai_quota(%L, 'analyze')$$, (select a from people)), 'ai_quota_exceeded');
--- Other kinds and other people have their own budget.
-select public.consume_ai_quota((select a from people), 'publish');
-select public.consume_ai_quota((select b from people), 'analyze');
-select tests.expect_error(format($$select public.consume_ai_quota(%L, 'analyze')$$, (select pending from people)), 'approved_student_required');
-select tests.expect_error(format($$select public.consume_ai_quota(%L, 'other')$$, (select a from people)), 'invalid_quota_kind');
-select tests.reset_role();
--- Usage older than 24 hours no longer counts.
-update public.ai_usage set created_at = now() - interval '25 hours' where user_id = (select a from people);
-select tests.act_as_service();
-select public.consume_ai_quota((select a from people), 'analyze');
-rollback;
-
--- 6. Account deletion removes requirements and usage.
-begin;
-select tests.act_as_service();
-select tests.insert_req((select a from people));
-select public.consume_ai_quota((select a from people), 'publish');
+select tests.assert_equals((select count(*) from public.requirement_synonyms), 0::bigint, 'synonyms not readable');
+select tests.expect_error($$select public.requirement_tag('x')$$, 'permission denied for function requirement_tag');
+select tests.new_req();
 select tests.reset_role();
 delete from auth.users where id = (select a from people);
-select tests.assert_equals(
-    (select count(*) from public.requirements) + (select count(*) from public.ai_usage),
-    0::bigint,
-    'cascade'
-);
+select tests.assert_equals((select count(*) from public.requirements), 0::bigint, 'cascade');
 rollback;

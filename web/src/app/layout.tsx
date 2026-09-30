@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" 
 export const metadata: Metadata = {
   title: "KampüsAğı — Üniversite öğrencileri için doğrulanmış kampüs ağı",
   description:
-    "KampüsAğı, belgesiyle doğrulanmış üniversite öğrencilerini topluluklar, yapay zekâ destekli ihtiyaç eşleştirme ve güvenli sohbetle bir araya getirir.",
+    "KampüsAğı, belgesiyle doğrulanmış üniversite öğrencilerini topluluklar, ihtiyaç eşleştirme ve güvenli sohbetle bir araya getirir.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

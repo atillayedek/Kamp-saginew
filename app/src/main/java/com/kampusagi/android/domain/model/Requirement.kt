@@ -6,7 +6,7 @@ enum class RequirementCategory { SPORTS, STUDY, PROJECT, TRANSPORT, ITEM, EVENT,
 /** Mirrors `public.requirement_status`. */
 enum class RequirementStatus { ACTIVE, CLOSED }
 
-/** What the AI suggested, as the student edits it before publishing. */
+/** The requirement form as the student fills it in. */
 data class RequirementDraft(
     val title: String,
     val description: String,
@@ -38,7 +38,10 @@ data class MatchOwner(
     val department: String?,
 )
 
-/** Another student's requirement similar to one of ours; [score] is 0-100 from pgvector cosine similarity. */
+/**
+ * Another student's requirement similar to one of ours. [score] (0-100) comes from `find_matches`:
+ * shared tags, shared words, time and place; [sharedTags] are the tags both have.
+ */
 data class Match(
     val requirementId: String,
     val title: String,
@@ -50,5 +53,6 @@ data class Match(
     val participantsNeeded: Int?,
     val createdAt: String,
     val score: Int,
+    val sharedTags: List<String>,
     val owner: MatchOwner,
 )

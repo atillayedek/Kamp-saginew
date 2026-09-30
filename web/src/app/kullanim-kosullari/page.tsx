@@ -59,15 +59,15 @@ export default function TermsPage() {
         items={[
           "Premium, Google Play üzerinden yenilenen bir aboneliktir; fiyat Google Play'de gösterilir ve ödeme Google tarafından alınır.",
           "Aboneliği Google Play → Ödemeler ve abonelikler bölümünden istediğin zaman iptal edebilirsin; dönem sonuna kadar Premium sürer.",
-          "Premium; kanal açma, kanal fotoğrafı, kanalda anket paylaşma ve daha yüksek yapay zekâ ve ilan limitleri sağlar. Premium sona ererse kanalın silinmez ancak yeni paylaşım yapılamaz.",
+          "Premium; kanal açma, kanal fotoğrafı, kanalda anket paylaşma ve daha fazla aktif ihtiyaç ilanı sağlar. Premium sona ererse kanalın silinmez ancak yeni paylaşım yapılamaz.",
           "İade talepleri Google Play iade politikasına tabidir.",
         ]}
       />
 
-      <H2>6. Yapay zekâ</H2>
+      <H2>6. Eşleştirme</H2>
       <p>
-        İhtiyaç analizi ve eşleştirme yapay zekâ ile yapılır ve hatalı olabilir. Yayınlamadan önce taslağı kontrol edip düzenleyebilirsin.
-        Eşleşme puanı bir benzerlik ölçüsüdür, kişi hakkında bir değerlendirme değildir.
+        İhtiyaç eşleştirmesi yapay zekâ kullanmaz; aynı kategorideki ilanlar ortak etiket, ortak kelime, zaman ve yer kurallarıyla puanlanır.
+        Eşleşme puanı yalnızca ilanların benzerliğini gösterir, kişi hakkında bir değerlendirme değildir.
       </p>
 
       <H2>7. Hesabın kapatılması</H2>

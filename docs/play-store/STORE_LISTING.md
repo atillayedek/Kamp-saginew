@@ -36,8 +36,8 @@ Her hesap öğrenci belgesiyle incelenir. Gönderilere, sohbetlere ve gruplara y
 📚 DERS NOTU ARŞİVİ
 Aynı üniversitedeki öğrencilerin paylaştığı ders notlarını derslere göre bul ve PDF olarak aç; kendi notlarını paylaşarak rozet kazan.
 
-✨ YAPAY ZEKÂ İLE İHTİYAÇ EŞLEŞTİRME
-Ev arkadaşı, ders çalışma partneri, ikinci el kitap… İhtiyacını yaz, yapay zekâ düzenlesin ve seni benzer ilanlarla eşleştirsin.
+🤝 İHTİYAÇ EŞLEŞTİRME
+Ev arkadaşı, ders çalışma partneri, maç için eksik oyuncu, ikinci el kitap… Kategori ve etiket seç, ihtiyacını yaz; KampüsAğı seni aynı şeyi arayan öğrencilerle eşleştirsin. Neden eşleştiğinizi ortak etiketlerle görürsün.
 
 🛡️ GÜVENLİ TOPLULUK
 • Kullanıcı engelleme ve içerik şikayeti
@@ -45,7 +45,7 @@ Ev arkadaşı, ders çalışma partneri, ikinci el kitap… İhtiyacını yaz, y
 • Hesabını ve tüm verilerini istediğin an uygulamadan silebilirsin
 
 ⭐ PREMIUM
-Kendi kanalını açma, daha fazla yapay zekâ analizi ve daha fazla aktif ilan. Premium aylık abonelikle alınır; Google Play üzerinden istediğin zaman iptal edebilirsin.
+Kendi kanalını açma, kanal fotoğrafı, kanalda anket ve daha fazla aktif ihtiyaç ilanı. Premium aylık abonelikle alınır; Google Play üzerinden istediğin zaman iptal edebilirsin.
 
 KampüsAğı 18 yaş üstü üniversite öğrencileri içindir.
 Gizlilik politikası: <SİTE>/gizlilik
@@ -122,8 +122,8 @@ Toplanan veri türleri (hepsi "Toplanıyor", "Paylaşılmıyor", "Geçici değil
 
 **Toplanmayanlar:** konum, rehber, takvim, sağlık, ses, reklam kimliği, web geçmişi, yüklü uygulamalar.
 
-Not: OpenAI'a gönderilen ihtiyaç metni, Google Play'in tanımında "hizmet sağlayıcıya aktarım" olduğu için
-"Paylaşım" sayılmaz. Supabase, Resend ve Vercel de hizmet sağlayıcıdır.
+Not: Supabase, Resend ve Vercel hizmet sağlayıcıdır; Google Play'in tanımında bunlara aktarım "Paylaşım" sayılmaz.
+Uygulama yapay zekâ servisi kullanmaz.
 
 ## 4. Abonelik (Para kazanma → Abonelikler)
 - Ürün kimliği: örn. `kampusagi.plus`; temel plan: aylık, otomatik yenilenen, **100 TL**.
@@ -135,7 +135,7 @@ KampüsAğı'nın ilk sürümü:
 • Doğrulanmış öğrencilerle kampüs akışı: fotoğraf, anket, etkinlik ve ilan paylaşımı
 • Birebir sohbet, çalışma grupları ve Premium kanallar
 • Ders notu arşivi ve rozetler
-• Yapay zekâ ile ihtiyaç eşleştirme
+• Etiketle ihtiyaç eşleştirme
 • Kullanıcı engelleme, şikayet ve hesap silme
 ```
 

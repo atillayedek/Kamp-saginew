@@ -8,8 +8,8 @@ select tests.approved_student('gg1@example.edu.tr', 'gg_bir', 'İSTANBUL TEKNİK
 grant select on gg to authenticated, anon, service_role;
 
 -- Premium for a: an active plan and a current entitlement.
-insert into public.subscription_plans (play_product_id, name, description, is_active, ai_analyze_daily, ai_publish_daily, max_active_requirements)
-values ('kampusagi.test.premium', 'Premium', 'Test planı', true, 100, 50, 50);
+insert into public.subscription_plans (play_product_id, name, description, is_active, max_active_requirements)
+values ('kampusagi.test.premium', 'Premium', 'Test planı', true, 50);
 insert into public.entitlements (user_id, plan_id, purchase_token, expires_at)
 values ((select a from gg), (select id from public.subscription_plans where play_product_id = 'kampusagi.test.premium'),
         'test-token-0000000001', now() + interval '30 days');

@@ -28,21 +28,16 @@ supabase functions deploy delete-account
 
 - **Auth → URL Configuration:** Redirect URL'lere `kampusagi://auth-callback` ve `kampusagi://auth-callback?type=recovery` eklenir.
 - **Auth → Email:** "Confirm email" açık olmalı.
-- **Database → Extensions:** `vector` (migration zaten `extensions` şemasında açar).
+- **Database → Extensions:** `vector` ilk migration'larda açılır; D54'ten sonra hiçbir tablo kullanmaz.
 
 ## 2. Edge Function secret'ları
 
-| Secret | Kullanım | Not |
-|---|---|---|
-| `OPENAI_API_KEY` | analyze/publish-requirement | Yalnızca backend. Android'e asla girmez. |
-| `OPENAI_CHAT_MODEL` | Yapılandırılmış ihtiyaç analizi | JSON schema (strict) destekleyen bir sohbet modeli. |
-| `OPENAI_EMBEDDING_MODEL` | Eşleşme vektörü | 1536 boyut üretebilen bir model (ör. `text-embedding-3-small`). |
+İhtiyaç eşleştirmesi yapay zekâ kullanmaz (D54); OpenAI secret'ı gerekmez. `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
+`SUPABASE_SERVICE_ROLE_KEY` Supabase tarafından fonksiyonlara otomatik verilir.
 
-`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` Supabase tarafından fonksiyonlara otomatik verilir.
-
-```bash
-supabase secrets set OPENAI_API_KEY=... OPENAI_CHAT_MODEL=... OPENAI_EMBEDDING_MODEL=...
-```
+**Eski fonksiyonları kaldır:** `analyze-requirement` ve `publish-requirement` repodan silindi; canlıda deploy edilmiş
+kalmışlarsa Dashboard → Edge Functions'tan sil. Varsa `OPENAI_API_KEY`, `OPENAI_CHAT_MODEL`, `OPENAI_EMBEDDING_MODEL`
+secret'larını da sil ve OpenAI anahtarını OpenAI panelinden iptal et.
 
 ### Çökme raporları
 
@@ -62,9 +57,8 @@ FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push
 3. `supabase functions deploy verify-purchase`
 4. Planı veritabanına ekle (ürün sahibi kararı; örnek değil, şablon):
    ```sql
-   insert into public.subscription_plans (play_product_id, name, description, is_active,
-       ai_analyze_daily, ai_publish_daily, max_active_requirements)
-   values ('<play ürün kimliği>', '<ad>', '<açıklama>', true, <n>, <n>, <n>);
+   insert into public.subscription_plans (play_product_id, name, description, is_active, max_active_requirements)
+   values ('<play ürün kimliği>', '<ad>', '<açıklama>', true, <aktif ilan sınırı, ücretsiz 20>);
    ```
 5. Billing yalnızca Play'den (iç test kanalı dahil) kurulan sürümde çalışır.
 6. Aktif bir plan satırı olmadan admin panelindeki Premium hediye ve promosyon kodu da çalışmaz (plan limitleri bu satırdan gelir). Hediye/kod Play'den bağımsızdır, ücret alınmaz.

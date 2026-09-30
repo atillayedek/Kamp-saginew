@@ -18,9 +18,9 @@ create temp table people as
 select tests.p_student('p1@example.edu.tr', 'pbir') as a, tests.p_student('p2@example.edu.tr', 'piki') as b;
 grant select on people to authenticated, service_role;
 
-insert into public.subscription_plans (play_product_id, name, description, is_active, ai_analyze_daily, ai_publish_daily, max_active_requirements)
-values ('kampusagi.plus', 'Plus', 'Daha fazla yapay zekâ analizi', true, 40, 15, 25),
-       ('kampusagi.draft', 'Taslak', 'Henüz satışta değil', false, 99, 99, 99);
+insert into public.subscription_plans (play_product_id, name, description, is_active, max_active_requirements)
+values ('kampusagi.plus', 'Plus', 'Daha fazla aktif ihtiyaç', true, 25),
+       ('kampusagi.draft', 'Taslak', 'Henüz satışta değil', false, 99);
 
 -- 1. Only active plans are listed, only to approved students.
 begin;
@@ -28,8 +28,8 @@ select tests.act_as((select a from people));
 select tests.assert_equals((select string_agg(play_product_id, ',') from public.list_plans()), 'kampusagi.plus', 'active plans');
 select tests.assert_equals((select count(*) from public.subscription_plans), 0::bigint, 'table not readable');
 select tests.assert_equals(
-    (select coalesce(plan_name, '-') || '|' || ai_analyze_daily from public.my_subscription()),
-    '-|30',
+    (select coalesce(plan_name, '-') || '|' || max_active_requirements from public.my_subscription()),
+    '-|20',
     'free limits'
 );
 rollback;
@@ -67,26 +67,32 @@ select public.record_entitlement((select a from people), 'kampusagi.plus', 'toke
 select tests.reset_role();
 select tests.act_as((select a from people));
 select tests.assert_equals(
-    (select plan_name || '|' || ai_analyze_daily || '|' || max_active_requirements from public.my_subscription()),
-    'Plus|40|25',
+    (select plan_name || '|' || max_active_requirements from public.my_subscription()),
+    'Plus|25',
     'plan limits'
 );
 rollback;
 
--- 3. The AI quota follows the plan and falls back when the entitlement expires.
+-- 3. The active-requirement limit follows the plan and falls back when the entitlement expires.
 begin;
 select tests.act_as_service();
 select public.record_entitlement((select a from people), 'kampusagi.plus', 'token-1234567890', now() + interval '30 days');
-select public.consume_ai_quota((select a from people), 'analyze') from generate_series(1, 40);
-select tests.expect_error(format($$select public.consume_ai_quota(%L, 'analyze')$$, (select a from people)), 'ai_quota_exceeded');
-select public.consume_ai_quota((select b from people), 'analyze') from generate_series(1, 30);
-select tests.expect_error(format($$select public.consume_ai_quota(%L, 'analyze')$$, (select b from people)), 'ai_quota_exceeded');
 select tests.reset_role();
-delete from public.ai_usage;
+select tests.act_as((select a from people));
+select public.create_requirement('İhtiyaç ' || i, '', 'OTHER', '{}', null, null, null) from generate_series(1, 25) i;
+select tests.expect_error(
+    $$select public.create_requirement('Bir tane daha', '', 'OTHER', '{}', null, null, null)$$, 'too_many_active_requirements'
+);
+select tests.reset_role();
+select tests.act_as((select b from people));
+select public.create_requirement('İhtiyaç ' || i, '', 'OTHER', '{}', null, null, null) from generate_series(1, 20) i;
+select tests.expect_error(
+    $$select public.create_requirement('Bir tane daha', '', 'OTHER', '{}', null, null, null)$$, 'too_many_active_requirements'
+);
+select tests.reset_role();
 update public.entitlements set expires_at = now() - interval '1 second';
-select tests.act_as_service();
-select public.consume_ai_quota((select a from people), 'analyze') from generate_series(1, 30);
-select tests.expect_error(format($$select public.consume_ai_quota(%L, 'analyze')$$, (select a from people)), 'ai_quota_exceeded');
+select tests.act_as((select a from people));
+select tests.assert_equals((select max_active_requirements from public.my_subscription()), 20, 'expired entitlement gives free limits');
 rollback;
 
 -- 4. Deactivating a plan removes its benefits immediately.
@@ -96,5 +102,5 @@ select public.record_entitlement((select a from people), 'kampusagi.plus', 'toke
 select tests.reset_role();
 update public.subscription_plans set is_active = false where play_product_id = 'kampusagi.plus';
 select tests.act_as((select a from people));
-select tests.assert_equals((select ai_analyze_daily from public.my_subscription()), 30, 'inactive plan gives free limits');
+select tests.assert_equals((select max_active_requirements from public.my_subscription()), 20, 'inactive plan gives free limits');
 rollback;

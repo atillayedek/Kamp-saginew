@@ -24,6 +24,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 15 | Akış: gönderiye fotoğraf (D42), anket, etkinlik, pazar yeri ilanı (D43), kaydedilenler, arama, kişi profili (D44) | Bitti — CI yeşil `eed1174` (DB 15 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol) |
 | 16 | Premium kanallar (D46), çalışma grupları (D47), ders notu arşivi (D48), rozetler (D49) | Bitti — CI yeşil `51306ab` (DB 16 test dosyası, Edge Function 40 test, web, Android birim testleri + lint + APK/AAB, canlı kontrol) |
 | 17 | Admin: uygulama içi duyuru (D50), aktiflik istatistikleri (D51), Premium hediye ve promosyon kodu (D52); Premium fiyatı Play'de 100 TL (D45) | Bitti — CI yeşil `c55372e` (DB 17 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol). Cihazda deneme: kullanıcı tarafından yapılacak |
+| 18 | Yapay zekâsız kurallı eşleştirme (D54): form + önerilen etiketler, `create_requirement`, puanlı `find_matches`, eşanlamlılar; OpenAI kaldırıldı | CI bekleniyor (yerel: DB 17 test dosyası PASS, Deno 29 test PASS, web PASS) |
 
 ## Son doğrulamalar
 

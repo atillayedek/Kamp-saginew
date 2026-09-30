@@ -7,8 +7,8 @@ kullanıcının `docs/DECISIONS.md`'deki açık kararları Bölüm 0'ın ilgili 
 
 - Android: Kotlin, Jetpack Compose + Material 3, Hilt, Coroutines/Flow, Navigation Compose (type-safe), supabase-kt.
 - Backend: Supabase — PostgreSQL + RLS, Supabase Auth, Storage, Edge Functions. Migration'lar `supabase/migrations/`.
-- AI: OpenAI — yalnızca backend (Edge Function) üzerinden; `OPENAI_API_KEY` backend secret'ıdır, Android'e asla girmez.
-  Embedding OpenAI embedding modeliyle üretilir ve pgvector'a yazılır.
+- AI: kullanılmıyor (kullanıcı kararı 2026-09-30, D54). İhtiyaç eşleştirmesi veritabanında kurallıdır
+  (kategori, etiket + eşanlamlılar, Türkçe kelime kökleri, zaman, yer).
 - Sıfırdan yazıldı; `kamp-sag-` / `kamp-sagiweb` yalnızca referanstır, kod kopyalanmaz.
 
 Kod yazım mantığı, aynı hesaptaki `atillayedek/whered-d-put` (WhereDidIPutIt) projesindeki desenlerden alınmıştır.

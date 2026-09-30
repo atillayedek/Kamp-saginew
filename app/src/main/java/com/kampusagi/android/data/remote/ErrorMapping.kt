@@ -75,11 +75,8 @@ private fun knownCode(text: String): AppError? = when {
     "invalid_bio" in text || "invalid_avatar_path" in text || "avatar_not_found" in text -> AppError.INVALID_INPUT
     "not_authenticated" in text -> AppError.SESSION_EXPIRED
     "approved_student_required" in text -> AppError.ACCOUNT_NOT_APPROVED
-    "ai_not_configured" in text -> AppError.AI_NOT_CONFIGURED
-    "ai_quota_exceeded" in text -> AppError.AI_QUOTA_EXCEEDED
-    "ai_refused" in text -> AppError.AI_REFUSED
-    "ai_failed" in text -> AppError.AI_FAILED
     "too_many_active_requirements" in text -> AppError.TOO_MANY_ACTIVE_REQUIREMENTS
+    "requirement_daily_limit" in text -> AppError.REQUIREMENT_DAILY_LIMIT
     "document_too_large" in text -> AppError.DOCUMENT_TOO_LARGE
     "invalid_document" in text -> AppError.DOCUMENT_NOT_PDF
     "verification_not_allowed" in text -> AppError.VERIFICATION_NOT_ALLOWED
