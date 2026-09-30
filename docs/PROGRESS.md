@@ -23,7 +23,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 14 | Görsel yenileme (D37), gönderi kategorileri (D38), profil fotoğrafı/biyografi/otomatik avatar (D39), Eşleşmeler sekmesi (D40) | Bitti — CI yeşil `2f0290b` (DB 14 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol). Cihazda görsel doğrulama: kullanıcı tarafından yapılacak |
 | 15 | Akış: gönderiye fotoğraf (D42), anket, etkinlik, pazar yeri ilanı (D43), kaydedilenler, arama, kişi profili (D44) | Bitti — CI yeşil `eed1174` (DB 15 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol) |
 | 16 | Premium kanallar (D46), çalışma grupları (D47), ders notu arşivi (D48), rozetler (D49) | Bitti — CI yeşil `51306ab` (DB 16 test dosyası, Edge Function 40 test, web, Android birim testleri + lint + APK/AAB, canlı kontrol) |
-| 17 | Admin: uygulama içi duyuru (D50), aktiflik istatistikleri (D51), Premium hediye ve promosyon kodu (D52); Premium fiyatı Play'de 100 TL (D45) | CI bekleniyor |
+| 17 | Admin: uygulama içi duyuru (D50), aktiflik istatistikleri (D51), Premium hediye ve promosyon kodu (D52); Premium fiyatı Play'de 100 TL (D45) | Bitti — CI yeşil `c55372e` (DB 17 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol). Cihazda deneme: kullanıcı tarafından yapılacak |
 
 ## Son doğrulamalar
 
