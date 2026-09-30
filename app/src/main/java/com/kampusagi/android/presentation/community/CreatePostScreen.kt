@@ -237,7 +237,7 @@ private fun PollFields(viewModel: CreatePostViewModel, enabled: Boolean) {
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.weight(1f).padding(start = Spacing.sm),
         )
-        Switch(checked = viewModel.pollEnabled, onCheckedChange = viewModel::setPollEnabled, enabled = enabled)
+        Switch(checked = viewModel.pollEnabled, onCheckedChange = viewModel::onPollToggle, enabled = enabled)
     }
     if (!viewModel.pollEnabled) return
     viewModel.pollOptions.forEachIndexed { index, option ->

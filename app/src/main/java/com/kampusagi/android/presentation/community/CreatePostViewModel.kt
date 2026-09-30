@@ -152,7 +152,7 @@ class CreatePostViewModel @Inject constructor(
         photos = photos.filterIndexed { i, _ -> i != index }
     }
 
-    fun setPollEnabled(enabled: Boolean) {
+    fun onPollToggle(enabled: Boolean) {
         pollEnabled = enabled
         error = null
     }
