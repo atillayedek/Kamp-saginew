@@ -381,4 +381,87 @@
     <string name="profile_remove_photo">Kaldır</string>
     <string name="profile_photo_hint">Fotoğrafın yalnızca doğrulanmış öğrencilere görünür. Fotoğraf eklemezsen adının baş harfleri gösterilir.</string>
     <string name="action_save">Kaydet</string>
+
+    <!-- Photos, polls, events, listings -->
+    <string name="cd_post_photo">Gönderi fotoğrafı</string>
+    <string name="photo_load_failed">Fotoğraf yüklenemedi, yeniden denemek için dokun</string>
+    <string name="poll_your_vote">Senin oyun</string>
+    <plurals name="poll_votes">
+        <item quantity="one">%d oy</item>
+        <item quantity="other">%d oy</item>
+    </plurals>
+    <string name="poll_closed">Anket kapandı</string>
+    <string name="poll_closes_at">Kapanış: %1$s</string>
+    <string name="poll_withdraw">Oyumu geri çek</string>
+    <plurals name="event_attendees">
+        <item quantity="one">%d kişi katılıyor</item>
+        <item quantity="other">%d kişi katılıyor</item>
+    </plurals>
+    <string name="event_attend">Katılıyorum</string>
+    <string name="event_attending">Katılıyorsun</string>
+    <string name="listing_sold">Satıldı</string>
+    <string name="listing_free">Ücretsiz</string>
+    <string name="listing_mark_sold">Satıldı olarak işaretle</string>
+    <string name="listing_mark_available">Satışa geri aç</string>
+    <string name="listing_message_seller">Satıcıya yaz</string>
+    <string name="cd_save">Kaydet</string>
+    <string name="cd_unsave">Kaydedilenlerden çıkar</string>
+
+    <!-- Saved, events, search -->
+    <string name="saved_title">Kaydedilenler</string>
+    <string name="saved_empty_title">Henüz kaydettiğin gönderi yok</string>
+    <string name="saved_empty_body">Bir gönderideki yer imi simgesine dokunarak onu buraya kaydedebilirsin.</string>
+    <string name="events_title">Etkinlikler</string>
+    <string name="events_empty_title">Yaklaşan etkinlik yok</string>
+    <string name="events_empty_body">Etkinlik kategorisinde tarih ekleyerek paylaşılan etkinlikler burada listelenir.</string>
+    <string name="search_title">Ara</string>
+    <string name="search_hint">Gönderi veya kişi ara</string>
+    <string name="search_clear">Aramayı temizle</string>
+    <string name="search_tab_posts">Gönderiler</string>
+    <string name="search_tab_people">Kişiler</string>
+    <string name="search_start">Aramak için en az 2 harf yaz. Türkçe karakterler fark etmez.</string>
+    <string name="search_no_results">Sonuç bulunamadı</string>
+    <string name="search_no_posts">Bu kelimeyi içeren bir gönderi yok.</string>
+    <string name="search_no_people">Bu isimde doğrulanmış bir öğrenci bulunamadı.</string>
+    <string name="search_failed">Arama yapılamadı</string>
+
+    <!-- Other people's profiles -->
+    <string name="user_profile_not_found">Profil bulunamadı</string>
+    <string name="user_profile_load_failed">Profil yüklenemedi</string>
+    <string name="user_profile_no_posts">Henüz görebileceğin bir gönderisi yok.</string>
+    <plurals name="user_profile_posts">
+        <item quantity="one">%d gönderi</item>
+        <item quantity="other">%d gönderi</item>
+    </plurals>
+    <string name="user_profile_message">Mesaj gönder</string>
+    <string name="profile_my_posts">Gönderilerim</string>
+    <string name="action_load_more">Daha fazla yükle</string>
+    <string name="action_ok">Tamam</string>
+
+    <!-- Creating posts -->
+    <string name="create_post_add_photos">Fotoğraf ekle (%1$d/%2$d)</string>
+    <string name="create_post_preparing_photos">Fotoğraflar hazırlanıyor…</string>
+    <string name="create_post_remove_photo">Fotoğrafı kaldır</string>
+    <string name="create_post_price">Fiyat</string>
+    <string name="create_post_price_hint">Boş bırakırsan fiyat gösterilmez. Ücretsiz için 0 yaz.</string>
+    <string name="create_post_price_invalid">Geçerli bir tutar yaz (ör. 250 veya 99,90).</string>
+    <string name="create_post_add_poll">Anket ekle</string>
+    <string name="create_post_poll_option">Seçenek %1$d</string>
+    <string name="create_post_poll_add_option">Seçenek ekle</string>
+    <string name="create_post_poll_remove_option">Seçeneği kaldır</string>
+    <string name="create_post_poll_invalid">2–4 farklı ve dolu seçenek gir.</string>
+    <string name="create_post_poll_duration">Anket süresi</string>
+    <string name="poll_duration_open">Süresiz</string>
+    <string name="poll_duration_day">1 gün</string>
+    <string name="poll_duration_three_days">3 gün</string>
+    <string name="poll_duration_week">1 hafta</string>
+    <string name="create_post_event_details">Etkinlik bilgileri</string>
+    <string name="create_post_event_date">Tarih seç</string>
+    <string name="create_post_event_time">Saat seç</string>
+    <string name="create_post_event_time_needed">Tarih seçtiysen saati de seç.</string>
+    <string name="create_post_event_location">Yer (isteğe bağlı)</string>
+
+    <string name="error_poll_closed">Bu anket kapandı.</string>
+    <string name="error_event_ended">Bu etkinlik sona erdi.</string>
+    <string name="error_too_many_saved">En fazla 1000 gönderi kaydedebilirsin.</string>
 </resources>

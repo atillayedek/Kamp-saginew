@@ -45,6 +45,31 @@ class ContentResolverImageEncoder @Inject constructor(
         }
     }
 
+    override suspend fun postPhotoJpeg(uri: String): AppResult<ByteArray> = withContext(Dispatchers.IO) {
+        try {
+            val source = decode(Uri.parse(uri)) ?: return@withContext AppResult.Failure(AppError.IMAGE_UNREADABLE)
+            val longest = maxOf(source.width, source.height)
+            val scaled = if (longest > POST_MAX_SIDE) {
+                val factor = POST_MAX_SIDE.toFloat() / longest
+                Bitmap.createScaledBitmap(source, (source.width * factor).toInt(), (source.height * factor).toInt(), true)
+            } else {
+                source
+            }
+            val output = ByteArrayOutputStream()
+            scaled.compress(Bitmap.CompressFormat.JPEG, POST_QUALITY, output)
+            AppResult.Success(output.toByteArray())
+        } catch (e: IOException) {
+            Log.w(TAG, "Picked image could not be read", e)
+            AppResult.Failure(AppError.IMAGE_UNREADABLE)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "No permission to read the picked image", e)
+            AppResult.Failure(AppError.IMAGE_UNREADABLE)
+        } catch (e: IllegalArgumentException) {
+            Log.w(TAG, "Picked image has an unsupported format", e)
+            AppResult.Failure(AppError.IMAGE_UNREADABLE)
+        }
+    }
+
     /** ImageDecoder applies the photo's rotation; on Android 8 the image is decoded as stored. */
     private fun decode(uri: Uri): Bitmap? =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -71,5 +96,8 @@ class ContentResolverImageEncoder @Inject constructor(
         const val SIZE = 512
         const val MAX_DECODE = 2048
         const val QUALITY = 85
+        // Sharp on phone screens and well under the bucket's 3 MB limit.
+        const val POST_MAX_SIDE = 1440
+        const val POST_QUALITY = 82
     }
 }

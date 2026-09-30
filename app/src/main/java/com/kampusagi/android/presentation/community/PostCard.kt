@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -75,8 +76,8 @@ fun CategoryLabel(category: PostCategory, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PostActions(post: Post, onToggleLike: () -> Unit, onOpenComments: (() -> Unit)?) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun PostActions(post: Post, onToggleLike: () -> Unit, onToggleSave: () -> Unit, onOpenComments: (() -> Unit)?) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         IconButton(onClick = onToggleLike) {
             Icon(
                 imageVector = if (post.likedByMe) AppIcons.FavoriteFilled else AppIcons.Favorite,
@@ -104,23 +105,54 @@ fun PostActions(post: Post, onToggleLike: () -> Unit, onOpenComments: (() -> Uni
                 modifier = Modifier.padding(start = Spacing.xs + 2.dp),
             )
         }
+        Spacer(Modifier.weight(1f))
+        IconButton(onClick = onToggleSave) {
+            Icon(
+                imageVector = if (post.savedByMe) AppIcons.BookmarkFilled else AppIcons.Bookmark,
+                contentDescription = stringResource(if (post.savedByMe) R.string.cd_unsave else R.string.cd_save),
+                tint = if (post.savedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 }
 
-/** A feed entry: author, category, text and actions on a flat surface, separated by a hairline. */
+/** Category and, for listings, the price; shown above the text. */
 @Composable
-fun PostCard(post: Post, onOpen: () -> Unit, onToggleLike: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth().clickable(onClick = onOpen)) {
+fun PostLabels(post: Post) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalAlignment = Alignment.CenterVertically) {
+        CategoryLabel(post.category)
+        post.listing?.let { ListingLabel(it) }
+    }
+}
+
+/** Photos, poll and event of a post, in that order. */
+@Composable
+fun PostAttachments(post: Post, callbacks: PostCallbacks) {
+    post.poll?.let { PollView(it, onVote = callbacks.onVote, modifier = Modifier.padding(horizontal = Spacing.md)) }
+    post.event?.let { EventView(it, onToggleAttending = callbacks.onToggleAttending, modifier = Modifier.padding(horizontal = Spacing.md)) }
+}
+
+/** A feed entry: author, labels, text, photos and actions on a flat surface, separated by a hairline. */
+@Composable
+fun PostCard(post: Post, callbacks: PostCallbacks, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth().clickable(onClick = callbacks.onOpen)) {
         Column(
-            modifier = Modifier.padding(start = Spacing.md, end = Spacing.md, top = Spacing.md),
+            modifier = Modifier.padding(start = Spacing.md, end = Spacing.md, top = Spacing.md, bottom = Spacing.sm),
             verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
-            AuthorLine(post.author, post.createdAt)
-            CategoryLabel(post.category)
+            AuthorLine(post.author, post.createdAt, modifier = Modifier.clickable { callbacks.onOpenAuthor(post.author.id) })
+            PostLabels(post)
             Text(post.body, style = MaterialTheme.typography.bodyLarge, maxLines = 12, overflow = TextOverflow.Ellipsis)
         }
+        PostMedia(post.media)
+        Column(
+            modifier = Modifier.padding(top = Spacing.sm),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        ) {
+            PostAttachments(post, callbacks)
+        }
         Row(modifier = Modifier.padding(horizontal = Spacing.xs)) {
-            PostActions(post, onToggleLike = onToggleLike, onOpenComments = onOpen)
+            PostActions(post, onToggleLike = callbacks.onToggleLike, onToggleSave = callbacks.onToggleSave, onOpenComments = callbacks.onOpen)
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }

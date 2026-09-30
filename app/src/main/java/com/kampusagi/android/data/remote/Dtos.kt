@@ -69,6 +69,60 @@ data class PostDto(
     @SerialName("author_full_name") val authorFullName: String? = null,
     @SerialName("author_username") val authorUsername: String? = null,
     @SerialName("author_university") val authorUniversity: String? = null,
+    @SerialName("saved_by_me") val savedByMe: Boolean = false,
+    val media: List<String> = emptyList(),
+    val poll: PollDto? = null,
+    val event: PostEventDto? = null,
+    val listing: ListingDto? = null,
+)
+
+@Serializable
+data class PollDto(
+    val id: String,
+    @SerialName("closes_at") val closesAt: String? = null,
+    @SerialName("total_votes") val totalVotes: Int = 0,
+    @SerialName("my_option_id") val myOptionId: String? = null,
+    val options: List<PollOptionDto> = emptyList(),
+)
+
+@Serializable
+data class PollOptionDto(val id: String, val label: String, val votes: Int)
+
+@Serializable
+data class PostEventDto(
+    @SerialName("starts_at") val startsAt: String,
+    @SerialName("ends_at") val endsAt: String? = null,
+    val location: String? = null,
+    @SerialName("attendee_count") val attendeeCount: Int = 0,
+    val attending: Boolean = false,
+)
+
+@Serializable
+data class ListingDto(
+    @SerialName("price_kurus") val priceKurus: Long,
+    val sold: Boolean = false,
+)
+
+@Serializable
+data class PersonDto(
+    @SerialName("user_id") val userId: String,
+    @SerialName("full_name") val fullName: String? = null,
+    val username: String? = null,
+    val university: String? = null,
+    val department: String? = null,
+)
+
+@Serializable
+data class UserProfileDto(
+    @SerialName("user_id") val userId: String,
+    @SerialName("full_name") val fullName: String? = null,
+    val username: String? = null,
+    val university: String? = null,
+    val department: String? = null,
+    val bio: String? = null,
+    @SerialName("joined_at") val joinedAt: String,
+    @SerialName("post_count") val postCount: Int,
+    @SerialName("is_me") val isMe: Boolean,
 )
 
 @Serializable

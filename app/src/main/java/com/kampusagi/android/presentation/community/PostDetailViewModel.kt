@@ -14,6 +14,7 @@ import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.ReportReason
 import com.kampusagi.android.domain.model.ReportTarget
+import com.kampusagi.android.domain.repository.ChatRepository
 import com.kampusagi.android.domain.repository.CommunityRepository
 import com.kampusagi.android.domain.repository.ModerationRepository
 import com.kampusagi.android.domain.usecase.AddCommentUseCase
@@ -24,6 +25,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+
+data class OpenedConversation(val id: String, val title: String)
 
 sealed interface PostDetailState {
     data object Loading : PostDetailState
@@ -37,6 +40,8 @@ class PostDetailViewModel @Inject constructor(
     private val repository: CommunityRepository,
     private val addComment: AddCommentUseCase,
     private val moderation: ModerationRepository,
+    private val chat: ChatRepository,
+    private val postChanges: PostChanges,
 ) : ViewModel() {
 
     private val postId = savedStateHandle.toRoute<PostDetailRoute>().postId
@@ -71,7 +76,13 @@ class PostDetailViewModel @Inject constructor(
     var blockedAuthorId by mutableStateOf<String?>(null)
         private set
 
+    /** A conversation opened with the seller, for the screen to navigate to. */
+    var openedConversation by mutableStateOf<OpenedConversation?>(null)
+        private set
+
     val canSendComment: Boolean get() = !isWorking && PostTextValidator.isValidComment(commentText)
+
+    val interactor = PostInteractor(repository, viewModelScope, ::updatePost) { actionError = it }
 
     init {
         load()
@@ -122,6 +133,7 @@ class PostDetailViewModel @Inject constructor(
         when (val result = repository.deletePost(postId)) {
             is AppResult.Success -> {
                 deleted = true
+                postChanges.publish(PostChange.Deleted(postId, source = this))
                 null
             }
             is AppResult.Failure -> result.error
@@ -169,6 +181,7 @@ class PostDetailViewModel @Inject constructor(
         runAction {
             when (val result = moderation.block(author.id)) {
                 is AppResult.Success -> {
+                    postChanges.publish(PostChange.AuthorBlocked(author.id, source = this))
                     if ((state as? PostDetailState.Loaded)?.post?.author?.id == author.id) {
                         blockedAuthorId = author.id
                     } else {
@@ -181,21 +194,30 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike() {
-        val loaded = state as? PostDetailState.Loaded ?: return
-        val post = loaded.post
-        val liked = !post.likedByMe
-        state = loaded.copy(post = post.copy(likedByMe = liked, likeCount = (post.likeCount + if (liked) 1 else -1).coerceAtLeast(0)))
-        viewModelScope.launch {
-            val current = state as? PostDetailState.Loaded ?: return@launch
-            state = when (val result = repository.setLiked(postId, liked)) {
-                is AppResult.Success -> current.copy(post = current.post.copy(likedByMe = liked, likeCount = result.value))
-                is AppResult.Failure -> {
-                    actionError = result.error
-                    current.copy(post = current.post.copy(likedByMe = post.likedByMe, likeCount = post.likeCount))
+    /** Opens (or creates) the conversation with the seller of a listing. */
+    fun messageAuthor() {
+        val post = (state as? PostDetailState.Loaded)?.post ?: return
+        runAction {
+            when (val result = chat.startConversation(post.author.id)) {
+                is AppResult.Success -> {
+                    openedConversation = OpenedConversation(result.value, post.author.fullName ?: post.author.username.orEmpty())
+                    null
                 }
+                is AppResult.Failure -> result.error
             }
         }
+    }
+
+    fun onConversationOpened() {
+        openedConversation = null
+    }
+
+    private fun updatePost(id: String, change: (Post) -> Post) {
+        val loaded = state as? PostDetailState.Loaded ?: return
+        if (loaded.post.id != id) return
+        val changed = change(loaded.post)
+        state = loaded.copy(post = changed)
+        postChanges.publish(PostChange.Changed(changed, source = this))
     }
 
     /** Refreshes post counters and comments after a change, keeping the screen on failure. */
@@ -204,6 +226,7 @@ class PostDetailViewModel @Inject constructor(
         val comments = repository.comments(postId)
         if (post is AppResult.Success && comments is AppResult.Success) {
             state = PostDetailState.Loaded(post.value, comments.value)
+            postChanges.publish(PostChange.Changed(post.value, source = this))
         } else {
             actionError = ((post as? AppResult.Failure) ?: (comments as? AppResult.Failure))?.error
         }

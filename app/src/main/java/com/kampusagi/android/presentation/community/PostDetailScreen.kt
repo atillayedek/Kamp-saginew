@@ -1,6 +1,7 @@
 package com.kampusagi.android.presentation.community
 
 import com.kampusagi.android.core.designsystem.icon.AppIcons
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,7 +39,6 @@ import com.kampusagi.android.core.designsystem.component.MessageView
 import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
 import com.kampusagi.android.domain.model.Comment
-import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.presentation.common.messageRes
 import com.kampusagi.android.presentation.moderation.BlockDialog
@@ -48,27 +50,25 @@ import com.kampusagi.android.presentation.moderation.ReportDialog
 @Composable
 fun PostDetailScreen(
     onBack: () -> Unit,
-    onPostChanged: (Post) -> Unit,
-    onPostDeleted: (String) -> Unit,
-    onAuthorBlocked: (String) -> Unit,
+    onOpenAuthor: (String) -> Unit,
+    onOpenChat: (conversationId: String, title: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     val loaded = viewModel.state as? PostDetailState.Loaded
 
-    // Keep the feed in step with likes and comment counts made here.
-    LaunchedEffect(loaded?.post) { loaded?.post?.let(onPostChanged) }
+    // Other screens learn about changes made here through PostChanges.
     LaunchedEffect(viewModel.blockedAuthorId) {
-        viewModel.blockedAuthorId?.let {
-            onAuthorBlocked(it)
-            onBack()
-        }
+        if (viewModel.blockedAuthorId != null) onBack()
     }
     LaunchedEffect(viewModel.deleted) {
-        if (viewModel.deleted) {
-            loaded?.post?.id?.let(onPostDeleted)
-            onBack()
+        if (viewModel.deleted) onBack()
+    }
+    LaunchedEffect(viewModel.openedConversation) {
+        viewModel.openedConversation?.let {
+            viewModel.onConversationOpened()
+            onOpenChat(it.id, it.title)
         }
     }
 
@@ -112,14 +112,44 @@ fun PostDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 ) {
                     item {
-                        Column(
-                            modifier = Modifier.padding(horizontal = Spacing.md),
-                            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                        ) {
-                            AuthorLine(state.post.author, state.post.createdAt)
-                            CategoryLabel(state.post.category)
-                            Text(state.post.body, style = MaterialTheme.typography.bodyLarge)
-                            PostActions(state.post, onToggleLike = viewModel::toggleLike, onOpenComments = null)
+                        val post = state.post
+                        val callbacks = viewModel.interactor.callbacks(post, onOpen = {}, onOpenAuthor = onOpenAuthor)
+                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = Spacing.md),
+                                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                            ) {
+                                AuthorLine(post.author, post.createdAt, modifier = Modifier.clickable { onOpenAuthor(post.author.id) })
+                                PostLabels(post)
+                                Text(post.body, style = MaterialTheme.typography.bodyLarge)
+                            }
+                            PostMedia(post.media)
+                            PostAttachments(post, callbacks)
+                            post.listing?.let { listing ->
+                                Row(modifier = Modifier.padding(horizontal = Spacing.md)) {
+                                    if (post.isMine) {
+                                        OutlinedButton(
+                                            onClick = { viewModel.interactor.setSold(post, !listing.sold) },
+                                            enabled = !viewModel.isWorking,
+                                        ) {
+                                            Text(stringResource(if (listing.sold) R.string.listing_mark_available else R.string.listing_mark_sold))
+                                        }
+                                    } else if (!listing.sold) {
+                                        FilledTonalButton(onClick = viewModel::messageAuthor, enabled = !viewModel.isWorking) {
+                                            Icon(AppIcons.Chat, contentDescription = null)
+                                            Text(stringResource(R.string.listing_message_seller), modifier = Modifier.padding(start = Spacing.sm))
+                                        }
+                                    }
+                                }
+                            }
+                            Row(modifier = Modifier.padding(horizontal = Spacing.xs)) {
+                                PostActions(
+                                    post,
+                                    onToggleLike = callbacks.onToggleLike,
+                                    onToggleSave = callbacks.onToggleSave,
+                                    onOpenComments = null,
+                                )
+                            }
                             HorizontalDivider()
                         }
                     }
@@ -137,6 +167,7 @@ fun PostDetailScreen(
                         CommentRow(
                             comment,
                             enabled = !viewModel.isWorking,
+                            onOpenAuthor = onOpenAuthor,
                             onDelete = { viewModel.deleteComment(comment) },
                             onReport = { viewModel.requestReport(ReportTarget.COMMENT, comment.id) },
                             onBlock = { viewModel.requestBlock(comment.author) },
@@ -211,13 +242,20 @@ fun PostDetailScreen(
 }
 
 @Composable
-private fun CommentRow(comment: Comment, enabled: Boolean, onDelete: () -> Unit, onReport: () -> Unit, onBlock: () -> Unit) {
+private fun CommentRow(
+    comment: Comment,
+    enabled: Boolean,
+    onOpenAuthor: (String) -> Unit,
+    onDelete: () -> Unit,
+    onReport: () -> Unit,
+    onBlock: () -> Unit,
+) {
     Row(
         verticalAlignment = Alignment.Top,
         modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.md),
     ) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            AuthorLine(comment.author, comment.createdAt)
+            AuthorLine(comment.author, comment.createdAt, modifier = Modifier.clickable { onOpenAuthor(comment.author.id) })
             Text(comment.body, style = MaterialTheme.typography.bodyMedium)
         }
         if (comment.isMine) {

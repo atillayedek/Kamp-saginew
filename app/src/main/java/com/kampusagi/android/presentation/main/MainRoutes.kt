@@ -17,3 +17,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 @Serializable data object MyMatchesRoute
 @Serializable data object EditProfileRoute
+@Serializable data object SearchRoute
+@Serializable data object SavedPostsRoute
+@Serializable data object EventsRoute
+@Serializable data class UserProfileRoute(val userId: String)

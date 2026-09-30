@@ -42,6 +42,9 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.PURCHASE_NOT_ACTIVE -> R.string.error_purchase_not_active
     AppError.PURCHASE_NOT_FOR_ACCOUNT -> R.string.error_purchase_not_for_account
     AppError.PURCHASE_CANCELLED -> R.string.error_purchase_cancelled
+    AppError.POLL_CLOSED -> R.string.error_poll_closed
+    AppError.EVENT_ENDED -> R.string.error_event_ended
+    AppError.TOO_MANY_SAVED -> R.string.error_too_many_saved
     AppError.NOT_FOUND -> R.string.error_not_found
     AppError.SERVER -> R.string.error_server
     AppError.UNKNOWN -> R.string.error_unknown

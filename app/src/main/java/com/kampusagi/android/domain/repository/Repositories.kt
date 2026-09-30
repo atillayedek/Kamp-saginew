@@ -11,6 +11,9 @@ import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.model.MessageCursor
+import com.kampusagi.android.domain.model.NewPost
+import com.kampusagi.android.domain.model.PersonSummary
+import com.kampusagi.android.domain.model.Poll
 import com.kampusagi.android.domain.model.AppNotification
 import com.kampusagi.android.domain.model.OpenReport
 import com.kampusagi.android.domain.model.PendingVerification
@@ -31,6 +34,7 @@ import com.kampusagi.android.domain.model.ReportReason
 import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.model.University
+import com.kampusagi.android.domain.model.UserProfile
 import com.kampusagi.android.domain.model.Verification
 import java.io.File
 import kotlinx.coroutines.flow.Flow
@@ -93,6 +97,9 @@ interface VerificationRepository {
 interface ImageEncoder {
     /** Decodes the picked image, crops it square and returns a small JPEG for the profile photo. */
     suspend fun avatarJpeg(uri: String): AppResult<ByteArray>
+
+    /** Decodes the picked image and returns a JPEG no larger than a post photo needs. */
+    suspend fun postPhotoJpeg(uri: String): AppResult<ByteArray>
 }
 
 interface DocumentReader {
@@ -113,13 +120,33 @@ interface CommunityRepository {
     suspend fun feed(scope: PostScope, category: PostCategory?, cursor: FeedCursor?): AppResult<FeedPage>
     suspend fun post(postId: String): AppResult<Post>
     suspend fun comments(postId: String): AppResult<List<Comment>>
-    suspend fun createPost(scope: PostScope, category: PostCategory, body: String): AppResult<String>
+
+    /** Uploads the photos into the person's folder, then creates the post with them. Returns the new id. */
+    suspend fun createPost(post: NewPost): AppResult<String>
     suspend fun deletePost(postId: String): AppResult<Unit>
     suspend fun addComment(postId: String, body: String): AppResult<Unit>
     suspend fun deleteComment(commentId: String): AppResult<Unit>
 
     /** Returns the post's like count after the change. */
     suspend fun setLiked(postId: String, liked: Boolean): AppResult<Int>
+    suspend fun setSaved(postId: String, saved: Boolean): AppResult<Unit>
+
+    /** Votes, changes the vote, or withdraws it when [optionId] is null. Returns the updated poll. */
+    suspend fun vote(pollId: String, optionId: String?): AppResult<Poll>
+
+    /** Returns the attendee count after the change. */
+    suspend fun setAttending(postId: String, attending: Boolean): AppResult<Int>
+    suspend fun setSold(postId: String, sold: Boolean): AppResult<Unit>
+
+    suspend fun savedPosts(): AppResult<List<Post>>
+    suspend fun upcomingEvents(): AppResult<List<Post>>
+    suspend fun searchPosts(query: String): AppResult<List<Post>>
+    suspend fun searchPeople(query: String): AppResult<List<PersonSummary>>
+    suspend fun userProfile(userId: String): AppResult<UserProfile>
+    suspend fun userPosts(userId: String, cursor: FeedCursor?): AppResult<FeedPage>
+
+    /** Downloads a post photo with the signed-in session; the bucket is private. */
+    suspend fun downloadPhoto(path: String): AppResult<ByteArray>
 }
 
 interface RequirementRepository {

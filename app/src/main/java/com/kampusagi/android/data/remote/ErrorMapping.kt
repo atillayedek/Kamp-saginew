@@ -99,6 +99,12 @@ private fun knownCode(text: String): AppError? = when {
     "user_not_found" in text || "report_target_not_found" in text || "report_not_found" in text -> AppError.NOT_FOUND
     "invalid_report" in text || "invalid_action" in text || "confirmation_required" in text -> AppError.INVALID_INPUT
     "account_deletion_failed" in text -> AppError.SERVER
+    "poll_closed" in text -> AppError.POLL_CLOSED
+    "event_ended" in text -> AppError.EVENT_ENDED
+    "too_many_saved_posts" in text -> AppError.TOO_MANY_SAVED
+    "invalid_media" in text || "invalid_poll" in text || "invalid_event" in text || "invalid_price" in text -> AppError.INVALID_INPUT
+    "invalid_query" in text -> AppError.INVALID_INPUT
+    "poll_not_found" in text || "event_not_found" in text || "listing_not_found" in text -> AppError.NOT_FOUND
     "rate_limited" in text -> AppError.RATE_LIMITED
     else -> null
 }

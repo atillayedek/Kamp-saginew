@@ -48,6 +48,8 @@ fun ProfileTab(
     onOpenPremium: () -> Unit,
     onOpenSettings: () -> Unit,
     onEditProfile: () -> Unit,
+    onOpenSaved: () -> Unit,
+    onOpenMyPosts: () -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
     statsViewModel: ProfileStatsViewModel = hiltViewModel(),
@@ -126,6 +128,8 @@ fun ProfileTab(
                 }
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            MenuRow(AppIcons.GridView, stringResource(R.string.profile_my_posts), onClick = onOpenMyPosts)
+            MenuRow(AppIcons.Bookmark, stringResource(R.string.saved_title), onClick = onOpenSaved)
             MenuRow(AppIcons.Mail, profile.email, onClick = null)
             MenuRow(AppIcons.Settings, stringResource(R.string.settings_title), onClick = onOpenSettings)
             if (isAdmin) MenuRow(AppIcons.AdminPanelSettings, stringResource(R.string.action_open_admin), onClick = onOpenAdmin)

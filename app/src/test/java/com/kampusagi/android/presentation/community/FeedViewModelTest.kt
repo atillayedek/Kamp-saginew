@@ -6,9 +6,13 @@ import com.kampusagi.android.domain.model.Author
 import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
+import com.kampusagi.android.domain.model.NewPost
+import com.kampusagi.android.domain.model.PersonSummary
+import com.kampusagi.android.domain.model.Poll
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
+import com.kampusagi.android.domain.model.UserProfile
 import com.kampusagi.android.domain.repository.CommunityRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,6 +37,7 @@ private fun feedPost(id: String, liked: Boolean = false, likes: Int = 0) = Post(
 private class ScriptedCommunityRepository : CommunityRepository {
     val pages = mutableMapOf<String?, AppResult<FeedPage>>()
     var likeResult: AppResult<Int> = AppResult.Success(1)
+    var saveResult: AppResult<Unit> = AppResult.Success(Unit)
     val feedCalls = mutableListOf<Pair<PostScope, FeedCursor?>>()
     val categoryCalls = mutableListOf<PostCategory?>()
 
@@ -43,11 +48,22 @@ private class ScriptedCommunityRepository : CommunityRepository {
     }
     override suspend fun post(postId: String): AppResult<Post> = AppResult.Failure(AppError.NOT_FOUND)
     override suspend fun comments(postId: String): AppResult<List<Comment>> = AppResult.Success(emptyList())
-    override suspend fun createPost(scope: PostScope, category: PostCategory, body: String): AppResult<String> = AppResult.Success("new")
+    override suspend fun createPost(post: NewPost): AppResult<String> = AppResult.Success("new")
     override suspend fun deletePost(postId: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun addComment(postId: String, body: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun deleteComment(commentId: String): AppResult<Unit> = AppResult.Success(Unit)
     override suspend fun setLiked(postId: String, liked: Boolean): AppResult<Int> = likeResult
+    override suspend fun setSaved(postId: String, saved: Boolean): AppResult<Unit> = saveResult
+    override suspend fun vote(pollId: String, optionId: String?): AppResult<Poll> = AppResult.Failure(AppError.NOT_FOUND)
+    override suspend fun setAttending(postId: String, attending: Boolean): AppResult<Int> = AppResult.Success(1)
+    override suspend fun setSold(postId: String, sold: Boolean): AppResult<Unit> = AppResult.Success(Unit)
+    override suspend fun savedPosts(): AppResult<List<Post>> = AppResult.Success(emptyList())
+    override suspend fun upcomingEvents(): AppResult<List<Post>> = AppResult.Success(emptyList())
+    override suspend fun searchPosts(query: String): AppResult<List<Post>> = AppResult.Success(emptyList())
+    override suspend fun searchPeople(query: String): AppResult<List<PersonSummary>> = AppResult.Success(emptyList())
+    override suspend fun userProfile(userId: String): AppResult<UserProfile> = AppResult.Failure(AppError.NOT_FOUND)
+    override suspend fun userPosts(userId: String, cursor: FeedCursor?): AppResult<FeedPage> = AppResult.Success(FeedPage(emptyList(), null))
+    override suspend fun downloadPhoto(path: String): AppResult<ByteArray> = AppResult.Failure(AppError.NOT_FOUND)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -66,7 +82,7 @@ class FeedViewModelTest {
             // The second page repeats a post (inserted meanwhile): it must not be duplicated.
             pages["2"] = AppResult.Success(FeedPage(listOf(feedPost("2"), feedPost("3")), null))
         }
-        val viewModel = FeedViewModel(repository)
+        val viewModel = FeedViewModel(repository, PostChanges())
         assertEquals(listOf("1", "2"), viewModel.state(PostScope.GENERAL).posts.map { it.id })
 
         viewModel.loadMore()
@@ -82,7 +98,7 @@ class FeedViewModelTest {
         val repository = ScriptedCommunityRepository().apply {
             pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1")), null))
         }
-        val viewModel = FeedViewModel(repository)
+        val viewModel = FeedViewModel(repository, PostChanges())
         viewModel.selectCategory(PostCategory.MARKETPLACE)
         assertEquals(listOf(null, PostCategory.MARKETPLACE), repository.categoryCalls)
         assertEquals(PostCategory.MARKETPLACE, viewModel.selectedCategory)
@@ -97,7 +113,7 @@ class FeedViewModelTest {
 
     @Test
     fun `an empty feed is an empty state, not an error`() {
-        val viewModel = FeedViewModel(ScriptedCommunityRepository())
+        val viewModel = FeedViewModel(ScriptedCommunityRepository(), PostChanges())
         val state = viewModel.state(PostScope.GENERAL)
         assertTrue(state.isEmpty)
         assertNull(state.error)
@@ -106,7 +122,7 @@ class FeedViewModelTest {
     @Test
     fun `first page failure is shown and retry recovers`() {
         val repository = ScriptedCommunityRepository().apply { pages[null] = AppResult.Failure(AppError.NETWORK) }
-        val viewModel = FeedViewModel(repository)
+        val viewModel = FeedViewModel(repository, PostChanges())
         assertEquals(AppError.NETWORK, viewModel.state(PostScope.GENERAL).error)
         assertFalse(viewModel.state(PostScope.GENERAL).loaded)
 
@@ -122,7 +138,7 @@ class FeedViewModelTest {
             pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1", likes = 4)), null))
             likeResult = AppResult.Success(7)
         }
-        val viewModel = FeedViewModel(repository)
+        val viewModel = FeedViewModel(repository, PostChanges())
         viewModel.toggleLike(viewModel.state(PostScope.GENERAL).posts.single())
         var updated = viewModel.state(PostScope.GENERAL).posts.single()
         assertTrue(updated.likedByMe)
@@ -133,17 +149,50 @@ class FeedViewModelTest {
         updated = viewModel.state(PostScope.GENERAL).posts.single()
         assertTrue(updated.likedByMe)
         assertEquals(7, updated.likeCount)
-        assertEquals(AppError.NETWORK, viewModel.likeError)
+        assertEquals(AppError.NETWORK, viewModel.actionError)
     }
 
     @Test
     fun `university tab loads lazily on first selection`() {
         val repository = ScriptedCommunityRepository()
-        val viewModel = FeedViewModel(repository)
+        val viewModel = FeedViewModel(repository, PostChanges())
         assertEquals(listOf(PostScope.GENERAL), repository.feedCalls.map { it.first })
         viewModel.selectScope(PostScope.UNIVERSITY)
         viewModel.selectScope(PostScope.GENERAL)
         viewModel.selectScope(PostScope.UNIVERSITY)
         assertEquals(listOf(PostScope.GENERAL, PostScope.UNIVERSITY), repository.feedCalls.map { it.first })
+    }
+
+    @Test
+    fun `saving is optimistic and rolled back on failure`() {
+        val repository = ScriptedCommunityRepository().apply {
+            pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1")), null))
+        }
+        val viewModel = FeedViewModel(repository, PostChanges())
+        viewModel.interactor.toggleSave(viewModel.state(PostScope.GENERAL).posts.single())
+        assertTrue(viewModel.state(PostScope.GENERAL).posts.single().savedByMe)
+
+        repository.saveResult = AppResult.Failure(AppError.TOO_MANY_SAVED)
+        viewModel.interactor.toggleSave(viewModel.state(PostScope.GENERAL).posts.single())
+        assertTrue(viewModel.state(PostScope.GENERAL).posts.single().savedByMe)
+        assertEquals(AppError.TOO_MANY_SAVED, viewModel.actionError)
+    }
+
+    @Test
+    fun `changes made on another screen reach the feed`() {
+        val repository = ScriptedCommunityRepository().apply {
+            pages[null] = AppResult.Success(FeedPage(listOf(feedPost("1"), feedPost("2")), null))
+        }
+        val changes = PostChanges()
+        val viewModel = FeedViewModel(repository, changes)
+        val other = Any()
+        changes.publish(PostChange.Changed(feedPost("1", liked = true, likes = 9), source = other))
+        assertEquals(9, viewModel.state(PostScope.GENERAL).posts.first().likeCount)
+
+        changes.publish(PostChange.Deleted("2", source = other))
+        assertEquals(listOf("1"), viewModel.state(PostScope.GENERAL).posts.map { it.id })
+
+        changes.publish(PostChange.AuthorBlocked("a", source = other))
+        assertTrue(viewModel.state(PostScope.GENERAL).posts.isEmpty())
     }
 }

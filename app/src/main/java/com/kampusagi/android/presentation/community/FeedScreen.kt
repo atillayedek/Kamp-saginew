@@ -51,7 +51,10 @@ import com.kampusagi.android.presentation.common.messageRes
 fun FeedScreen(
     viewModel: FeedViewModel,
     onOpenPost: (Post) -> Unit,
+    onOpenAuthor: (String) -> Unit,
     onCreatePost: (PostScope) -> Unit,
+    onOpenSearch: () -> Unit,
+    onOpenEvents: () -> Unit,
     unreadNotifications: Int,
     onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
@@ -70,7 +73,15 @@ fun FeedScreen(
                         color = MaterialTheme.colorScheme.primary,
                     )
                 },
+                navigationIcon = {
+                    IconButton(onClick = onOpenSearch) {
+                        Icon(AppIcons.Search, contentDescription = stringResource(R.string.search_title))
+                    }
+                },
                 actions = {
+                    IconButton(onClick = onOpenEvents) {
+                        Icon(AppIcons.CalendarMonth, contentDescription = stringResource(R.string.events_title))
+                    }
                     IconButton(onClick = onOpenNotifications) {
                         BadgedBox(
                             badge = {
@@ -97,7 +108,7 @@ fun FeedScreen(
                 }
             }
             CategoryFilter(selected = viewModel.selectedCategory, onSelect = viewModel::selectCategory)
-            viewModel.likeError?.let { error ->
+            viewModel.actionError?.let { error ->
                 Text(
                     stringResource(error.messageRes()),
                     color = MaterialTheme.colorScheme.error,
@@ -132,7 +143,7 @@ fun FeedScreen(
                             ),
                         )
                     } else {
-                        PostList(state, viewModel, onOpenPost)
+                        PostList(state, viewModel, onOpenPost, onOpenAuthor)
                     }
                 }
             }
@@ -147,7 +158,7 @@ fun FeedScreen(
 }
 
 @Composable
-private fun PostList(state: FeedState, viewModel: FeedViewModel, onOpenPost: (Post) -> Unit) {
+private fun PostList(state: FeedState, viewModel: FeedViewModel, onOpenPost: (Post) -> Unit, onOpenAuthor: (String) -> Unit) {
     val listState = rememberLazyListState()
     val nearEnd by remember {
         derivedStateOf {
@@ -165,7 +176,7 @@ private fun PostList(state: FeedState, viewModel: FeedViewModel, onOpenPost: (Po
         contentPadding = PaddingValues(bottom = FAB_CLEARANCE),
     ) {
         items(state.posts, key = { it.id }) { post ->
-            PostCard(post = post, onOpen = { onOpenPost(post) }, onToggleLike = { viewModel.toggleLike(post) })
+            PostCard(post = post, callbacks = viewModel.interactor.callbacks(post, onOpen = { onOpenPost(post) }, onOpenAuthor = onOpenAuthor))
         }
         item {
             Box(modifier = Modifier.fillMaxWidth().padding(Spacing.md), contentAlignment = Alignment.Center) {

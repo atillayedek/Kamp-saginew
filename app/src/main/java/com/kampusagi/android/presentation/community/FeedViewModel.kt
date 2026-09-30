@@ -34,6 +34,7 @@ data class FeedState(
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val repository: CommunityRepository,
+    private val postChanges: PostChanges,
 ) : ViewModel() {
 
     var selectedScope by mutableStateOf(PostScope.GENERAL)
@@ -45,14 +46,31 @@ class FeedViewModel @Inject constructor(
 
     private val feeds = mutableStateMapOf<PostScope, FeedState>()
 
-    /** Transient error from a like that could not be saved. */
-    var likeError by mutableStateOf<AppError?>(null)
+    /** Transient error from a like, save, vote or attendance that could not be saved. */
+    var actionError by mutableStateOf<AppError?>(null)
         private set
+
+    val interactor = PostInteractor(
+        repository = repository,
+        scope = viewModelScope,
+        update = ::updatePost,
+        onError = { actionError = it },
+    )
 
     fun state(scope: PostScope): FeedState = feeds[scope] ?: FeedState()
 
     init {
         loadFirstPage(PostScope.GENERAL)
+        viewModelScope.launch {
+            postChanges.changes.collect { change ->
+                if (change.source === this@FeedViewModel) return@collect
+                when (change) {
+                    is PostChange.Changed -> replacePost(change.post.id) { change.post }
+                    is PostChange.Deleted -> onPostDeleted(change.postId)
+                    is PostChange.AuthorBlocked -> onAuthorBlocked(change.userId)
+                }
+            }
+        }
     }
 
     fun selectScope(scope: PostScope) {
@@ -109,8 +127,6 @@ class FeedViewModel @Inject constructor(
         loadFirstPage(scope)
     }
 
-    fun onPostChanged(post: Post) = updatePost(post.id) { post }
-
     fun onPostDeleted(postId: String) {
         PostScope.entries.forEach { scope ->
             val current = state(scope)
@@ -128,23 +144,12 @@ class FeedViewModel @Inject constructor(
 
     /** Optimistic: the heart changes at once and is rolled back if the server refuses. */
     fun toggleLike(post: Post) {
-        val liked = !post.likedByMe
-        val optimistic = post.copy(likedByMe = liked, likeCount = (post.likeCount + if (liked) 1 else -1).coerceAtLeast(0))
-        updatePost(post.id) { optimistic }
-        likeError = null
-        viewModelScope.launch {
-            when (val result = repository.setLiked(post.id, liked)) {
-                is AppResult.Success -> updatePost(post.id) { it.copy(likedByMe = liked, likeCount = result.value) }
-                is AppResult.Failure -> {
-                    updatePost(post.id) { it.copy(likedByMe = post.likedByMe, likeCount = post.likeCount) }
-                    likeError = result.error
-                }
-            }
-        }
+        actionError = null
+        interactor.toggleLike(post)
     }
 
-    fun dismissLikeError() {
-        likeError = null
+    fun dismissActionError() {
+        actionError = null
     }
 
     private fun loadFirstPage(scope: PostScope) {
@@ -164,11 +169,17 @@ class FeedViewModel @Inject constructor(
         }
 
     private fun updatePost(postId: String, change: (Post) -> Post) {
+        replacePost(postId, change)?.let { postChanges.publish(PostChange.Changed(it, source = this)) }
+    }
+
+    private fun replacePost(postId: String, change: (Post) -> Post): Post? {
+        var changed: Post? = null
         PostScope.entries.forEach { scope ->
             val current = state(scope)
             if (current.posts.any { it.id == postId }) {
-                feeds[scope] = current.copy(posts = current.posts.map { if (it.id == postId) change(it) else it })
+                feeds[scope] = current.copy(posts = current.posts.map { if (it.id == postId) change(it).also { new -> changed = new } else it })
             }
         }
+        return changed
     }
 }

@@ -49,6 +49,11 @@ import androidx.compose.ui.unit.dp
 import com.kampusagi.android.presentation.common.avatar.AvatarHostViewModel
 import com.kampusagi.android.presentation.common.avatar.LocalAvatarLoader
 import com.kampusagi.android.presentation.common.avatar.UserAvatar
+import com.kampusagi.android.presentation.common.media.LocalPostPhotoLoader
+import com.kampusagi.android.presentation.community.EventsScreen
+import com.kampusagi.android.presentation.community.SavedPostsScreen
+import com.kampusagi.android.presentation.community.SearchScreen
+import com.kampusagi.android.presentation.profile.UserProfileScreen
 import com.kampusagi.android.presentation.profile.EditProfileScreen
 import com.kampusagi.android.presentation.requirement.MyMatchesScreen
 import com.kampusagi.android.domain.model.Profile
@@ -105,7 +110,7 @@ fun MainScreen(
     val requirementsViewModel: RequirementsViewModel = hiltViewModel(key = "requirements-${profile.id}")
     val conversationsViewModel: ConversationsViewModel = hiltViewModel(key = "conversations-${profile.id}")
     val notificationsViewModel: NotificationsViewModel = hiltViewModel(key = "notifications-${profile.id}")
-    val avatarLoader = hiltViewModel<AvatarHostViewModel>().loader
+    val mediaHost = hiltViewModel<AvatarHostViewModel>()
 
     // Android 13+ asks once for permission to show system notifications.
     var notificationsAllowed by remember { mutableStateOf(notificationPermissionGranted(context)) }
@@ -128,7 +133,7 @@ fun MainScreen(
     val destination = backStack?.destination
     val showBar = Tab.entries.any { tab -> destination?.hasRoute(tab.route::class) == true }
 
-    CompositionLocalProvider(LocalAvatarLoader provides avatarLoader) {
+    CompositionLocalProvider(LocalAvatarLoader provides mediaHost.loader, LocalPostPhotoLoader provides mediaHost.photos) {
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -189,7 +194,10 @@ fun MainScreen(
                 FeedScreen(
                     viewModel = feedViewModel,
                     onOpenPost = { navController.navigate(PostDetailRoute(it.id)) },
+                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
                     onCreatePost = { navController.navigate(CreatePostRoute(it)) },
+                    onOpenSearch = { navController.navigate(SearchRoute) },
+                    onOpenEvents = { navController.navigate(EventsRoute) },
                     unreadNotifications = notificationsViewModel.unreadCount,
                     onOpenNotifications = {
                         notificationsViewModel.load()
@@ -200,9 +208,38 @@ fun MainScreen(
             composable<PostDetailRoute> {
                 PostDetailScreen(
                     onBack = { navController.popBackStack() },
-                    onPostChanged = feedViewModel::onPostChanged,
-                    onPostDeleted = feedViewModel::onPostDeleted,
-                    onAuthorBlocked = feedViewModel::onAuthorBlocked,
+                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                )
+            }
+            composable<SearchRoute> {
+                SearchScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                )
+            }
+            composable<SavedPostsRoute> {
+                SavedPostsScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                )
+            }
+            composable<EventsRoute> {
+                EventsScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                )
+            }
+            composable<UserProfileRoute> {
+                UserProfileScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                    onEditOwnProfile = { navController.navigate(EditProfileRoute) },
                 )
             }
             composable<CreatePostRoute> {
@@ -288,6 +325,8 @@ fun MainScreen(
                     onOpenPremium = { navController.navigate(PremiumRoute) },
                     onOpenSettings = { navController.navigate(SettingsRoute) },
                     onEditProfile = { navController.navigate(EditProfileRoute) },
+                    onOpenSaved = { navController.navigate(SavedPostsRoute) },
+                    onOpenMyPosts = { navController.navigate(UserProfileRoute(profile.id)) },
                     onSignOut = onSignOut,
                 )
             }
