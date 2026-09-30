@@ -1,6 +1,7 @@
 package com.kampusagi.android.domain.repository
 
 import com.kampusagi.android.domain.model.AppResult
+import com.kampusagi.android.domain.model.Announcement
 import com.kampusagi.android.domain.model.AuthRedirectResult
 import com.kampusagi.android.domain.model.AuthState
 import com.kampusagi.android.domain.model.BlockedUser
@@ -215,6 +216,21 @@ interface PremiumRepository {
 
     /** Sends a Google Play purchase to the backend, which verifies it with Google. */
     suspend fun verify(purchase: StorePurchase): AppResult<Unit>
+
+    /** Redeems a promo code; returns when the Premium it gives ends. */
+    suspend fun redeemPromoCode(code: String): AppResult<String>
+}
+
+/** Announcements from the team and the once-a-day "app opened" mark for activity statistics. */
+interface AnnouncementRepository {
+    suspend fun active(): AppResult<List<Announcement>>
+    suspend fun dismiss(announcementId: String): AppResult<Unit>
+
+    /** Emits when an announcement is published or ended (Supabase Realtime). */
+    fun changes(): Flow<Unit>
+
+    /** Records that the person opened the app today; nothing else is stored. */
+    suspend fun touchActivity(): AppResult<Unit>
 }
 
 /** Blocking and reporting for students; the report queue for admins. */

@@ -4,6 +4,7 @@ import com.kampusagi.android.data.document.ContentResolverDocumentReader
 import com.kampusagi.android.data.image.ContentResolverImageEncoder
 import com.kampusagi.android.data.repository.ProfileMediaRepositoryImpl
 import com.kampusagi.android.data.repository.AccountRepositoryImpl
+import com.kampusagi.android.data.repository.AnnouncementRepositoryImpl
 import com.kampusagi.android.data.repository.AdminRepositoryImpl
 import com.kampusagi.android.data.repository.AuthRepositoryImpl
 import com.kampusagi.android.data.repository.ChatRepositoryImpl
@@ -19,6 +20,7 @@ import com.kampusagi.android.data.repository.RequirementRepositoryImpl
 import com.kampusagi.android.data.repository.UniversityRepositoryImpl
 import com.kampusagi.android.data.repository.VerificationRepositoryImpl
 import com.kampusagi.android.domain.repository.AccountRepository
+import com.kampusagi.android.domain.repository.AnnouncementRepository
 import com.kampusagi.android.domain.repository.AdminRepository
 import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ChatRepository
@@ -62,4 +64,5 @@ abstract class RepositoryModule {
     @Binds abstract fun bindGroupRepository(impl: GroupRepositoryImpl): GroupRepository
     @Binds abstract fun bindNoteRepository(impl: NoteRepositoryImpl): NoteRepository
     @Binds abstract fun bindReputationRepository(impl: ReputationRepositoryImpl): ReputationRepository
+    @Binds abstract fun bindAnnouncementRepository(impl: AnnouncementRepositoryImpl): AnnouncementRepository
 }

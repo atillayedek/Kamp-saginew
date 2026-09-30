@@ -34,7 +34,7 @@ sealed interface PremiumState {
     data class Failed(val error: AppError) : PremiumState
 }
 
-enum class PremiumMessage { PURCHASE_ACTIVATED, PURCHASE_PENDING, NOTHING_TO_RESTORE }
+enum class PremiumMessage { PURCHASE_ACTIVATED, PURCHASE_PENDING, NOTHING_TO_RESTORE, PROMO_REDEEMED }
 
 @HiltViewModel
 class PremiumViewModel @Inject constructor(
@@ -120,6 +120,33 @@ class PremiumViewModel @Inject constructor(
 
     fun dismissMessage() {
         message = null
+    }
+
+    /** Promo codes are case-insensitive; the server decides whether one is valid. */
+    var promoCode by mutableStateOf("")
+        private set
+
+    fun onPromoCodeChange(value: String) {
+        if (value.length <= 32) promoCode = value.uppercase()
+    }
+
+    fun redeemPromoCode() {
+        val code = promoCode.trim()
+        if (code.length < 4 || isWorking) return
+        isWorking = true
+        error = null
+        message = null
+        viewModelScope.launch {
+            when (val result = premiumRepository.redeemPromoCode(code)) {
+                is AppResult.Success -> {
+                    promoCode = ""
+                    message = PremiumMessage.PROMO_REDEEMED
+                    load()
+                }
+                is AppResult.Failure -> error = result.error
+            }
+            isWorking = false
+        }
     }
 
     private suspend fun verifyAll(purchases: List<StorePurchase>, activatedMessage: Boolean) {

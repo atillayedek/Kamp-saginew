@@ -587,4 +587,15 @@
     <string name="error_group_full">Bu grup dolu.</string>
     <string name="error_owner_cannot_leave">Kurucu gruptan ayrılamaz; istersen grubu silebilirsin.</string>
     <string name="error_group_not_allowed">Bu işlem için yetkin yok.</string>
+
+    <!-- Announcements and promo codes -->
+    <string name="announcement_dismiss">Duyuruyu kapat</string>
+    <string name="premium_promo_title">Promosyon kodun var mı?</string>
+    <string name="premium_promo_hint">Kod</string>
+    <string name="premium_promo_action">Kodu kullan</string>
+    <string name="premium_promo_redeemed">Kod kullanıldı, Premium açıldı.</string>
+    <string name="premium_status_gift">Premium (hediye): %1$s</string>
+    <string name="error_promo_code_invalid">Bu kod geçerli değil ya da süresi dolmuş.</string>
+    <string name="error_promo_code_used">Bu kodu daha önce kullandın.</string>
+    <string name="error_promo_code_exhausted">Bu kodun kullanım hakkı dolmuş.</string>
 </resources>

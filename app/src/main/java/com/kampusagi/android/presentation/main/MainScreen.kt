@@ -55,6 +55,8 @@ import com.kampusagi.android.presentation.community.SavedPostsScreen
 import com.kampusagi.android.presentation.community.SearchScreen
 import com.kampusagi.android.presentation.profile.UserProfileScreen
 import com.kampusagi.android.presentation.group.CreateGroupScreen
+import com.kampusagi.android.presentation.announcement.AnnouncementsViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.kampusagi.android.presentation.group.DiscoverGroupsScreen
 import com.kampusagi.android.presentation.group.GroupChatScreen
 import com.kampusagi.android.presentation.group.GroupInfoScreen
@@ -119,6 +121,13 @@ fun MainScreen(
     val conversationsViewModel: ConversationsViewModel = hiltViewModel(key = "conversations-${profile.id}")
     val notificationsViewModel: NotificationsViewModel = hiltViewModel(key = "notifications-${profile.id}")
     val groupsViewModel: GroupsViewModel = hiltViewModel(key = "groups-${profile.id}")
+    val announcementsViewModel: AnnouncementsViewModel = hiltViewModel(key = "announcements-${profile.id}")
+    // Marks the day as active and refreshes announcements whenever the app returns to the foreground.
+    LifecycleResumeEffect(announcementsViewModel) {
+        announcementsViewModel.onAppOpened()
+        // Nothing to undo when the app goes to the background.
+        onPauseOrDispose { }
+    }
     val mediaHost = hiltViewModel<AvatarHostViewModel>()
 
     // Android 13+ asks once for permission to show system notifications.
@@ -208,6 +217,8 @@ fun MainScreen(
                     onOpenSearch = { navController.navigate(SearchRoute) },
                     onOpenEvents = { navController.navigate(EventsRoute) },
                     unreadNotifications = notificationsViewModel.unreadCount,
+                    announcements = announcementsViewModel.announcements,
+                    onDismissAnnouncement = announcementsViewModel::dismiss,
                     onOpenNotifications = {
                         notificationsViewModel.load()
                         navController.navigate(NotificationsRoute) { launchSingleTop = true }

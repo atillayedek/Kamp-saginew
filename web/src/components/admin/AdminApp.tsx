@@ -2,14 +2,17 @@
 
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import {
+  Activity,
   Building2,
   CreditCard,
+  Gift,
   FileCheck,
   Flag,
   GraduationCap,
   LayoutDashboard,
   LogOut,
   Mail,
+  Megaphone,
   Menu,
   Moon,
   Sun,
@@ -22,6 +25,7 @@ import { errorMessage } from "@/lib/errors";
 import { supabase } from "@/lib/supabase";
 import { BroadcastView } from "./BroadcastView";
 import { DocumentsView } from "./DocumentsView";
+import { ActivityView, AnnouncementsView, PremiumView } from "./GrowthViews";
 import { Button, ErrorBox, inputClass, Loading } from "./ui";
 import { OverviewView, PurchasesView, ReportsView, UniversitiesView, UsersView } from "./views";
 
@@ -30,6 +34,9 @@ const TABS = [
   { id: "documents", label: "Belge onayları", icon: FileCheck },
   { id: "users", label: "Kullanıcılar", icon: Users },
   { id: "purchases", label: "Satın almalar", icon: CreditCard },
+  { id: "premium", label: "Premium hediye", icon: Gift },
+  { id: "activity", label: "Aktiflik", icon: Activity },
+  { id: "announcements", label: "Uygulama duyurusu", icon: Megaphone },
   { id: "email", label: "Toplu e-posta", icon: Mail },
   { id: "reports", label: "Şikayetler", icon: Flag },
   { id: "universities", label: "Üniversiteler", icon: Building2 },
@@ -264,6 +271,9 @@ function Shell({ client, email }: { client: SupabaseClient; email: string }) {
         {tab === "documents" ? <DocumentsView client={client} /> : null}
         {tab === "users" ? <UsersView client={client} /> : null}
         {tab === "purchases" ? <PurchasesView client={client} /> : null}
+        {tab === "premium" ? <PremiumView client={client} /> : null}
+        {tab === "activity" ? <ActivityView client={client} /> : null}
+        {tab === "announcements" ? <AnnouncementsView client={client} /> : null}
         {tab === "email" ? <BroadcastView client={client} adminEmail={email} /> : null}
         {tab === "reports" ? <ReportsView client={client} /> : null}
         {tab === "universities" ? <UniversitiesView client={client} /> : null}

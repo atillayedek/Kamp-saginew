@@ -243,6 +243,8 @@ data class SubscriptionDto(
     @SerialName("plan_name") val planName: String? = null,
     @SerialName("play_product_id") val playProductId: String? = null,
     @SerialName("expires_at") val expiresAt: String? = null,
+    /** PLAY, ADMIN (gift) or PROMO (promo code); null without Premium. */
+    val source: String? = null,
     @SerialName("ai_analyze_daily") val aiAnalyzeDaily: Int,
     @SerialName("ai_publish_daily") val aiPublishDaily: Int,
     @SerialName("max_active_requirements") val maxActiveRequirements: Int,
@@ -382,3 +384,12 @@ data class NoteCourseDto(
 
 @Serializable
 data class ReputationDto(val points: Int, val badges: List<String> = emptyList())
+
+@Serializable
+data class AnnouncementDto(
+    val id: String,
+    val title: String,
+    val body: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("ends_at") val endsAt: String,
+)

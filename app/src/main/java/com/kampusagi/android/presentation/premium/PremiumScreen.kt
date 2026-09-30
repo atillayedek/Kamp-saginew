@@ -62,6 +62,12 @@ fun PremiumScreen(
             ) {
                 CurrentStatus(state.subscription)
                 PremiumPerks()
+                PromoCodeCard(
+                    code = viewModel.promoCode,
+                    onCodeChange = viewModel::onPromoCodeChange,
+                    onRedeem = viewModel::redeemPromoCode,
+                    busy = viewModel.isWorking,
+                )
                 viewModel.message?.let { Text(stringResource(it.textRes()), style = MaterialTheme.typography.bodyMedium) }
                 viewModel.error?.let {
                     Text(stringResource(it.messageRes()), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
@@ -121,6 +127,28 @@ fun PremiumScreen(
     }
 }
 
+@Composable
+private fun PromoCodeCard(code: String, onCodeChange: (String) -> Unit, onRedeem: () -> Unit, busy: Boolean) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            Text(stringResource(R.string.premium_promo_title), style = MaterialTheme.typography.titleMedium)
+            androidx.compose.material3.OutlinedTextField(
+                value = code,
+                onValueChange = onCodeChange,
+                label = { Text(stringResource(R.string.premium_promo_hint)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            PrimaryButton(
+                text = stringResource(R.string.premium_promo_action),
+                onClick = onRedeem,
+                enabled = code.trim().length >= 4,
+                loading = busy,
+            )
+        }
+    }
+}
+
 /** What Premium unlocks besides the plan's limits; each is enforced by the server. */
 @Composable
 private fun PremiumPerks() {
@@ -143,7 +171,9 @@ private fun CurrentStatus(subscription: SubscriptionStatus) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Text(
-                if (subscription.isPremium) {
+                if (subscription.isGift) {
+                    stringResource(R.string.premium_status_gift, subscription.planName.orEmpty())
+                } else if (subscription.isPremium) {
                     stringResource(R.string.premium_status_active, subscription.planName.orEmpty())
                 } else {
                     stringResource(R.string.premium_status_free)
@@ -170,4 +200,5 @@ private fun PremiumMessage.textRes(): Int = when (this) {
     PremiumMessage.PURCHASE_ACTIVATED -> R.string.premium_activated
     PremiumMessage.PURCHASE_PENDING -> R.string.premium_pending
     PremiumMessage.NOTHING_TO_RESTORE -> R.string.premium_nothing_to_restore
+    PremiumMessage.PROMO_REDEEMED -> R.string.premium_promo_redeemed
 }

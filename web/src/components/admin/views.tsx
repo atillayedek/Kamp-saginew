@@ -63,7 +63,7 @@ export function OverviewView({ client, onNavigate }: Props & { onNavigate: (tab:
             <Stat
               label="Aktif premium"
               value={formatNumber(o.active_premium)}
-              hint={`Toplam ${formatNumber(o.purchase_count)} doğrulanmış satın alma`}
+              hint={`${formatNumber(o.active_gifts)} hediye/kod · toplam ${formatNumber(o.purchase_count)} doğrulanmış satın alma`}
             />
             <Stat
               label="Açık şikayet"

@@ -41,7 +41,9 @@ import com.kampusagi.android.core.designsystem.component.LoadingView
 import com.kampusagi.android.core.designsystem.component.MessageView
 import com.kampusagi.android.core.designsystem.component.PrimaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
+import com.kampusagi.android.domain.model.Announcement
 import com.kampusagi.android.domain.model.Post
+import com.kampusagi.android.presentation.announcement.AnnouncementBanners
 import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
 import com.kampusagi.android.presentation.common.messageRes
@@ -57,6 +59,8 @@ fun FeedScreen(
     onOpenEvents: () -> Unit,
     unreadNotifications: Int,
     onOpenNotifications: () -> Unit,
+    announcements: List<Announcement>,
+    onDismissAnnouncement: (Announcement) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = viewModel.selectedScope
@@ -107,6 +111,7 @@ fun FeedScreen(
                     )
                 }
             }
+            AnnouncementBanners(announcements, onDismissAnnouncement)
             CategoryFilter(selected = viewModel.selectedCategory, onSelect = viewModel::selectCategory)
             viewModel.actionError?.let { error ->
                 Text(

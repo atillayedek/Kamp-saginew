@@ -46,6 +46,9 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.EVENT_ENDED -> R.string.error_event_ended
     AppError.TOO_MANY_SAVED -> R.string.error_too_many_saved
     AppError.PREMIUM_REQUIRED -> R.string.error_premium_required
+    AppError.PROMO_CODE_INVALID -> R.string.error_promo_code_invalid
+    AppError.PROMO_CODE_USED -> R.string.error_promo_code_used
+    AppError.PROMO_CODE_EXHAUSTED -> R.string.error_promo_code_exhausted
     AppError.TOO_MANY_GROUPS -> R.string.error_too_many_groups
     AppError.GROUP_FULL -> R.string.error_group_full
     AppError.OWNER_CANNOT_LEAVE -> R.string.error_owner_cannot_leave

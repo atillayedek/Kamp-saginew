@@ -57,7 +57,7 @@ FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push
 
 ### Premium (Google Play Billing)
 
-1. Play Console'da abonelik ürün(ler)ini oluştur (ör. `kampusagi.plus`) ve temel planı/fiyatı tanımla.
+1. Play Console'da abonelik ürün(ler)ini oluştur (ör. `kampusagi.plus`) ve temel planı/fiyatı tanımla. Kullanıcı kararı (D45): aylık temel plan **100 TL** (Türkiye fiyatı; diğer ülkeler için Play'in önerdiği karşılıkları onayla). Uygulama fiyatı Play'den okur, koda fiyat yazılmaz.
 2. Play Console → Kurulum → API erişimi: bir Google Cloud service account'u bağla, "Finansal verileri görüntüleme" ve "Siparişleri yönetme" izinlerini ver; JSON anahtarını `GOOGLE_PLAY_SERVICE_ACCOUNT` secret'ı yap. `ANDROID_PACKAGE_NAME=com.kampusagi.android`.
 3. `supabase functions deploy verify-purchase`
 4. Planı veritabanına ekle (ürün sahibi kararı; örnek değil, şablon):
@@ -67,6 +67,7 @@ FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push
    values ('<play ürün kimliği>', '<ad>', '<açıklama>', true, <n>, <n>, <n>);
    ```
 5. Billing yalnızca Play'den (iç test kanalı dahil) kurulan sürümde çalışır.
+6. Aktif bir plan satırı olmadan admin panelindeki Premium hediye ve promosyon kodu da çalışmaz (plan limitleri bu satırdan gelir). Hediye/kod Play'den bağımsızdır, ücret alınmaz.
 
 ### Hesap silme ve gizlilik (Google Play zorunlulukları)
 

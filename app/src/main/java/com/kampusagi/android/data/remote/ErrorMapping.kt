@@ -99,6 +99,9 @@ private fun knownCode(text: String): AppError? = when {
     "user_not_found" in text || "report_target_not_found" in text || "report_not_found" in text -> AppError.NOT_FOUND
     "invalid_report" in text || "invalid_action" in text || "confirmation_required" in text -> AppError.INVALID_INPUT
     "account_deletion_failed" in text -> AppError.SERVER
+    "promo_code_used" in text -> AppError.PROMO_CODE_USED
+    "promo_code_exhausted" in text -> AppError.PROMO_CODE_EXHAUSTED
+    "promo_code_invalid" in text -> AppError.PROMO_CODE_INVALID
     "premium_required" in text -> AppError.PREMIUM_REQUIRED
     "too_many_groups" in text -> AppError.TOO_MANY_GROUPS
     "group_full" in text -> AppError.GROUP_FULL

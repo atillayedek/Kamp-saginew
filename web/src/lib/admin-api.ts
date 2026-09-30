@@ -12,6 +12,7 @@ export interface Overview {
   pending_verifications: number;
   open_reports: number;
   active_premium: number;
+  active_gifts: number;
   purchase_count: number;
   purchases_30_days: number;
   purchases_without_price: number;
@@ -99,6 +100,67 @@ export interface PendingVerification {
   submitted_at: string;
 }
 
+export interface ActivityStats {
+  first_day: string | null;
+  today: number;
+  last_7_days: number;
+  last_30_days: number;
+  daily: { day: string; active: number }[];
+  retention: { cohort: number; returned: number; returned_after_7_days: number };
+  top_universities: { name: string; active: number }[];
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  university_name: string | null;
+  starts_at: string;
+  ends_at: string;
+  dismissed_count: number;
+  created_at: string;
+}
+
+export interface UniversityOption {
+  id: string;
+  name: string;
+  city: string;
+}
+
+export interface Plan {
+  id: string;
+  name: string;
+  play_product_id: string;
+  is_active: boolean;
+}
+
+export interface PremiumGrant {
+  id: string;
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  username: string | null;
+  plan_name: string;
+  source: "ADMIN" | "PROMO";
+  promo_code: string | null;
+  note: string | null;
+  expires_at: string;
+  revoked_at: string | null;
+  created_at: string;
+}
+
+export interface PromoCode {
+  id: string;
+  code: string;
+  plan_name: string;
+  days: number;
+  max_redemptions: number;
+  redemption_count: number;
+  expires_at: string | null;
+  disabled_at: string | null;
+  created_at: string;
+}
+
 export type ReportAction = "DISMISS" | "REMOVE_CONTENT" | "SUSPEND_USER";
 
 export interface BroadcastInput {
@@ -159,6 +221,27 @@ export const adminApi = {
   openReports: (c: SupabaseClient) => rpc<Report[]>(c, "list_open_reports"),
   resolveReport: (c: SupabaseClient, reportId: string, action: ReportAction) =>
     rpc<void>(c, "resolve_report", { p_report_id: reportId, p_action: action }),
+  activity: (c: SupabaseClient) => rpc<ActivityStats>(c, "admin_activity_stats"),
+  announcements: (c: SupabaseClient) => rpc<Announcement[]>(c, "admin_list_announcements"),
+  universityOptions: (c: SupabaseClient) => rpc<UniversityOption[]>(c, "admin_list_universities"),
+  createAnnouncement: (c: SupabaseClient, title: string, body: string, universityId: string | null, endsAt: string) =>
+    rpc<string>(c, "admin_create_announcement", { p_title: title, p_body: body, p_university_id: universityId, p_ends_at: endsAt }),
+  endAnnouncement: (c: SupabaseClient, id: string) => rpc<void>(c, "admin_end_announcement", { p_announcement_id: id }),
+  plans: (c: SupabaseClient) => rpc<Plan[]>(c, "admin_list_plans"),
+  grants: (c: SupabaseClient) => rpc<PremiumGrant[]>(c, "admin_list_grants", { p_limit: 100 }),
+  grantPremium: (c: SupabaseClient, userId: string, planId: string, days: number, note: string | null) =>
+    rpc<string>(c, "admin_grant_premium", { p_user_id: userId, p_plan_id: planId, p_days: days, p_note: note }),
+  revokeGrant: (c: SupabaseClient, grantId: string) => rpc<void>(c, "admin_revoke_grant", { p_grant_id: grantId }),
+  promoCodes: (c: SupabaseClient) => rpc<PromoCode[]>(c, "admin_list_promo_codes"),
+  createPromoCode: (c: SupabaseClient, code: string | null, planId: string, days: number, maxRedemptions: number, expiresAt: string | null) =>
+    rpc<string>(c, "admin_create_promo_code", {
+      p_code: code,
+      p_plan_id: planId,
+      p_days: days,
+      p_max_redemptions: maxRedemptions,
+      p_expires_at: expiresAt,
+    }),
+  disablePromoCode: (c: SupabaseClient, id: string) => rpc<void>(c, "admin_disable_promo_code", { p_code_id: id }),
 };
 
 export async function unsubscribe(client: SupabaseClient, userId: string, signature: string): Promise<void> {

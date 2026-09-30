@@ -22,6 +22,7 @@ import io.ktor.http.isSuccess
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 @Singleton
 class PremiumRepositoryImpl @Inject constructor(
@@ -37,7 +38,7 @@ class PremiumRepositoryImpl @Inject constructor(
     override suspend fun subscription(): AppResult<SubscriptionStatus> = call { client ->
         val row = client.postgrest.rpc("my_subscription", JsonObject(emptyMap())).decodeList<SubscriptionDto>().firstOrNull()
             ?: throw MissingRowException()
-        SubscriptionStatus(row.planName, row.playProductId, row.expiresAt, row.aiAnalyzeDaily, row.aiPublishDaily, row.maxActiveRequirements)
+        SubscriptionStatus(row.planName, row.playProductId, row.expiresAt, row.aiAnalyzeDaily, row.aiPublishDaily, row.maxActiveRequirements, row.source)
     }
 
     override suspend fun verify(purchase: StorePurchase): AppResult<Unit> = call { client ->
@@ -49,6 +50,10 @@ class PremiumRepositoryImpl @Inject constructor(
             throw VerificationFailure(functionError(response.status.value, response.bodyAsText()))
         }
         Unit
+    }
+
+    override suspend fun redeemPromoCode(code: String): AppResult<String> = call { client ->
+        client.postgrest.rpc("redeem_promo_code", JsonObject(mapOf("p_code" to JsonPrimitive(code.trim())))).decodeAs<String>()
     }
 
     private suspend fun <T> call(block: suspend (SupabaseClient) -> T): AppResult<T> {

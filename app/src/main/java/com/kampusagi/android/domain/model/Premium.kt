@@ -19,9 +19,15 @@ data class SubscriptionStatus(
     val aiAnalyzeDaily: Int,
     val aiPublishDaily: Int,
     val maxActiveRequirements: Int,
+    /** PLAY for a Google Play subscription; ADMIN or PROMO for Premium given without payment. */
+    val source: String? = null,
 ) {
     val isPremium: Boolean get() = planName != null
+    val isGift: Boolean get() = source == "ADMIN" || source == "PROMO"
 }
+
+/** A message from the team shown on top of the feed until the person closes it. */
+data class Announcement(val id: String, val title: String, val body: String, val createdAt: String, val endsAt: String)
 
 /** Price and offer from Google Play for one product. */
 data class StoreOffer(val productId: String, val formattedPrice: String, val billingPeriod: String)
