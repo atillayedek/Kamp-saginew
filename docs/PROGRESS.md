@@ -27,7 +27,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 18 | Yapay zekâsız kurallı eşleştirme (D54): form + önerilen etiketler, `create_requirement`, puanlı `find_matches`, eşanlamlılar; OpenAI kaldırıldı | Bitti — CI yeşil `308a228` (DB 17 test dosyası, Deno 29 test, web, Android unit test + lintRelease + APK + AAB) |
 | 19 | Push bildirimleri FCM ile (D55, D56): cihaz belirteçleri, veritabanından otomatik `dispatch-push` (pg_net), admin "Bildirimleri etkinleştir" + "Telefonlara gönder", Android FCM | Kod bitti — CI yeşil `3d23948` (DB, Deno 34 test, web, Android unit test + lint + APK + AAB, canlı kontroller). Uçtan uca push: NOT RUN (Firebase secret'ları bekleniyor) |
 | 20 | KVKK ve yasal uyum (D57–D66): veri envanteri, 13 hukuki metin taslağı (sürümlü), zincirli loglar, roller + MFA + gerekçe, md.11 hakları (dışa aktarma, 30 gün geri alınabilir silme, rızalar, başvuru), moderasyon itirazı, telif formu, günlük imha, sır taraması, mağaza formları | Kod bitti — CI yeşil `6402e65` (DB 20 test dosyası, Deno 44 test, web, sır taraması, Android unit test + lint + APK + AAB, canlı kontroller); `docs/kvkk/test-raporu.md`. Cihazda uçtan uca: NOT RUN. Hukuki adımlar: `docs/kvkk/uyum-kontrol-listesi.md` |
-| 21 | Kişi etiketleme (@) ve konu etiketleme (#) (D67): bağlantılı metin, "@" yazarken kişi önerisi, etiket sayfası, popüler etiketler, `MENTIONED` bildirimi; KKTC üniversiteleri (D68) | CI bekleniyor |
+| 21 | Kişi etiketleme (@) ve konu etiketleme (#) (D67): bağlantılı metin, "@" yazarken kişi önerisi, etiket sayfası, popüler etiketler, `MENTIONED` bildirimi; KKTC üniversiteleri (D68); web'de SSS sayfası (D69) | CI bekleniyor |
 
 ## Son doğrulamalar
 

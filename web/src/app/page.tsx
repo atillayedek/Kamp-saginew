@@ -7,6 +7,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+import Link from "next/link";
 import { LegalFooter } from "@/components/legal/LegalPage";
 import { config } from "@/lib/config";
 
@@ -60,14 +61,19 @@ export default function Home() {
           </span>
           KampüsAğı
         </div>
-        {store ? (
-          <a
-            href={store}
-            className="rounded-full bg-ink px-4 py-2 text-sm font-medium text-bg transition hover:opacity-85"
-          >
-            Uygulamayı indir
-          </a>
-        ) : null}
+        <nav className="flex items-center gap-2" aria-label="Üst menü">
+          <Link href="/sss" className="rounded-full px-4 py-2 text-sm font-medium text-ink-2 hover:text-ink">
+            SSS
+          </Link>
+          {store ? (
+            <a
+              href={store}
+              className="rounded-full bg-ink px-4 py-2 text-sm font-medium text-bg transition hover:opacity-85"
+            >
+              Uygulamayı indir
+            </a>
+          ) : null}
+        </nav>
       </header>
 
       <main>

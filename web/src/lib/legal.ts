@@ -88,3 +88,14 @@ export async function loadLegalIndex(): Promise<{ doc_type: string; title: strin
     return null;
   }
 }
+
+/** Public compliance settings (durations shown on the site), or {} when they cannot be read. */
+export async function loadPublicSettings(): Promise<Record<string, unknown>> {
+  if (backendState() !== "ready") return {};
+  try {
+    return await call<Record<string, unknown>>("public_compliance_config", {});
+  } catch (error) {
+    console.error(error);
+    return {};
+  }
+}

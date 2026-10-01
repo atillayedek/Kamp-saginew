@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { config } from "@/lib/config";
 
 export const LEGAL_LINKS = [
+  { href: "/sss", label: "Sık sorulan sorular" },
   { href: "/yasal/aydinlatma-metni", label: "KVKK aydınlatma metni" },
   { href: "/gizlilik", label: "Gizlilik politikası" },
   { href: "/kullanim-kosullari", label: "Kullanım koşulları" },
@@ -62,7 +63,7 @@ export function LegalFooter() {
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <span>© {new Date().getFullYear()} KampüsAğı</span>
-        <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Yasal">
+        <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Site bağlantıları">
           {LEGAL_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className="hover:text-ink">
               {link.label}
