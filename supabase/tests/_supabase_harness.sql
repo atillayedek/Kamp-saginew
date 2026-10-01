@@ -20,7 +20,18 @@ create table auth.users (
     id uuid primary key default gen_random_uuid(),
     email text,
     raw_app_meta_data jsonb not null default '{}'::jsonb,
+    raw_user_meta_data jsonb not null default '{}'::jsonb,
+    last_sign_in_at timestamptz,
     created_at timestamptz not null default now()
+);
+
+-- Supabase Auth's own audit trail (sign-in, sign-out, sign-up, recovery) with the server-side IP.
+create table auth.audit_log_entries (
+    instance_id uuid,
+    id uuid primary key default gen_random_uuid(),
+    payload json,
+    created_at timestamptz default now(),
+    ip_address varchar(64) not null default ''
 );
 
 create function auth.uid() returns uuid

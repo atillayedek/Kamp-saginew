@@ -143,7 +143,7 @@ update public.student_verifications set status = 'APPROVED';
 select tests.reset_role();
 select tests.assert_equals((select status::text from public.student_verifications), 'PENDING', 'no direct update');
 
--- Admin lists and sees the document.
+-- Admin lists the request; the file itself opens only through the audited admin-document function.
 select tests.act_as_admin((select admin from ids));
 select tests.assert_equals((select count(*) from public.list_pending_verifications()), 1::bigint, 'pending listed');
 select tests.assert_equals(
@@ -151,7 +151,7 @@ select tests.assert_equals(
     'Test Kişi|s5@example.edu.tr',
     'listing details'
 );
-select tests.assert_equals((select count(*) from storage.objects where bucket_id = 'student-documents'), 1::bigint, 'admin reads documents');
+select tests.assert_equals((select count(*) from storage.objects where bucket_id = 'student-documents'), 0::bigint, 'no direct storage read for staff');
 select tests.expect_error(format($$select public.review_student_verification(%L, false, ' ')$$, (select id from v)), 'rejection_reason_required');
 select public.review_student_verification((select id from v), false, 'Belge okunamıyor');
 select tests.expect_error(format($$select public.review_student_verification(%L, true)$$, (select id from v)), 'verification_not_pending');

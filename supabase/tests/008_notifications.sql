@@ -128,7 +128,7 @@ select tests.act_as_service();
 select tests.assert_equals(
     (select kind::text || '|' || actor_name || '|' || cardinality(tokens)::text
      from public.push_payload((select id from public.notifications where user_id = (select a from people)))),
-    'NEW_MESSAGE|Kişi niki|0',
+    'NEW_MESSAGE|Kişi n.|0',
     'push payload'
 );
 select public.delete_device_tokens(array['token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa']);

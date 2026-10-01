@@ -90,7 +90,8 @@ select tests.assert_equals(
 select tests.assert_equals(
     (select owner_full_name || '|' || owner_username || '|' || owner_department
      from public.find_matches((select mine from reqs)) where title = 'Pota arıyorum'),
-    'Öğrenci muc|muc|Bölüm muc',
+    -- Surnames are hidden from other students unless shown (KVKK data minimisation).
+    'Öğrenci m.|muc|Bölüm muc',
     'owner details'
 );
 select tests.assert_equals((select count(*) from public.find_matches((select mine from reqs), 1)), 1::bigint, 'limit');

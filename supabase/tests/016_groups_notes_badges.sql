@@ -197,30 +197,36 @@ insert into storage.objects (bucket_id, name, owner)
 values ('course-notes', (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf', (select a from gg));
 select tests.act_as((select a from gg));
 select tests.expect_error(
-    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Özet', null, %L, 1000)$$,
+    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Özet', null, %L, 1000, true)$$,
            (select a from gg), (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf'),
     'permission denied for function create_course_note'
 );
 select tests.reset_role();
 select tests.act_as_service();
 select tests.expect_error(
-    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Özet', null, %L, 1000)$$,
+    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Özet', null, %L, 1000, true)$$,
            (select a from gg), (select b from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf'),
     'invalid_document_path'
 );
 select tests.expect_error(
-    format($$select public.create_course_note(%L, '', 'Matematik', 'Özet', null, %L, 1000)$$,
+    format($$select public.create_course_note(%L, '', 'Matematik', 'Özet', null, %L, 1000, true)$$,
            (select a from gg), (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf'),
     'invalid_note'
 );
+-- The uploader must declare the rights to the content (FSEK).
+select tests.expect_error(
+    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Özet', null, %L, 1000, false)$$,
+           (select a from gg), (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf'),
+    'rights_declaration_required'
+);
 select public.create_course_note((select a from gg), 'mat 101', 'Matematik I', 'Vize özeti', 'Limit ve türev',
-                                 (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf', 123456);
+                                 (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf', 123456, true);
 select tests.reset_role();
 create temp table cn as select id from public.course_notes;
 grant select on cn to authenticated, service_role;
 select tests.act_as_service();
 select tests.expect_error(
-    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Tekrar', null, %L, 1000)$$,
+    format($$select public.create_course_note(%L, 'MAT101', 'Matematik', 'Tekrar', null, %L, 1000, true)$$,
            (select a from gg), (select a from gg)::text || '/30000000-0000-4000-8000-000000000001.pdf'),
     'invalid_document_path'
 );

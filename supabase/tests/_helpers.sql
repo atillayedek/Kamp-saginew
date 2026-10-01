@@ -18,19 +18,45 @@ create function tests.act_as(p_user uuid) returns void
 language plpgsql as $$
 begin
     perform set_config('request.jwt.claims', json_build_object('sub', p_user, 'role', 'authenticated')::text, true);
+    perform set_config('request.headers', json_build_object('cf-connecting-ip', '198.51.100.20', 'user-agent', 'KampusAgi/test')::text, true);
     execute 'set local role authenticated';
 end;
 $$;
 
--- Acts as a user whose JWT carries app_metadata.role = 'admin'.
+-- Acts as a staff member: app_metadata roles, the session's MFA level and the reason the
+-- panel would send in the x-audit-reason header (base64 UTF-8).
+create function tests.act_as_staff(
+    p_user uuid, p_roles text[], p_aal text default 'aal2', p_reason text default 'Test işlemi', p_ip text default '203.0.113.7'
+) returns void
+language plpgsql as $$
+begin
+    perform set_config(
+        'request.jwt.claims',
+        json_build_object('sub', p_user, 'role', 'authenticated', 'aal', p_aal,
+                          'app_metadata', json_build_object('roles', p_roles))::text,
+        true
+    );
+    perform set_config(
+        'request.headers',
+        json_build_object('x-audit-reason', case when p_reason is not null then encode(convert_to(p_reason, 'UTF8'), 'base64') end,
+                          'cf-connecting-ip', p_ip, 'user-agent', 'test-agent')::text,
+        true
+    );
+    execute 'set local role authenticated';
+end;
+$$;
+
+-- Acts as a user whose JWT carries app_metadata.role = 'admin' (superadmin) in an MFA session.
 create function tests.act_as_admin(p_user uuid) returns void
 language plpgsql as $$
 begin
     perform set_config(
         'request.jwt.claims',
-        json_build_object('sub', p_user, 'role', 'authenticated', 'app_metadata', json_build_object('role', 'admin'))::text,
+        json_build_object('sub', p_user, 'role', 'authenticated', 'aal', 'aal2',
+                          'app_metadata', json_build_object('role', 'admin'))::text,
         true
     );
+    perform set_config('request.headers', json_build_object('x-audit-reason', encode(convert_to('Test işlemi', 'UTF8'), 'base64'))::text, true);
     execute 'set local role authenticated';
 end;
 $$;
@@ -57,6 +83,7 @@ language plpgsql as $$
 begin
     execute 'reset role';
     perform set_config('request.jwt.claims', '', true);
+    perform set_config('request.headers', '', true);
 end;
 $$;
 

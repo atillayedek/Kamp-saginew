@@ -1,4 +1,5 @@
--- No SECURITY DEFINER function in the API schema may run for anonymous callers,
+-- No SECURITY DEFINER function in the API schema may run for anonymous callers
+-- except the public legal texts, public compliance settings and failed-login logging,
 -- and trigger functions are not callable by any API role. (Supabase grants
 -- EXECUTE to anon/authenticated by default, so every function must revoke it.)
 
@@ -8,7 +9,7 @@ select tests.assert_equals(
      from pg_proc p join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'public' and p.prosecdef
        and has_function_privilege('anon', p.oid, 'execute')),
-    '',
+    'get_legal_document,list_legal_document_versions,list_legal_documents,log_failed_login,public_compliance_config,submit_copyright_notice',
     'security definer functions executable by anon'
 );
 select tests.assert_equals(
