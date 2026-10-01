@@ -41,7 +41,7 @@ describe("formatting", () => {
 
 describe("error messages", () => {
   it("maps backend codes, network failures and unknown errors", () => {
-    expect(errorMessage(new Error("admin_required"))).toBe("Bu işlem için yönetici yetkisi gerekiyor.");
+    expect(errorMessage(new Error("admin_required"))).toBe("Bu işlem için yetkin yok ya da iki adımlı doğrulama süresi doldu. Yeniden giriş yap.");
     expect(errorMessage(new Error("Invalid login credentials"))).toBe("E-posta ya da şifre hatalı.");
     expect(errorMessage(new TypeError("Failed to fetch"))).toContain("Sunucuya ulaşılamadı");
     expect(errorMessage(new Error("Edge Function returned: no_recipients"))).toBe("Bu gruba uyan alıcı yok.");
