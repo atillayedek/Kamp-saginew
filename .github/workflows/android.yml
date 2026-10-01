@@ -191,7 +191,7 @@ jobs:
   publish-apk:
     name: Publish test APK as a GitHub release
     needs: android
-    if: github.event_name == 'push'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write
