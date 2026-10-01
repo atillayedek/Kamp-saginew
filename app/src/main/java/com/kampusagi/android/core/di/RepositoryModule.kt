@@ -2,6 +2,7 @@ package com.kampusagi.android.core.di
 
 import com.kampusagi.android.data.document.ContentResolverDocumentReader
 import com.kampusagi.android.data.image.ContentResolverImageEncoder
+import com.kampusagi.android.data.push.PushRepositoryImpl
 import com.kampusagi.android.data.repository.ProfileMediaRepositoryImpl
 import com.kampusagi.android.data.repository.AccountRepositoryImpl
 import com.kampusagi.android.data.repository.AnnouncementRepositoryImpl
@@ -19,6 +20,7 @@ import com.kampusagi.android.data.repository.ProfileRepositoryImpl
 import com.kampusagi.android.data.repository.RequirementRepositoryImpl
 import com.kampusagi.android.data.repository.UniversityRepositoryImpl
 import com.kampusagi.android.data.repository.VerificationRepositoryImpl
+import com.kampusagi.android.domain.repository.PushRepository
 import com.kampusagi.android.domain.repository.AccountRepository
 import com.kampusagi.android.domain.repository.AnnouncementRepository
 import com.kampusagi.android.domain.repository.AdminRepository
@@ -65,4 +67,5 @@ abstract class RepositoryModule {
     @Binds abstract fun bindNoteRepository(impl: NoteRepositoryImpl): NoteRepository
     @Binds abstract fun bindReputationRepository(impl: ReputationRepositoryImpl): ReputationRepository
     @Binds abstract fun bindAnnouncementRepository(impl: AnnouncementRepositoryImpl): AnnouncementRepository
+    @Binds abstract fun bindPushRepository(impl: PushRepositoryImpl): PushRepository
 }

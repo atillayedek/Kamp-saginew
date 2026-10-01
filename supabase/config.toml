@@ -12,6 +12,13 @@ enable_confirmations = true
 [functions.submit-student-document]
 verify_jwt = true
 
+[functions.dispatch-push]
+# Called by a Database Webhook with x-webhook-secret, not by a signed-in user.
+verify_jwt = false
+
+[functions.admin-push]
+verify_jwt = true
+
 [functions.verify-purchase]
 verify_jwt = true
 

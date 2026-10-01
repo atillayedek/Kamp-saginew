@@ -45,10 +45,22 @@ Ek yapılandırma gerekmez. Raporlar **Dashboard → Table Editor → `client_er
 istisna türü, yığın izi). Gizlilik politikasında çökme verilerinin (cihaz modeli, Android sürümü, hata kaydı) hesapla
 ilişkilendirilerek saklandığı belirtilmelidir.
 
-### Bildirimler
+### Bildirimler (push, FCM — D55)
 
-FCM kullanılmaz (D30); ek yapılandırma gerekmez. Canlıda eski `dispatch-push` Edge Function'ı kaldıysa
-**Dashboard → Edge Functions → dispatch-push → Delete** ile silinir (artık kullanılmıyor).
+Firebase projesi: `kampusaginew`, Android uygulaması `com.kampusagi.android`.
+
+1. **Android build (GitHub):** Settings → Secrets and variables → Actions → New repository secret
+   `GOOGLE_SERVICES_JSON` = Firebase'den indirilen `google-services.json` dosyasının **içeriği**. Build yalnızca istemciye açık
+   değerleri (proje kimliği, uygulama kimliği, API anahtarı, gönderici numarası) okur. Yerelde dosyayı `app/google-services.json`
+   olarak koy (git'e girmez). Yoksa uygulama derlenir, push kapalı kalır ve bildirimler yalnızca uygulama açıkken Realtime ile gelir.
+2. **Edge Function secret'ları (Supabase → Edge Functions → Secrets):**
+   - `FCM_SERVICE_ACCOUNT`: Firebase → Proje ayarları → Hizmet hesapları → "Yeni özel anahtar oluştur" ile inen JSON'un tamamı.
+   - `PUSH_WEBHOOK_SECRET`: rastgele uzun bir değer (`openssl rand -hex 32`).
+3. **Database Webhook (Supabase → Database → Webhooks → Create):** tablo `public.notifications`, olay `INSERT`,
+   tür "Supabase Edge Functions" → `dispatch-push`, yöntem POST, HTTP başlığı `x-webhook-secret: <PUSH_WEBHOOK_SECRET>`.
+4. `dispatch-push` JWT doğrulamasız çalışır (`config.toml`), yalnızca bu başlıkla kabul eder. `admin-push` yalnızca yöneticiye açıktır;
+   admin paneli → Duyurular → "Telefonlara gönder" ile aktif bir duyuru hedefindeki onaylı öğrencilere **bir kez** gönderilir.
+5. Kilit ekranında mesaj içeriği gösterilmez ("X sana mesaj gönderdi"). FCM'nin tanımadığı cihaz belirteçleri otomatik silinir.
 
 ### Premium (Google Play Billing)
 

@@ -77,10 +77,14 @@ else
   failures=$((failures + 1))
 fi
 rm -f "$unsub_body"
-for fn in submit-student-document verify-purchase delete-account admin-broadcast submit-course-note; do
+for fn in submit-student-document verify-purchase delete-account admin-broadcast submit-course-note admin-push; do
   check "function $fn: requires a signed-in user" 401 '"error":"not_authenticated"' \
     -X POST "${SUPABASE_URL}/functions/v1/${fn}" "${anon[@]}" -d '{}'
 done
+
+# The push webhook refuses calls without its secret (or says push is not set up yet).
+check "function dispatch-push: requires the webhook secret" 401 '"error":"not_authenticated"' \
+  -X POST "${SUPABASE_URL}/functions/v1/dispatch-push" "${anon[@]}" -d '{}'
 
 if [ "$failures" -gt 0 ]; then
   echo "${failures} live check(s) failed"

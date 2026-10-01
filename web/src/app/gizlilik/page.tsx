@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <><strong>Mesajlar:</strong> birebir sohbetler, çalışma grubu ve kanal mesajları, beğeniler, okundu bilgisi.</>,
           <><strong>Güvenlik kayıtları:</strong> engellediğin kişiler, gönderdiğin ve hakkında yapılan şikayetler.</>,
           <><strong>Satın alma:</strong> Premium için Google Play satın alma jetonu, sipariş numarası, plan ve fiyat bilgisi. Kart bilgilerin bize hiç ulaşmaz; ödemeyi Google işler.</>,
-          <><strong>Teknik veriler:</strong> uygulama çöktüğünde uygulama sürümü, Android sürümü, cihaz modeli ve hata kaydı; uygulamayı hangi gün açtığın (günde tek kayıt, istatistik için).</>,
+          <><strong>Teknik veriler:</strong> uygulama çöktüğünde uygulama sürümü, Android sürümü, cihaz modeli ve hata kaydı; uygulamayı hangi gün açtığın (günde tek kayıt, istatistik için); bildirim gönderebilmek için cihazının bildirim belirteci (FCM token).</>,
           <><strong>Tercihler:</strong> pazarlama e-postası izni ve zamanı, görünüm (koyu/açık tema) tercihi (yalnızca cihazında).</>,
         ]}
       />
@@ -60,6 +60,7 @@ export default function PrivacyPage() {
         items={[
           <><strong>Supabase</strong> — veritabanı, kimlik doğrulama, dosya depolama ve sunucu fonksiyonları (tüm hesap ve içerik verileri).</>,
           <><strong>Google (Google Play)</strong> — Premium ödemeleri ve satın alma doğrulaması.</>,
+          <><strong>Google (Firebase Cloud Messaging)</strong> — telefonuna bildirim iletmek için cihaz belirteci ve bildirim metni (ör. «Ayşe sana mesaj gönderdi»); mesajlarının içeriği gönderilmez.</>,
           <><strong>Resend</strong> — hizmet ve (rızan varsa) pazarlama e-postalarının gönderimi; e-posta adresin ve mesaj içeriği.</>,
           <><strong>Vercel</strong> — web sitesi ve yönetim panelinin barındırılması.</>,
         ]}

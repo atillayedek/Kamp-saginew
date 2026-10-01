@@ -206,6 +206,19 @@ interface NotificationRepository {
     fun changes(): Flow<Unit>
 }
 
+interface PushRepository {
+    /** False when this build has no Firebase configuration. */
+    val isConfigured: Boolean
+
+    /** Registers this device's FCM token for the signed-in person. */
+    suspend fun registerCurrentDevice(): AppResult<Unit>
+
+    suspend fun registerToken(token: String): AppResult<Unit>
+
+    /** Removes this device's token before signing out. */
+    suspend fun unregisterCurrentDevice(): AppResult<Unit>
+}
+
 /** Backend side of Premium: plans, the person's status and server-side purchase verification. */
 interface PremiumRepository {
     suspend fun plans(): AppResult<List<Plan>>

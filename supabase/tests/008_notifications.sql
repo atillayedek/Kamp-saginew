@@ -105,14 +105,73 @@ select public.mark_notifications_read();
 select tests.assert_equals((select count(*) from public.list_notifications() where read_at is null), 0::bigint, 'mark all read');
 rollback;
 
--- 5. There is no push delivery (D30): no device tokens or push functions exist.
+-- 5. Device tokens (D55): registration moves a token to its latest owner; push data is service-role only.
 begin;
-select tests.assert_equals(to_regclass('public.device_tokens')::text, null::text, 'device_tokens dropped');
+select tests.act_as((select a from people));
+select public.register_device_token('token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+select tests.expect_error($$select public.register_device_token('short')$$, 'invalid_token');
+select tests.assert_equals((select count(*) from public.device_tokens), 0::bigint, 'tokens not readable by clients');
+select tests.expect_error(format($$select * from public.push_payload(%L)$$, gen_random_uuid()), 'permission denied for function push_payload');
+select tests.reset_role();
+select tests.act_as((select b from people));
+select public.register_device_token('token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+create temp table conv as select public.start_conversation((select a from people)) as id;
+select public.send_message((select id from conv), gen_random_uuid(), 'selam');
+select tests.reset_role();
 select tests.assert_equals(
-    (select count(*) from pg_proc
-     where pronamespace = 'public'::regnamespace
-       and proname in ('register_device_token', 'unregister_device_token', 'push_payload', 'delete_device_tokens')),
-    0::bigint,
-    'push functions dropped'
+    (select user_id from public.device_tokens where token = 'token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
+    (select b from people),
+    'token moved to latest owner'
 );
+-- a no longer owns the token, so the notification for a has no device.
+select tests.act_as_service();
+select tests.assert_equals(
+    (select kind::text || '|' || actor_name || '|' || cardinality(tokens)::text
+     from public.push_payload((select id from public.notifications where user_id = (select a from people)))),
+    'NEW_MESSAGE|Kişi niki|0',
+    'push payload'
+);
+select public.delete_device_tokens(array['token-aaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
+select tests.reset_role();
+select tests.assert_equals((select count(*) from public.device_tokens), 0::bigint, 'invalid tokens removed');
+rollback;
+
+-- 6. An announcement goes to phones once, only to approved students it is meant for.
+begin;
+select tests.act_as((select a from people));
+select public.register_device_token('token-announce-aaaaaaaaaaaaaaaaaaaa');
+select tests.expect_error(format($$select * from public.claim_announcement_push(%L)$$, gen_random_uuid()),
+    'permission denied for function claim_announcement_push');
+select tests.reset_role();
+select tests.act_as((select b from people));
+select public.register_device_token('token-announce-bbbbbbbbbbbbbbbbbbbb');
+select tests.reset_role();
+update public.profiles set account_status = 'SUSPENDED' where id = (select b from people);
+insert into public.announcements (title, body, university_id, ends_at)
+values ('Herkese', 'Genel duyuru', null, now() + interval '1 day'),
+       ('ODTÜ', 'Yalnızca ODTÜ', (select id from public.universities where name = 'ORTA DOĞU TEKNİK ÜNİVERSİTESİ'), now() + interval '1 day'),
+       ('Bitti', 'Süresi geçti', null, now() + interval '1 second');
+update public.announcements set starts_at = now() - interval '2 days', ends_at = now() - interval '1 day' where title = 'Bitti';
+select tests.act_as_service();
+select tests.assert_equals(
+    (select title || '|' || array_to_string(tokens, ',') from public.claim_announcement_push((select id from public.announcements where title = 'Herkese'))),
+    'Herkese|token-announce-aaaaaaaaaaaaaaaaaaaa',
+    'approved students only'
+);
+select tests.expect_error(format($$select * from public.claim_announcement_push(%L)$$, (select id from public.announcements where title = 'Herkese')),
+    'announcement_already_pushed');
+select tests.assert_equals(
+    (select cardinality(tokens) from public.claim_announcement_push((select id from public.announcements where title = 'ODTÜ'))),
+    0, 'other university gets nothing'
+);
+select tests.expect_error(format($$select * from public.claim_announcement_push(%L)$$, (select id from public.announcements where title = 'Bitti')),
+    'announcement_not_found');
+select public.record_announcement_push((select id from public.announcements where title = 'Herkese'), 1);
+select tests.reset_role();
+select tests.act_as_admin((select a from people));
+select tests.assert_equals(
+    (select (pushed_at is not null)::text || '|' || push_sent from public.admin_list_announcements() where title = 'Herkese'),
+    'true|1', 'admin sees the push'
+);
+select tests.reset_role();
 rollback;

@@ -19,6 +19,7 @@ output-metadata.json
 
 # Local configuration and secrets — never commit these
 local.properties
+google-services.json
 keystore.properties
 *.jks
 *.keystore

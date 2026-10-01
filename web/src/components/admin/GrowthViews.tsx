@@ -92,6 +92,8 @@ export function AnnouncementsView({ client }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [endingId, setEndingId] = useState<string | null>(null);
+  const [pushingId, setPushingId] = useState<string | null>(null);
+  const [pushNote, setPushNote] = useState<string | null>(null);
   // Status badges compare against the time the page was opened.
   const [now] = useState(() => Date.now());
 
@@ -124,11 +126,29 @@ export function AnnouncementsView({ client }: Props) {
     setEndingId(null);
   }
 
+  async function push(id: string, title: string) {
+    if (!window.confirm(`"${title}" duyurusu hedefindeki öğrencilerin telefonlarına bildirim olarak gönderilsin mi? Bu yalnızca bir kez yapılabilir.`)) return;
+    setPushingId(id);
+    setError(null);
+    setPushNote(null);
+    try {
+      const result = await adminApi.pushAnnouncement(client, id);
+      setPushNote(`${formatNumber(result.sent)} cihaza gönderildi` +
+        (result.failed > 0 ? `, ${formatNumber(result.failed)} başarısız` : "") +
+        (result.devices === 0 ? " (bu hedefte bildirime kayıtlı cihaz yok)" : "") + ".");
+      list.reload();
+    } catch (err) {
+      console.error(err);
+      setError(errorMessage(err));
+    }
+    setPushingId(null);
+  }
+
   return (
     <>
       <PageHeader
         title="Uygulama içi duyuru"
-        description="Duyuru, uygulamayı açık olan öğrencilere anında, diğerlerine uygulamayı açtıklarında akışın en üstünde gösterilir. Öğrenci kapatabilir."
+        description="Duyuru, uygulamayı açık olan öğrencilere anında, diğerlerine uygulamayı açtıklarında akışın en üstünde gösterilir. Öğrenci kapatabilir. İstersen bir kez telefonlara bildirim olarak da gönderebilirsin."
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
         <Card title="Yeni duyuru">
@@ -165,6 +185,7 @@ export function AnnouncementsView({ client }: Props) {
           {list.error ? <ErrorBox message={list.error} onRetry={list.reload} /> : null}
           {!list.data && list.loading ? <Loading /> : null}
           {list.data && list.data.length === 0 ? <Empty>Henüz duyuru yok.</Empty> : null}
+          {pushNote ? <p className="mb-2 rounded-lg bg-good-soft px-3 py-2 text-sm text-good">{pushNote}</p> : null}
           <ul className="divide-y divide-line">
             {(list.data ?? []).map((a) => {
               const active = new Date(a.ends_at).getTime() > now && new Date(a.starts_at).getTime() <= now;
@@ -174,6 +195,7 @@ export function AnnouncementsView({ client }: Props) {
                     <span className="font-medium">{a.title}</span>
                     {active ? <Badge tone="good">Yayında</Badge> : <Badge>Bitti</Badge>}
                     <Badge tone="brand">{a.university_name ?? "Tüm öğrenciler"}</Badge>
+                    {a.pushed_at ? <Badge>Telefonlara gönderildi{a.push_sent != null ? ` (${formatNumber(a.push_sent)})` : ""}</Badge> : null}
                   </div>
                   <p className="text-sm text-ink-2 whitespace-pre-line">{a.body}</p>
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-3">
@@ -181,7 +203,12 @@ export function AnnouncementsView({ client }: Props) {
                       {formatDateTime(a.created_at)} → {formatDateTime(a.ends_at)} · {formatNumber(a.dismissed_count)} kişi kapattı
                     </span>
                     {active ? (
-                      <Button variant="secondary" onClick={() => end(a.id)} busy={endingId === a.id}>Şimdi bitir</Button>
+                      <span className="flex gap-2">
+                        {a.pushed_at ? null : (
+                          <Button variant="secondary" onClick={() => push(a.id, a.title)} busy={pushingId === a.id}>Telefonlara gönder</Button>
+                        )}
+                        <Button variant="secondary" onClick={() => end(a.id)} busy={endingId === a.id}>Şimdi bitir</Button>
+                      </span>
                     ) : null}
                   </div>
                 </li>

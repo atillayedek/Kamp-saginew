@@ -117,12 +117,13 @@ Toplanan veri türleri (hepsi "Toplanıyor", "Paylaşılmıyor", "Geçici değil
 | Dosyalar ve dokümanlar | Öğrenci belgesi PDF, ders notu PDF | Belge zorunlu | Uygulama işlevselliği, Dolandırıcılığı önleme/güvenlik |
 | Uygulama etkinliği → Diğer kullanıcı tarafından oluşturulan içerik | Gönderi, yorum, anket, ilan, ihtiyaç metni | İsteğe bağlı | Uygulama işlevselliği |
 | Uygulama etkinliği → Uygulama etkileşimleri | Uygulamayı açtığı gün (günde tek kayıt) | Zorunlu | Analiz |
+| Cihaz veya diğer kimlikler | Bildirim belirteci (FCM token) | Zorunlu (bildirim için) | Uygulama işlevselliği |
 | Uygulama bilgileri ve performans → Kilitlenme günlükleri | Çökme türü, stack trace | Zorunlu | Analiz |
 | Uygulama bilgileri ve performans → Diğer | Uygulama sürümü, Android sürümü, cihaz modeli (yalnızca çökmede) | Zorunlu | Analiz |
 
 **Toplanmayanlar:** konum, rehber, takvim, sağlık, ses, reklam kimliği, web geçmişi, yüklü uygulamalar.
 
-Not: Supabase, Resend ve Vercel hizmet sağlayıcıdır; Google Play'in tanımında bunlara aktarım "Paylaşım" sayılmaz.
+Not: Supabase, Resend, Vercel ve Firebase Cloud Messaging hizmet sağlayıcıdır; Google Play'in tanımında bunlara aktarım "Paylaşım" sayılmaz.
 Uygulama yapay zekâ servisi kullanmaz.
 
 ## 4. Abonelik (Para kazanma → Abonelikler)

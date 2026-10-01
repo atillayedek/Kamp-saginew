@@ -11,6 +11,8 @@ import com.kampusagi.android.domain.model.Profile
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.repository.AuthRepository
 import com.kampusagi.android.domain.repository.ProfileRepository
+import com.kampusagi.android.domain.repository.PushRepository
+import android.util.Log
 import com.kampusagi.android.data.crash.CrashReporter
 import com.kampusagi.android.presentation.common.avatar.AvatarLoader
 import com.kampusagi.android.presentation.common.media.PostPhotoLoader
@@ -58,6 +60,7 @@ class RootViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val backgroundNotifier: BackgroundNotifier,
+    private val pushRepository: PushRepository,
     private val crashReporter: CrashReporter,
     private val avatarLoader: AvatarLoader,
     private val photoLoader: PostPhotoLoader,
@@ -127,7 +130,14 @@ class RootViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collect { userId ->
                     if (userId != null) {
-                        backgroundNotifier.start()
+                        // With FCM the system delivers notifications even when the app is closed;
+                        // the Realtime notifier is only the fallback for builds without Firebase.
+                        if (pushRepository.isConfigured) {
+                            val result = pushRepository.registerCurrentDevice()
+                            if (result is AppResult.Failure) Log.w(TAG, "Push registration failed: ${result.error}")
+                        } else {
+                            backgroundNotifier.start()
+                        }
                         // Crashes recorded earlier on this device are sent under the signed-in account.
                         crashReporter.sendPending()
                     } else {
@@ -191,7 +201,14 @@ class RootViewModel @Inject constructor(
             adminOpen.value = false
             editingProfile.value = false
             passwordRecovery.value = false
+            // This device must stop receiving the account's notifications.
+            val unregistered = pushRepository.unregisterCurrentDevice()
+            if (unregistered is AppResult.Failure) Log.w(TAG, "Push token not removed: ${unregistered.error}")
             if (authRepository.signOut() is AppResult.Failure) messageChannel.send(AppMessage.SIGN_OUT_FAILED)
         }
+    }
+
+    private companion object {
+        const val TAG = "Root"
     }
 }

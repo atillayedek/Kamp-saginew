@@ -32,6 +32,7 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.ACCOUNT_NOT_APPROVED -> R.string.error_account_not_approved
     AppError.TOO_MANY_ACTIVE_REQUIREMENTS -> R.string.error_too_many_active_requirements
     AppError.REQUIREMENT_DAILY_LIMIT -> R.string.error_requirement_daily_limit
+    AppError.PUSH_NOT_CONFIGURED -> R.string.error_push_not_configured
     AppError.RECIPIENT_NOT_AVAILABLE -> R.string.error_recipient_not_available
     AppError.BILLING_UNAVAILABLE -> R.string.error_billing_unavailable
     AppError.BILLING_NOT_CONFIGURED -> R.string.error_billing_not_configured

@@ -119,6 +119,16 @@ export interface Announcement {
   ends_at: string;
   dismissed_count: number;
   created_at: string;
+  /** Set once the announcement was sent to phones (admin-push); it can be sent only once. */
+  pushed_at: string | null;
+  push_sent: number | null;
+}
+
+export interface PushResult {
+  devices: number;
+  sent: number;
+  failed: number;
+  unregistered: number;
 }
 
 export interface UniversityOption {
@@ -227,6 +237,7 @@ export const adminApi = {
   createAnnouncement: (c: SupabaseClient, title: string, body: string, universityId: string | null, endsAt: string) =>
     rpc<string>(c, "admin_create_announcement", { p_title: title, p_body: body, p_university_id: universityId, p_ends_at: endsAt }),
   endAnnouncement: (c: SupabaseClient, id: string) => rpc<void>(c, "admin_end_announcement", { p_announcement_id: id }),
+  pushAnnouncement: (c: SupabaseClient, id: string) => invoke<PushResult>(c, "admin-push", { announcement_id: id }),
   plans: (c: SupabaseClient) => rpc<Plan[]>(c, "admin_list_plans"),
   grants: (c: SupabaseClient) => rpc<PremiumGrant[]>(c, "admin_list_grants", { p_limit: 100 }),
   grantPremium: (c: SupabaseClient, userId: string, planId: string, days: number, note: string | null) =>

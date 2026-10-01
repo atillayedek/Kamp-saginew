@@ -65,6 +65,7 @@
     <string name="error_rejection_reason_required">Ret nedeni 3–500 karakter olmalı.</string>
     <string name="error_verification_not_pending">Bu başvuru zaten sonuçlandırılmış.</string>
     <string name="error_account_not_approved">Bu özellik yalnızca doğrulanmış öğrenciler içindir.</string>
+    <string name="error_push_not_configured">Anlık bildirimler bu sürümde yapılandırılmamış.</string>
     <string name="error_requirement_daily_limit">Bugün çok fazla ilan açtın. Yarın tekrar dene.</string>
     <string name="error_too_many_active_requirements">Aktif ilan sınırına ulaştın. Önce eski bir ilanı kapat.</string>
     <string name="error_recipient_not_available">Bu öğrenciye şu an mesaj gönderilemiyor.</string>
@@ -264,7 +265,7 @@
     <string name="notification_new_comment">%1$s gönderine yorum yaptı.</string>
     <string name="notification_verification_approved">Öğrenci doğrulaman onaylandı.</string>
     <string name="notification_verification_rejected">Öğrenci belgen onaylanmadı. Nedenini profil durumunda görebilirsin.</string>
-    <string name="push_permission_denied">Bildirim izni kapalı. Uygulama açıkken gelen bildirimleri görmek için Android ayarlarından KampüsAğı bildirim iznini ver.</string>
+    <string name="push_permission_denied">Bildirim izni kapalı. Mesaj ve yorum bildirimlerini almak için Android ayarlarından KampüsAğı bildirim iznini ver.</string>
     <!-- Premium -->
     <string name="premium_title">Premium</string>
     <string name="premium_load_failed">Premium bilgileri yüklenemedi</string>
