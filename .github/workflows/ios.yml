@@ -5,10 +5,6 @@ on:
     paths:
       - "ios/**"
       - ".github/workflows/ios.yml"
-  pull_request:
-    paths:
-      - "ios/**"
-      - ".github/workflows/ios.yml"
   workflow_dispatch:
 
 permissions:
@@ -51,6 +47,7 @@ jobs:
       - name: Unit tests (simulator)
         run: |
           set -o pipefail
+          mkdir -p build
           DEVICE=$(xcrun simctl list devices available | grep -m1 -oE "iPhone 1[5-7][^(]*" | sed 's/ *$//')
           echo "Simulator: $DEVICE"
           xcodebuild test -project KampusAgi.xcodeproj -scheme KampusAgi \
