@@ -19,6 +19,8 @@ const MESSAGES: Record<string, string> = {
   notice_not_found: "Bildirim bulunamadı ya da zaten sonuçlanmış.",
   statement_required: "Doğruluk ve yetki beyanını onaylaman gerekiyor.",
   invalid_notice: "Bilgiler eksik ya da hatalı: ad en az 3, eser açıklaması en az 10 karakter ve geçerli bir e-posta gerekli.",
+  pg_cron_unavailable: "Bu projede pg_cron eklentisi bulunmuyor; Supabase desteğine danış.",
+  pg_cron_not_enabled: "pg_cron açılamadı. Supabase → Database → Extensions → pg_cron'u aç, sonra tekrar dene.",
   rate_limited: "Kısa sürede çok fazla istek gönderildi. Biraz sonra tekrar dene.",
   not_authenticated: "Oturumun sona erdi. Yeniden giriş yap.",
   invalid_page: "Geçersiz sayfa isteği.",

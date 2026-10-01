@@ -111,6 +111,12 @@ export interface RetentionStatus {
   last_run: { started_at: string; finished_at: string | null; summary: Record<string, unknown>; error: string | null } | null;
 }
 
+export interface ScheduledJob {
+  name: string;
+  schedule: string;
+  active: boolean;
+}
+
 export interface MatchObjection {
   username: string;
   requirement_title: string;
@@ -217,6 +223,8 @@ export const complianceApi = {
   setSetting: (c: C, key: string, value: unknown) => rpc<void>(c, "admin_set_compliance_setting", { p_key: key, p_value: value }),
   retentionReport: (c: C, days: number) => rpc<RetentionRow[]>(c, "admin_retention_report", { p_days: days }),
   retentionStatus: (c: C) => rpc<RetentionStatus>(c, "admin_retention_status"),
+  scheduleStatus: (c: C) => rpc<{ jobs: ScheduledJob[] }>(c, "admin_schedule_status"),
+  ensureSchedules: (c: C) => rpc<{ jobs: ScheduledJob[] }>(c, "admin_ensure_schedules"),
   matchObjections: (c: C) => rpc<MatchObjection[]>(c, "admin_list_match_objections"),
   appeals: (c: C) => rpc<Appeal[]>(c, "admin_list_appeals"),
   decideAppeal: (c: C, id: string, reverse: boolean, note: string) =>

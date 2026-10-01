@@ -683,6 +683,7 @@ function Retention({ client }: Props) {
   const ask = useReason();
   const status = useAsync(() => complianceApi.retentionStatus(client), "retention-status");
   const report = useAsync(() => complianceApi.retentionReport(client, 90), "retention-report");
+  const jobs = useAsync(() => complianceApi.scheduleStatus(client), "schedule-status");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const s = status.data;
@@ -703,6 +704,25 @@ function Retention({ client }: Props) {
     setBusy(false);
   }
 
+  async function schedule() {
+    const reason = await ask("Zamanlamayı kur", { initial: "pg_cron zamanlaması" });
+    if (!reason) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await withReason(reason, () => complianceApi.ensureSchedules(client));
+      jobs.reload();
+      status.reload();
+    } catch (e) {
+      console.error(e);
+      setError(errorMessage(e));
+    }
+    setBusy(false);
+  }
+
+  const jobList = jobs.data?.jobs ?? [];
+  const scheduled = jobList.length >= 2 && jobList.every((j) => j.active);
+
   return (
     <div className="space-y-4">
       {error ? <ErrorBox message={error} /> : null}
@@ -715,7 +735,14 @@ function Retention({ client }: Props) {
               <Badge tone={s.pg_net_installed ? "good" : "bad"}>pg_net {s.pg_net_installed ? "var" : "yok"}</Badge>
               <Badge tone={s.functions_url_set ? "good" : "warn"}>{s.functions_url_set ? "Fonksiyon adresi kayıtlı" : "Fonksiyon adresi yok"}</Badge>
             </div>
-            {!s.pg_cron_installed ? <p className="text-ink-2">Supabase → Database → Extensions → pg_cron&apos;u aç; ardından migration&apos;daki zamanlama bir sonraki dağıtımda kurulur.</p> : null}
+            {!s.pg_cron_installed ? <p className="text-ink-2">Supabase → Database → Extensions → pg_cron&apos;u aç, ardından &quot;Zamanlamayı kur&quot;a bas.</p> : null}
+            {jobs.error ? <ErrorBox message={jobs.error} onRetry={jobs.reload} /> : null}
+            {jobList.length > 0 ? (
+              <ul className="text-ink-2">
+                {jobList.map((j) => <li key={j.name}>{j.name} — <code>{j.schedule}</code> {j.active ? "" : "(pasif)"}</li>)}
+              </ul>
+            ) : null}
+            {jobs.data && !scheduled ? <Button onClick={schedule} busy={busy}>Zamanlamayı kur</Button> : null}
             {!s.functions_url_set ? <Button onClick={setup} busy={busy}>Etkinleştir</Button> : null}
             {s.last_run ? (
               <p className={s.last_run.error ? "text-bad" : "text-ink-2"}>

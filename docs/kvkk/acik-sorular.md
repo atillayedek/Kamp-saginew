@@ -64,5 +64,5 @@ Kod tarafında karar verilemeyen, uydurulmaması gereken her şey. Her madde kod
   (`{"role":"admin"}` = superadmin; ya da `{"roles":["verifier"]}`, `["moderator"]`, `["compliance"]`). İlk girişte
   web paneli TOTP kurulumu ister.
 - **S18 — pg_cron** projede açık değilse (Dashboard → Database → Extensions) erişim kaydı kopyalama ve günlük imha
-  zamanlanmaz; panel → KVKK → İmha durumu gösterir. Açılınca migration'daki `cron.schedule` çağrılarının yeniden
-  çalıştırılması gerekir (bkz. DEPLOYMENT.md).
+  zamanlanmaz; panel → KVKK → İmha durumu gösterir. Açılınca panel → KVKK → İmha → "Zamanlamayı kur"
+  (bkz. DEPLOYMENT.md §4).

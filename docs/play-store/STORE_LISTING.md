@@ -100,6 +100,8 @@ ihtiyaç eşleştirme) kullanılabilir. Yeni hesaplar öğrenci belgesi yönetic
 
 ## 3. Veri güvenliği formu
 
+> Güncel ve ayrıntılı yanıtlar: `docs/store/play-data-safety.md` (KVKK envanterinden türetildi). Aşağıdaki özet ona göre güncellendi.
+
 Genel: Veriler aktarım sırasında şifrelenir (**Evet**, HTTPS). Kullanıcı veri silme talebinde bulunabilir (**Evet**).
 Hiçbir veri reklam veya pazarlama amacıyla üçüncü taraflarla **paylaşılmaz**. Veri toplama zorunlu değil mi? → Hesap için zorunlu.
 
@@ -107,7 +109,7 @@ Toplanan veri türleri (hepsi "Toplanıyor", "Paylaşılmıyor", "Geçici değil
 
 | Play veri türü | Ne | Zorunlu mu | Amaç |
 |---|---|---|---|
-| Kişisel bilgiler → Ad | Ad soyad | Zorunlu | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → Ad | Ad soyad (soyad diğerlerine varsayılan baş harf) | Zorunlu | Uygulama işlevselliği, Hesap yönetimi |
 | Kişisel bilgiler → E-posta adresi | Hesap e-postası | Zorunlu | Hesap yönetimi, Uygulama işlevselliği, (izinle) Pazarlama |
 | Kişisel bilgiler → Kullanıcı kimlikleri | Kullanıcı adı, hesap kimliği | Zorunlu | Uygulama işlevselliği, Hesap yönetimi |
 | Kişisel bilgiler → Diğer | Üniversite, bölüm, biyografi | Üniversite zorunlu | Uygulama işlevselliği |

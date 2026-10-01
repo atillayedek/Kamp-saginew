@@ -42,6 +42,18 @@ Kod yazım mantığı, aynı hesaptaki `atillayedek/whered-d-put` (WhereDidIPutI
 - ViewModel tek bir `UiState` data class'ı `StateFlow` olarak açar (`stateIn(WhileSubscribed(5_000))`);
   loading / empty / error durumları state'te açıkça modellenir.
 
+## KVKK kuralları
+
+- Yasal süreler/metinler `compliance_settings`'ten okunur (`compliance_int('…')`, `public_compliance_config()`); kodda sabit süre yok.
+- Yönetici fonksiyonları `has_staff_role('verifier'|'moderator'|'compliance')` ile korunur (superadmin hepsini geçer, MFA açıksa
+  `aal2` gerekir). Her yönetici okuması/işlemi `write_admin_audit` ile loglanır; gerekçe `x-audit-reason` başlığından
+  (base64 UTF-8) `request_audit_reason()` ile okunur. Web'de çağrılar `withReason(reason, () => …)` ile sarılır.
+- `consent_logs`, `access_logs`, `admin_audit_logs`, `deletion_logs` zincirlidir: yalnızca ekleme, `ON CONFLICT` yok,
+  silme yalnızca `purge_log`. Yeni tablo eklenirse saklama süresi + imha yolu + envanter satırı (`docs/kvkk/veri-envanteri.md`) birlikte gelir.
+- Diğer kullanıcılara isim dönen her fonksiyon `full_name` yerine `public_name` döner.
+- Hukuki metin değişikliği: `docs/legal/*.md` + panelden yeni sürüm; yayımlanmış sürüm değiştirilmez.
+- Loglara (Logcat, console) e-posta, telefon, mesaj/belge içeriği yazılmaz (`NoPersonalDataInLogsTest`, `logging.test.ts`).
+
 ## Build doğrulaması
 
 - Bu cloud ortamında Android SDK / Google Maven erişimi yoktur. Build doğrulaması **GitHub Actions** üzerinde yapılır:

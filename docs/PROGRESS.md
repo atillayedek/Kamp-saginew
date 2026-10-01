@@ -26,6 +26,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 17 | Admin: uygulama içi duyuru (D50), aktiflik istatistikleri (D51), Premium hediye ve promosyon kodu (D52); Premium fiyatı Play'de 100 TL (D45) | Bitti — CI yeşil `c55372e` (DB 17 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol). Cihazda deneme: kullanıcı tarafından yapılacak |
 | 18 | Yapay zekâsız kurallı eşleştirme (D54): form + önerilen etiketler, `create_requirement`, puanlı `find_matches`, eşanlamlılar; OpenAI kaldırıldı | Bitti — CI yeşil `308a228` (DB 17 test dosyası, Deno 29 test, web, Android unit test + lintRelease + APK + AAB) |
 | 19 | Push bildirimleri FCM ile (D55, D56): cihaz belirteçleri, veritabanından otomatik `dispatch-push` (pg_net), admin "Bildirimleri etkinleştir" + "Telefonlara gönder", Android FCM | Kod bitti — CI yeşil `3d23948` (DB, Deno 34 test, web, Android unit test + lint + APK + AAB, canlı kontroller). Uçtan uca push: NOT RUN (Firebase secret'ları bekleniyor) |
+| 20 | KVKK ve yasal uyum (D57–D66): veri envanteri, 13 hukuki metin taslağı (sürümlü), zincirli loglar, roller + MFA + gerekçe, md.11 hakları (dışa aktarma, 30 gün geri alınabilir silme, rızalar, başvuru), moderasyon itirazı, telif formu, günlük imha, sır taraması, mağaza formları | Kod bitti — sonuç: `docs/kvkk/test-raporu.md`. Hukuki adımlar: `docs/kvkk/uyum-kontrol-listesi.md` |
 
 ## Son doğrulamalar
 

@@ -113,10 +113,28 @@ Resend hesabında şu an doğrulanmış tek alan adı başka bir ürüne ait; Ka
 - Admin paneli `/admin`. Landing page'de bağlantısı yoktur, arama motorlarına kapalıdır.
 - Supabase Auth → URL Configuration'a site adresini ekle (şifre sıfırlama bağlantıları için).
 
-## 4. İlk yönetici
+## 4. Yöneticiler, MFA ve KVKK kurulumu
 
-Supabase Dashboard → Authentication → kullanıcı → **app_metadata**: `{"role": "admin"}` (yalnızca service role/Dashboard yazabilir).
-Kullanıcı yeniden giriş yaptığında (yeni JWT) uygulamada "Yönetim" ekranı (doğrulamalar + şikayetler) görünür.
+Roller Supabase Dashboard → Authentication → kullanıcı → **app_metadata**'ya yazılır (yalnızca service role/Dashboard yazabilir):
+
+| app_metadata | Rol | Görür |
+|---|---|---|
+| `{"role": "admin"}` | superadmin | Her şey |
+| `{"roles": ["verifier"]}` | Belge doğrulama | Doğrulamalar (belge 5 dk'lık bağlantıyla) |
+| `{"roles": ["moderator"]}` | İçerik | Moderasyon, itirazlar, telif bildirimleri |
+| `{"roles": ["compliance"]}` | KVKK | Loglar, başvurular, ihlaller, hukuki metinler, imha, ayarlar |
+
+Roller birleştirilebilir (`["verifier","moderator"]`). Kişi `/admin`'e girince TOTP (Google Authenticator vb.) kurar; her
+girişte kod ister. 30 dakika hareketsizlikte çıkış yapılır. Her işlem için kısa bir gerekçe istenir ve loglanır.
+Uygulamada yönetim ekranı yoktur; ayarlarda "Yönetim paneli" bağlantısı web paneline gider.
+
+KVKK ilk kurulum (compliance ya da superadmin):
+1. Supabase → Database → Extensions → **pg_cron** ve **pg_net** açık olmalı.
+2. Panel → KVKK ve Uyum → İmha → **Zamanlamayı kur** (erişim kaydı kopyalama her 5 dk, imha her gün 03:17 UTC) ve
+   (fonksiyon adresi kayıtlı değilse) **Etkinleştir**.
+3. Hukuki metinlerdeki yer tutucuları avukatla doldur → panel → Hukuki metinler → yeni sürüm yayımla (eski sürümler kalır,
+   kullanıcılar bir sonraki girişte yeni sürümü görür/kabul eder).
+4. Saklama süreleri: panel → Ayarlar (`docs/kvkk/acik-sorular.md` S0c). Süre değişirse ilgili metnin yeni sürümünü yayımla.
 
 ## 5. Android build
 
