@@ -104,6 +104,9 @@ Resend hesabında şu an doğrulanmış tek alan adı başka bir ürüne ait; Ka
 
 ## 3. Web sitesi (Vercel)
 
+- Alan adı: `https://kampusagi.tsdmrdigitalstudio.com.tr` (Cloudflare'de `kampusagi` CNAME → `cname.vercel-dns.com`, DNS only). `kampusagi-nine.vercel.app` da çalışır.
+- Veri sorumlusu `TSDMR Digital Studio`, iletişim `iletisim@tsdmrdigitalstudio.com.tr` (Vercel env). Toplu e-posta `mail.tsdmrdigitalstudio.com.tr` alt alan adından gider (Resend, SPF/DKIM/DMARC doğrulandı).
+
 - Proje: `kampusagi` (Vercel), kök dizin `web`, framework Next.js.
 - Ortam değişkenleri: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (yalnızca `sb_publishable_…`; gizli anahtar
   konursa site "kurulum gerekli" gösterir), `NEXT_PUBLIC_LEGAL_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL` (yasal sayfalar için gerekli), isteğe bağlı `NEXT_PUBLIC_PLAY_STORE_URL`.

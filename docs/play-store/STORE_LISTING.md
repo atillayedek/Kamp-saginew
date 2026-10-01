@@ -1,7 +1,7 @@
 # Google Play — mağaza kaydı ve Uygulama içeriği yanıtları
 
 Bu dosyadaki metinler Play Console'a olduğu gibi yapıştırılmak içindir. `<SİTE>` = yayındaki web adresi
-(şu an `https://kampusagi-nine.vercel.app`; kendi alan adın olursa onu kullan).
+(`https://kampusagi.tsdmrdigitalstudio.com.tr`).
 
 ## 1. Ana mağaza kaydı (Büyüme → Mağaza varlığı → Ana mağaza kaydı)
 
@@ -60,7 +60,7 @@ Kullanım koşulları: <SİTE>/kullanim-kosullari
   ders notları, ihtiyaç eşleştirme, profil/rozetler, Premium. Kişisel veri görünen ekranlarda test hesabı kullan.
 
 **Kategori:** Sosyal · **Etiketler:** Topluluk, Eğitim
-**İletişim:** e-posta (zorunlu) = Vercel'deki `NEXT_PUBLIC_CONTACT_EMAIL` ile aynı adres; web sitesi `<SİTE>`.
+**İletişim:** e-posta `iletisim@tsdmrdigitalstudio.com.tr`; web sitesi `<SİTE>`.
 
 ## 2. Uygulama içeriği (Politika → Uygulama içeriği)
 
