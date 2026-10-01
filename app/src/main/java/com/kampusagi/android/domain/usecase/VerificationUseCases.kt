@@ -2,7 +2,6 @@ package com.kampusagi.android.domain.usecase
 
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
-import com.kampusagi.android.domain.repository.AdminRepository
 import com.kampusagi.android.domain.repository.DocumentReader
 import com.kampusagi.android.domain.repository.VerificationRepository
 import javax.inject.Inject
@@ -42,20 +41,5 @@ class SubmitStudentDocumentUseCase @Inject constructor(
         }
         StudentDocumentValidator.check(bytes)?.let { return AppResult.Failure(it) }
         return verificationRepository.submitDocument(bytes)
-    }
-}
-
-object RejectionReasonValidator {
-    val LENGTH = 3..500
-
-    fun isValid(reason: String): Boolean = reason.trim().length in LENGTH
-}
-
-class ReviewVerificationUseCase @Inject constructor(private val adminRepository: AdminRepository) {
-    suspend operator fun invoke(verificationId: String, approve: Boolean, reason: String): AppResult<Unit> {
-        if (!approve && !RejectionReasonValidator.isValid(reason)) {
-            return AppResult.Failure(AppError.REJECTION_REASON_REQUIRED)
-        }
-        return adminRepository.review(verificationId, approve, if (approve) null else reason.trim())
     }
 }

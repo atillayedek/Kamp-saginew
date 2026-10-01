@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.presentation.common.rememberPersonalDataGuard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -82,6 +83,7 @@ fun CreatePostScreen(
     modifier: Modifier = Modifier,
     viewModel: CreatePostViewModel = hiltViewModel(),
 ) {
+    val personalData = rememberPersonalDataGuard()
     LaunchedEffect(viewModel.createdIn) { viewModel.createdIn?.let(onCreated) }
     val enabled = !viewModel.isSubmitting
     val pickPhotos = rememberLauncherForActivityResult(
@@ -180,7 +182,7 @@ fun CreatePostScreen(
             }
             PrimaryButton(
                 text = stringResource(R.string.action_share),
-                onClick = viewModel::submit,
+                onClick = { personalData.send(viewModel.body, viewModel::submit) },
                 enabled = viewModel.canSubmit,
                 loading = viewModel.isSubmitting,
             )

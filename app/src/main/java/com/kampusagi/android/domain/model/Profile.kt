@@ -22,6 +22,8 @@ data class Profile(
     val bio: String? = null,
     /** Path in the private `avatars` bucket; null shows the initials avatar. */
     val avatarPath: String? = null,
+    /** Whether other students see the surname; off by default ("Ayşe Y."). */
+    val showFullName: Boolean = false,
 )
 
 data class ProfileStats(

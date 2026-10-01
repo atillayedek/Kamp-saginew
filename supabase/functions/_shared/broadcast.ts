@@ -2,6 +2,7 @@
 // unsubscribe links that marketing mail carries. Pure logic; `fetchFn` and
 // `sleep` are injectable for tests.
 
+import { redact } from "./http.ts";
 type Fetch = typeof fetch;
 
 export const AUDIENCES = ["ALL", "APPROVED", "PENDING_REVIEW", "DOCUMENT_REQUIRED", "PREMIUM"] as const;
@@ -158,7 +159,7 @@ export async function sendBatches(
         sent += batch.length;
       } else {
         const detail = await response.text();
-        onError(`Resend batch ${i + 1}/${batches.length} returned HTTP ${response.status}: ${detail.slice(0, 300)}`);
+        onError(`Resend batch ${i + 1}/${batches.length} returned HTTP ${response.status}: ${redact(detail.slice(0, 300))}`);
         failed += batch.length;
       }
     } catch (error) {

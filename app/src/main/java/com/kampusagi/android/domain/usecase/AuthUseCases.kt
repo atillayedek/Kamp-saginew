@@ -1,11 +1,31 @@
 package com.kampusagi.android.domain.usecase
 
 import com.kampusagi.android.domain.model.AppResult
+import com.kampusagi.android.domain.model.SignUpConsents
 import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.repository.AuthRepository
+import java.time.LocalDate
+import java.time.Period
 import javax.inject.Inject
 
-enum class AuthInputError { EMAIL_INVALID, PASSWORD_REQUIRED, PASSWORD_TOO_SHORT, PASSWORDS_DO_NOT_MATCH }
+enum class AuthInputError {
+    EMAIL_INVALID,
+    PASSWORD_REQUIRED,
+    PASSWORD_TOO_SHORT,
+    PASSWORDS_DO_NOT_MATCH,
+    BIRTH_DATE_REQUIRED,
+    UNDERAGE,
+    NOTICE_NOT_READ,
+    TERMS_NOT_ACCEPTED,
+}
+
+/** The minimum age comes from the compliance settings; the birth date is not stored. */
+object AgePolicy {
+    fun age(birthDate: LocalDate, today: LocalDate): Int = Period.between(birthDate, today).years
+
+    fun isOldEnough(birthDate: LocalDate, today: LocalDate, minAge: Int): Boolean =
+        !birthDate.isAfter(today) && age(birthDate, today) >= minAge
+}
 
 /**
  * Client-side checks that give instant feedback. Supabase Auth enforces its
@@ -47,15 +67,34 @@ class SignInUseCase @Inject constructor(private val authRepository: AuthReposito
     }
 }
 
+/** What the sign-up form collected besides e-mail and password. */
+data class SignUpForm(
+    val birthDate: LocalDate?,
+    val minAge: Int,
+    val today: LocalDate,
+    /** The privacy notice (aydınlatma) was shown and marked as read. */
+    val noticeRead: Boolean,
+    /** Terms of use and community rules accepted (never pre-ticked). */
+    val termsAccepted: Boolean,
+    val consents: (birthDate: LocalDate) -> SignUpConsents,
+)
+
 class SignUpUseCase @Inject constructor(private val authRepository: AuthRepository) {
     suspend operator fun invoke(
         email: String,
         password: String,
         confirmation: String,
+        form: SignUpForm,
     ): FormResult<SignUpResult, AuthInputError> {
-        val errors = AuthInputValidator.validateSignUp(email, password, confirmation)
+        val errors = AuthInputValidator.validateSignUp(email, password, confirmation).toMutableSet()
+        when {
+            form.birthDate == null -> errors += AuthInputError.BIRTH_DATE_REQUIRED
+            !AgePolicy.isOldEnough(form.birthDate, form.today, form.minAge) -> errors += AuthInputError.UNDERAGE
+        }
+        if (!form.noticeRead) errors += AuthInputError.NOTICE_NOT_READ
+        if (!form.termsAccepted) errors += AuthInputError.TERMS_NOT_ACCEPTED
         if (errors.isNotEmpty()) return FormResult.Invalid(errors)
-        return authRepository.signUp(email, password).toFormResult()
+        return authRepository.signUp(email, password, form.consents(form.birthDate!!)).toFormResult()
     }
 }
 

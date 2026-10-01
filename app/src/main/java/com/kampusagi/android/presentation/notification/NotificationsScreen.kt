@@ -120,5 +120,9 @@ private fun AppNotification.text(): String {
         NotificationKind.NEW_COMMENT -> stringResource(R.string.notification_new_comment, who)
         NotificationKind.VERIFICATION_APPROVED -> stringResource(R.string.notification_verification_approved)
         NotificationKind.VERIFICATION_REJECTED -> stringResource(R.string.notification_verification_rejected)
+        NotificationKind.CONTENT_REMOVED -> stringResource(R.string.notification_content_removed)
+        NotificationKind.ACCOUNT_SUSPENDED -> stringResource(R.string.notification_account_suspended)
+        NotificationKind.APPEAL_DECIDED -> stringResource(R.string.notification_appeal_decided)
+        NotificationKind.DSR_ANSWERED -> stringResource(R.string.notification_dsr_answered)
     }
 }

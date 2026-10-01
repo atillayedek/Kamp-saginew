@@ -71,6 +71,12 @@ fun AccountStatusScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            // KVKK: purpose, who sees it and how long it is kept, before anything is uploaded.
+            Text(
+                viewModel.uploadNotice ?: stringResource(R.string.document_upload_notice_fallback),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             PrimaryButton(
                 text = stringResource(R.string.action_upload_document),
                 onClick = { picker.launch(arrayOf(PDF_MIME_TYPE)) },

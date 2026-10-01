@@ -2,12 +2,9 @@ package com.kampusagi.android.domain.usecase
 
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
-import com.kampusagi.android.domain.model.PendingVerification
 import com.kampusagi.android.domain.model.Verification
-import com.kampusagi.android.domain.repository.AdminRepository
 import com.kampusagi.android.domain.repository.DocumentReader
 import com.kampusagi.android.domain.repository.VerificationRepository
-import java.io.File
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -55,14 +52,6 @@ private class RecordingVerificationRepository : VerificationRepository {
     override suspend fun latestVerification(): AppResult<Verification?> = AppResult.Success(null)
 }
 
-private class RecordingAdminRepository : AdminRepository {
-    var lastReview: Triple<String, Boolean, String?>? = null
-    override suspend fun pendingVerifications(): AppResult<List<PendingVerification>> = AppResult.Success(emptyList())
-    override suspend fun downloadDocument(path: String): AppResult<File> = AppResult.Failure(AppError.NOT_FOUND)
-    override suspend fun review(verificationId: String, approve: Boolean, reason: String?): AppResult<Unit> =
-        AppResult.Success(Unit).also { lastReview = Triple(verificationId, approve, reason) }
-}
-
 class VerificationUseCasesTest {
 
     @Test
@@ -88,18 +77,6 @@ class VerificationUseCasesTest {
         val result = SubmitStudentDocumentUseCase(ScriptedReader(AppResult.Failure(AppError.DOCUMENT_UNREADABLE)), repository)("content://doc")
         assertEquals(AppResult.Failure(AppError.DOCUMENT_UNREADABLE), result)
         assertNull(repository.submitted)
-    }
-
-    @Test
-    fun `rejection needs a reason, approval sends none`() = runTest {
-        val repository = RecordingAdminRepository()
-        val useCase = ReviewVerificationUseCase(repository)
-        assertEquals(AppResult.Failure(AppError.REJECTION_REASON_REQUIRED), useCase("v1", approve = false, reason = "  x "))
-        assertNull(repository.lastReview)
-        useCase("v1", approve = false, reason = "  Belge okunmuyor ")
-        assertEquals(Triple("v1", false, "Belge okunmuyor"), repository.lastReview)
-        useCase("v2", approve = true, reason = "ignored")
-        assertEquals(Triple("v2", true, null), repository.lastReview)
     }
 }
 

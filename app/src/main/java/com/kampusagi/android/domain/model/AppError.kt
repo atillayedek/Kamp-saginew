@@ -48,6 +48,11 @@ enum class AppError {
     GROUP_FULL,
     OWNER_CANNOT_LEAVE,
     GROUP_NOT_ALLOWED,
+    /** A requirement tag names a special category of personal data (religion, health…; KVKK md.6). */
+    SENSITIVE_TAG,
+    /** A course note needs the uploader's rights declaration (FSEK). */
+    RIGHTS_DECLARATION_REQUIRED,
+    APPEAL_EXISTS,
     NOT_FOUND,
     SERVER,
     UNKNOWN,

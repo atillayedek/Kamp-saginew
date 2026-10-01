@@ -123,6 +123,7 @@ class ProfileRepositoryImpl @Inject constructor(
             ?: throw UnknownStatusException(accountStatus),
         bio = bio,
         avatarPath = avatarPath,
+        showFullName = showFullName,
     )
 
     private companion object {

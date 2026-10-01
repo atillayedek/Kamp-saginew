@@ -1,5 +1,14 @@
 package com.kampusagi.android.presentation.premium
 
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.Checkbox
+import androidx.compose.foundation.layout.Row
+import android.util.Log
+import android.net.Uri
+import android.content.Intent
+import android.content.ActivityNotFoundException
 import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +43,7 @@ import com.kampusagi.android.presentation.requirement.formatStartsAt
 @Composable
 fun PremiumScreen(
     onBack: () -> Unit,
+    onOpenLegal: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PremiumViewModel = hiltViewModel(),
 ) {
@@ -80,6 +90,9 @@ fun PremiumScreen(
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
+                if (state.plans.isNotEmpty() && state.storeAvailable) {
+                    PurchaseTerms(viewModel, onOpenLegal)
+                }
                 state.plans.forEach { item ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
@@ -96,7 +109,7 @@ fun PremiumScreen(
                                 PrimaryButton(
                                     text = stringResource(if (current) R.string.premium_current_plan else R.string.action_subscribe),
                                     onClick = { activity?.let { viewModel.buy(it, item.plan) } },
-                                    enabled = !current && activity != null,
+                                    enabled = !current && activity != null && viewModel.canBuy,
                                     loading = viewModel.isWorking,
                                 )
                             } else if (state.storeAvailable) {
@@ -111,6 +124,7 @@ fun PremiumScreen(
                 }
                 if (state.plans.isNotEmpty()) {
                     LinkButton(stringResource(R.string.action_restore_purchases), viewModel::restore, enabled = !viewModel.isWorking)
+                    ManageSubscriptionLink(state.subscription.productId)
                     Text(
                         stringResource(R.string.premium_legal_note),
                         style = MaterialTheme.typography.bodySmall,
@@ -191,4 +205,43 @@ private fun PremiumMessage.textRes(): Int = when (this) {
     PremiumMessage.PURCHASE_PENDING -> R.string.premium_pending
     PremiumMessage.NOTHING_TO_RESTORE -> R.string.premium_nothing_to_restore
     PremiumMessage.PROMO_REDEEMED -> R.string.premium_promo_redeemed
+}
+
+/** 6502 / Mesafeli Sözleşmeler Yönetmeliği: both boxes before buying; nothing is pre-ticked. */
+@Composable
+private fun PurchaseTerms(viewModel: PremiumViewModel, onOpenLegal: (String) -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Text(stringResource(R.string.premium_pre_info_title), style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.premium_pre_info_summary), style = MaterialTheme.typography.bodySmall)
+            viewModel.purchaseDocuments.forEach { doc ->
+                LinkButton(doc.title, { onOpenLegal(doc.docType) })
+            }
+            Row(verticalAlignment = Alignment.Top) {
+                Checkbox(checked = viewModel.contractAccepted, onCheckedChange = viewModel::onContractAcceptedChange)
+                Text(stringResource(R.string.premium_accept_contract), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 12.dp))
+            }
+            Row(verticalAlignment = Alignment.Top) {
+                Checkbox(checked = viewModel.withdrawalWaived, onCheckedChange = viewModel::onWithdrawalWaivedChange)
+                Text(stringResource(R.string.premium_waive_withdrawal), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 12.dp))
+            }
+        }
+    }
+}
+
+/** Google Play's own subscription page, where the subscription is cancelled. */
+@Composable
+private fun ManageSubscriptionLink(productId: String?) {
+    val context = LocalContext.current
+    LinkButton(stringResource(R.string.premium_manage_subscription), {
+        val url = buildString {
+            append("https://play.google.com/store/account/subscriptions?package=").append(context.packageName)
+            if (productId != null) append("&sku=").append(productId)
+        }
+        try {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: ActivityNotFoundException) {
+            Log.w("Premium", "No app to manage subscriptions", e)
+        }
+    })
 }

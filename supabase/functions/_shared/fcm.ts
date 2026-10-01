@@ -21,6 +21,11 @@ export interface PushMessage {
   data: Record<string, string>;
 }
 
+/** Android notification channel: transactional by default, campaigns on the marketing channel. */
+export function channelId(data: Record<string, string>): string {
+  return data.channel === "marketing" ? "kampusagi_marketing" : "kampusagi_default";
+}
+
 export async function sendToDevice(
   fetchFn: Fetch,
   projectId: string,
@@ -38,8 +43,9 @@ export async function sendToDevice(
         data: message.data,
         android: {
           priority: "HIGH",
-          // Matches the intent filter on MainActivity: a tap opens the notification list.
-          notification: { channel_id: "kampusagi_default", click_action: OPEN_NOTIFICATIONS_ACTION },
+          // Matches the intent filter on MainActivity: a tap opens the notification list. Campaigns use
+          // their own channel so people can silence them separately (6563).
+          notification: { channel_id: channelId(message.data), click_action: OPEN_NOTIFICATIONS_ACTION },
         },
       },
     }),

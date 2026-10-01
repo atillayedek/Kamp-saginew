@@ -1,5 +1,17 @@
 package com.kampusagi.android.domain.repository
 
+import com.kampusagi.android.domain.model.AccessLogEntry
+import com.kampusagi.android.domain.model.AccountGateState
+import com.kampusagi.android.domain.model.ComplianceConfig
+import com.kampusagi.android.domain.model.ConsentEvent
+import com.kampusagi.android.domain.model.ConsentStatus
+import com.kampusagi.android.domain.model.DataExport
+import com.kampusagi.android.domain.model.DataRequestType
+import com.kampusagi.android.domain.model.DataSubjectRequest
+import com.kampusagi.android.domain.model.LegalDocument
+import com.kampusagi.android.domain.model.LegalDocumentInfo
+import com.kampusagi.android.domain.model.ModerationDecision
+import com.kampusagi.android.domain.model.SignUpConsents
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.Announcement
 import com.kampusagi.android.domain.model.AuthRedirectResult
@@ -16,8 +28,6 @@ import com.kampusagi.android.domain.model.NewPost
 import com.kampusagi.android.domain.model.PersonSummary
 import com.kampusagi.android.domain.model.Poll
 import com.kampusagi.android.domain.model.AppNotification
-import com.kampusagi.android.domain.model.OpenReport
-import com.kampusagi.android.domain.model.PendingVerification
 import com.kampusagi.android.domain.model.Plan
 import com.kampusagi.android.domain.model.StoreOffer
 import com.kampusagi.android.domain.model.StorePurchase
@@ -30,7 +40,6 @@ import com.kampusagi.android.domain.model.ProfileStats
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.model.Requirement
 import com.kampusagi.android.domain.model.RequirementDraft
-import com.kampusagi.android.domain.model.ReportAction
 import com.kampusagi.android.domain.model.ReportReason
 import com.kampusagi.android.domain.model.ReportTarget
 import com.kampusagi.android.domain.model.SignUpResult
@@ -58,7 +67,7 @@ interface AuthRepository {
     val isBackendConfigured: Boolean
 
     suspend fun signIn(email: String, password: String): AppResult<Unit>
-    suspend fun signUp(email: String, password: String): AppResult<SignUpResult>
+    suspend fun signUp(email: String, password: String, consents: SignUpConsents): AppResult<SignUpResult>
     suspend fun resendVerificationEmail(email: String): AppResult<Unit>
     suspend fun sendPasswordReset(email: String): AppResult<Unit>
     suspend fun updatePassword(newPassword: String): AppResult<Unit>
@@ -117,15 +126,6 @@ interface ImageEncoder {
 
 interface DocumentReader {
     suspend fun read(uri: String, maxBytes: Int): AppResult<ByteArray>
-}
-
-interface AdminRepository {
-    suspend fun pendingVerifications(): AppResult<List<PendingVerification>>
-
-    /** Downloads the document into the app's private cache for viewing. */
-    suspend fun downloadDocument(path: String): AppResult<File>
-
-    suspend fun review(verificationId: String, approve: Boolean, reason: String?): AppResult<Unit>
 }
 
 interface CommunityRepository {
@@ -254,19 +254,52 @@ interface ModerationRepository {
 
     /** The other member of a conversation, for blocking or reporting them from the chat. */
     suspend fun conversationPartner(conversationId: String): AppResult<String>
-
-    suspend fun openReports(): AppResult<List<OpenReport>>
-    suspend fun resolve(reportId: String, action: ReportAction): AppResult<Unit>
 }
 
 interface AccountRepository {
-    /** Permanently deletes the signed-in account on the server, then ends the local session. */
-    suspend fun deleteAccount(): AppResult<Unit>
+    /**
+     * Schedules the deletion of the signed-in account after the grace period (the person can sign in
+     * and cancel until then). Returns when the account will be deleted (ISO time).
+     */
+    suspend fun deleteAccount(): AppResult<String>
+}
 
-    /** Whether the signed-in person agreed to receive marketing e-mail. */
-    suspend fun marketingConsent(): AppResult<Boolean>
+/** KVKK: legal texts, consents, data subject rights, access records, moderation decisions. */
+interface ComplianceRepository {
+    /** What must happen before the app can be used; null while signed out. */
+    val accountGate: StateFlow<AccountGateState?>
+    suspend fun refreshAccountGate()
+    fun clearAccountGate()
 
-    suspend fun setMarketingConsent(optIn: Boolean): AppResult<Unit>
+    suspend fun config(): AppResult<ComplianceConfig>
+    suspend fun legalDocuments(): AppResult<List<LegalDocumentInfo>>
+    suspend fun legalDocument(docType: String, version: Int? = null): AppResult<LegalDocument>
+
+    /** Records "accepted" for agreements and purchase texts, "read" for notices. */
+    suspend fun acknowledge(document: LegalDocumentInfo, channel: String): AppResult<Unit>
+
+    suspend fun consents(): AppResult<List<ConsentStatus>>
+    suspend fun setConsent(docType: String, granted: Boolean): AppResult<Unit>
+    suspend fun consentHistory(): AppResult<List<ConsentEvent>>
+
+    suspend fun logSignIn(): AppResult<Unit>
+    suspend fun logSignOut(): AppResult<Unit>
+    suspend fun logFailedSignIn(email: String): AppResult<Unit>
+    suspend fun accessLogs(): AppResult<List<AccessLogEntry>>
+
+    /** Returns the request number (KVKK-yyyy-nnnnnn). */
+    suspend fun submitRequest(type: DataRequestType, details: String): AppResult<String>
+    suspend fun myRequests(): AppResult<List<DataSubjectRequest>>
+    suspend fun exportMyData(): AppResult<DataExport>
+    suspend fun cancelDeletion(): AppResult<Unit>
+    suspend fun setShowFullName(show: Boolean): AppResult<Unit>
+
+    suspend fun moderationDecisions(): AppResult<List<ModerationDecision>>
+    suspend fun appeal(reportId: String, body: String): AppResult<Unit>
+    suspend fun objectToMatch(requirementId: String, matchedRequirementId: String, reason: String?): AppResult<Unit>
+
+    /** Words naming special categories of personal data (KVKK md.6); used for warnings. */
+    suspend fun sensitiveTerms(): AppResult<List<String>>
 }
 
 /** Channels (Premium) and study groups. */

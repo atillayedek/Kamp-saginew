@@ -53,3 +53,15 @@ class ModerationErrorMappingTest {
         assertEquals(AppError.SERVER, functionError(500, """{"error":"account_deletion_failed"}"""))
     }
 }
+
+class ComplianceErrorMappingTest {
+    @Test
+    fun `maps KVKK codes`() {
+        assertEquals(AppError.SENSITIVE_TAG, functionError(400, """{"message":"sensitive_tag"}"""))
+        assertEquals(AppError.RIGHTS_DECLARATION_REQUIRED, functionError(400, """{"error":"rights_declaration_required"}"""))
+        assertEquals(AppError.APPEAL_EXISTS, functionError(400, """{"message":"appeal_exists"}"""))
+        assertEquals(AppError.INVALID_INPUT, functionError(400, """{"message":"invalid_appeal"}"""))
+        assertEquals(AppError.NOT_FOUND, functionError(400, """{"message":"legal_document_not_found"}"""))
+        assertEquals(AppError.RATE_LIMITED, functionError(429, """{"error":"rate_limited"}"""))
+    }
+}

@@ -50,7 +50,8 @@ class KampusAgiMessagingService : FirebaseMessagingService() {
             .setAction(AppConfig.ACTION_OPEN_NOTIFICATIONS)
             .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pending = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        val built = NotificationCompat.Builder(this, AppConfig.NOTIFICATION_CHANNEL_ID)
+        val channel = if (message.data["channel"] == "marketing") AppConfig.MARKETING_CHANNEL_ID else AppConfig.NOTIFICATION_CHANNEL_ID
+        val built = NotificationCompat.Builder(this, channel)
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
             .setContentTitle(notification.title)
             .setContentText(notification.body)

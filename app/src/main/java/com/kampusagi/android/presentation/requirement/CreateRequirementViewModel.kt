@@ -1,11 +1,13 @@
 package com.kampusagi.android.presentation.requirement
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kampusagi.android.domain.model.AppError
+import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.RequirementCategory
 import com.kampusagi.android.domain.model.RequirementDraft
 import com.kampusagi.android.domain.usecase.CreateRequirementUseCase
@@ -13,6 +15,8 @@ import com.kampusagi.android.domain.usecase.DraftInputError
 import com.kampusagi.android.domain.usecase.FormResult
 import com.kampusagi.android.domain.usecase.RequirementTags
 import com.kampusagi.android.domain.usecase.RequirementValidator
+import com.kampusagi.android.domain.usecase.TurkishFold
+import com.kampusagi.android.domain.repository.ComplianceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -25,7 +29,24 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class CreateRequirementViewModel @Inject constructor(
     private val createRequirement: CreateRequirementUseCase,
+    private val compliance: ComplianceRepository,
 ) : ViewModel() {
+
+    /** KVKK md.6 words (religion, ethnicity, health…); tags with them are refused, free text is only warned. */
+    private var sensitiveTerms by mutableStateOf<List<String>>(emptyList())
+
+    init {
+        viewModelScope.launch {
+            when (val terms = compliance.sensitiveTerms()) {
+                is AppResult.Success -> sensitiveTerms = terms.value
+                is AppResult.Failure -> Log.w("CreateRequirement", "Sensitive terms not loaded: ${terms.error}")
+            }
+        }
+    }
+
+    /** Special-category words found in what the person wrote; shown as a warning, never blocked. */
+    val sensitiveMatches: List<String>
+        get() = TurkishFold.matches(listOf(title, description, location, tags.joinToString(" ")).joinToString(" "), sensitiveTerms)
 
     var category by mutableStateOf<RequirementCategory?>(null)
         private set

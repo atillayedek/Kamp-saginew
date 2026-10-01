@@ -208,6 +208,13 @@ fun CreateRequirementScreen(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+            if (viewModel.sensitiveMatches.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.requirement_sensitive_warning, viewModel.sensitiveMatches.joinToString(", ")),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             viewModel.error?.let { error ->
                 Text(stringResource(error.messageRes()), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
             }

@@ -21,7 +21,18 @@ data class ChatMessage(
 data class MessageCursor(val createdAt: String, val id: String)
 
 /** Mirrors `public.notification_kind`. */
-enum class NotificationKind { NEW_MESSAGE, NEW_COMMENT, VERIFICATION_APPROVED, VERIFICATION_REJECTED }
+enum class NotificationKind {
+    NEW_MESSAGE,
+    NEW_COMMENT,
+    VERIFICATION_APPROVED,
+    VERIFICATION_REJECTED,
+    /** A moderator removed the person's content; the reason and the appeal are in Privacy → decisions. */
+    CONTENT_REMOVED,
+    ACCOUNT_SUSPENDED,
+    APPEAL_DECIDED,
+    /** A KVKK application was answered; the answer is in Privacy → requests. */
+    DSR_ANSWERED,
+}
 
 data class AppNotification(
     val id: String,

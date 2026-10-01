@@ -77,10 +77,10 @@ class AvatarLoader @Inject constructor(
                     val bitmap = withContext(Dispatchers.Default) {
                         BitmapFactory.decodeByteArray(bytes.value, 0, bytes.value.size)?.asImageBitmap()
                     }
-                    if (bitmap != null) images[userId] = bitmap else Log.w(TAG, "Avatar $path is not a valid image")
+                    if (bitmap != null) images[userId] = bitmap else Log.w(TAG, "An avatar is not a valid image")
                 }
                 is AppResult.Failure -> {
-                    Log.w(TAG, "Avatar $path could not be downloaded: ${bytes.error}")
+                    Log.w(TAG, "Avatar could not be downloaded: ${bytes.error}")
                     requested.remove(userId)
                 }
             }

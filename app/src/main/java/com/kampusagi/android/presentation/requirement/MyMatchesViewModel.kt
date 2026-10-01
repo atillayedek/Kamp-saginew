@@ -9,6 +9,7 @@ import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.repository.ChatRepository
+import com.kampusagi.android.domain.repository.ComplianceRepository
 import com.kampusagi.android.domain.usecase.MatchGroup
 import com.kampusagi.android.domain.usecase.MyMatchesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ sealed interface MyMatchesState {
 class MyMatchesViewModel @Inject constructor(
     private val myMatches: MyMatchesUseCase,
     private val chatRepository: ChatRepository,
+    private val compliance: ComplianceRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf<MyMatchesState>(MyMatchesState.Loading)
@@ -45,6 +47,24 @@ class MyMatchesViewModel @Inject constructor(
 
     init {
         load()
+    }
+
+    /** KVKK md.11/1-g: objection to an automatically suggested match; it is not shown again. */
+    fun objectTo(requirementId: String, match: Match, reason: String?) {
+        chatError = null
+        viewModelScope.launch {
+            when (val result = compliance.objectToMatch(requirementId, match.requirementId, reason)) {
+                is AppResult.Success -> (state as? MyMatchesState.Loaded)?.let { loaded ->
+                    state = MyMatchesState.Loaded(
+                        loaded.groups.map { group ->
+                            if (group.requirement.id != requirementId) group
+                            else group.copy(matches = group.matches.filterNot { it.requirementId == match.requirementId })
+                        },
+                    )
+                }
+                is AppResult.Failure -> chatError = result.error
+            }
+        }
     }
 
     fun load() {

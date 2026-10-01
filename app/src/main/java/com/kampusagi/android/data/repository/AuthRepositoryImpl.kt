@@ -2,6 +2,7 @@ package com.kampusagi.android.data.repository
 
 import android.net.Uri
 import android.util.Log
+import com.kampusagi.android.BuildConfig
 import com.kampusagi.android.core.config.AppConfig
 import com.kampusagi.android.core.di.ApplicationScope
 import com.kampusagi.android.data.remote.SupabaseProvider
@@ -11,6 +12,7 @@ import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.AuthRedirectResult
 import com.kampusagi.android.domain.model.AuthState
+import com.kampusagi.android.domain.model.SignUpConsents
 import com.kampusagi.android.domain.model.SignUpResult
 import com.kampusagi.android.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
@@ -33,7 +35,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.put
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
@@ -76,10 +80,39 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signUp(email: String, password: String): AppResult<SignUpResult> = call { client ->
+    /**
+     * The sign-up form's answers travel in the user metadata: the database checks the age and records
+     * every acceptance, notice and optional consent in consent_logs in the same transaction as the
+     * account (kvkk_before_signup), and drops the birth date.
+     */
+    override suspend fun signUp(email: String, password: String, consents: SignUpConsents): AppResult<SignUpResult> = call { client ->
         client.auth.signUpWith(Email, redirectUrl = AppConfig.AUTH_REDIRECT_URL) {
             this.email = email.normalizedEmail()
             this.password = password
+            data = buildJsonObject {
+                put(
+                    "kvkk",
+                    buildJsonObject {
+                        put("birth_date", consents.birthDate.toString())
+                        put("accepted", buildJsonObject { consents.accepted.forEach { (type, version) -> put(type, version) } })
+                        put("informed", buildJsonObject { consents.informed.forEach { (type, version) -> put(type, version) } })
+                        put(
+                            "consents",
+                            buildJsonObject {
+                                consents.consents.forEach { (type, choice) ->
+                                    put(type, buildJsonObject {
+                                        put("version", choice.first)
+                                        put("granted", choice.second)
+                                    })
+                                }
+                            },
+                        )
+                        put("app_version", BuildConfig.VERSION_NAME)
+                        put("platform", "android")
+                        put("user_agent", "KampusAgi/${BuildConfig.VERSION_NAME} (${ComplianceRepositoryImpl.deviceInfo()})")
+                    },
+                )
+            }
         }
         if (client.auth.currentSessionOrNull() != null) SignUpResult.SIGNED_IN else SignUpResult.VERIFICATION_REQUIRED
     }

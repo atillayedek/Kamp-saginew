@@ -117,6 +117,10 @@ class BackgroundNotifier @Inject constructor(
             NotificationKind.NEW_COMMENT -> context.getString(R.string.notification_new_comment, who)
             NotificationKind.VERIFICATION_APPROVED -> context.getString(R.string.notification_verification_approved)
             NotificationKind.VERIFICATION_REJECTED -> context.getString(R.string.notification_verification_rejected)
+            NotificationKind.CONTENT_REMOVED -> context.getString(R.string.notification_content_removed)
+            NotificationKind.ACCOUNT_SUSPENDED -> context.getString(R.string.notification_account_suspended)
+            NotificationKind.APPEAL_DECIDED -> context.getString(R.string.notification_appeal_decided)
+            NotificationKind.DSR_ANSWERED -> context.getString(R.string.notification_dsr_answered)
         }
     }
 

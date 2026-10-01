@@ -85,7 +85,7 @@ fun ReportDialog(
             ) {
                 Text(stringResource(R.string.report_body), style = MaterialTheme.typography.bodyMedium)
                 Column(Modifier.selectableGroup()) {
-                    ReportReason.entries.forEach { option ->
+                    ReportReason.entries.filter { it != ReportReason.INAPPROPRIATE }.forEach { option ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -133,6 +133,11 @@ fun ReportReason.labelRes(): Int = when (this) {
     ReportReason.HARASSMENT -> R.string.report_reason_harassment
     ReportReason.INAPPROPRIATE -> R.string.report_reason_inappropriate
     ReportReason.FAKE_PROFILE -> R.string.report_reason_fake_profile
+    ReportReason.HATE_SPEECH -> R.string.report_reason_hate_speech
+    ReportReason.PERSONAL_DATA_LEAK -> R.string.report_reason_personal_data
+    ReportReason.PERSONALITY_RIGHTS -> R.string.report_reason_personality_rights
+    ReportReason.SEXUAL_CONTENT -> R.string.report_reason_sexual
+    ReportReason.COPYRIGHT -> R.string.report_reason_copyright
     ReportReason.OTHER -> R.string.report_reason_other
 }
 

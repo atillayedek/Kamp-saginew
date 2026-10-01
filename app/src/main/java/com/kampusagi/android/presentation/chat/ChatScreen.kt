@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.chat
 
+import com.kampusagi.android.presentation.common.rememberPersonalDataGuard
 import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatViewModel = hiltViewModel(),
 ) {
+    val personalData = rememberPersonalDataGuard()
     val state = viewModel.state
     LaunchedEffect(viewModel.blocked) { if (viewModel.blocked) onBlocked() }
     Column(modifier = modifier.fillMaxSize().imePadding()) {
@@ -115,7 +117,7 @@ fun ChatScreen(
                 maxLines = 5,
                 modifier = Modifier.weight(1f),
             )
-            IconButton(onClick = viewModel::send, enabled = viewModel.draft.isNotBlank()) {
+            IconButton(onClick = { personalData.send(viewModel.draft, viewModel::send) }, enabled = viewModel.draft.isNotBlank()) {
                 Icon(AppIcons.Send, contentDescription = stringResource(R.string.action_send_message))
             }
         }

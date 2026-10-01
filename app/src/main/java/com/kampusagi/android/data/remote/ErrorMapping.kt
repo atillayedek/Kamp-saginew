@@ -113,5 +113,10 @@ private fun knownCode(text: String): AppError? = when {
     "invalid_query" in text -> AppError.INVALID_INPUT
     "poll_not_found" in text || "event_not_found" in text || "listing_not_found" in text -> AppError.NOT_FOUND
     "rate_limited" in text -> AppError.RATE_LIMITED
+    "sensitive_tag" in text -> AppError.SENSITIVE_TAG
+    "rights_declaration_required" in text -> AppError.RIGHTS_DECLARATION_REQUIRED
+    "appeal_exists" in text -> AppError.APPEAL_EXISTS
+    "invalid_appeal" in text || "invalid_channel" in text -> AppError.INVALID_INPUT
+    "legal_document_not_found" in text -> AppError.NOT_FOUND
     else -> null
 }

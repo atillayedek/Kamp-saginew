@@ -103,6 +103,7 @@ fun MyMatchesScreen(
                                     starting = viewModel.startingChatWith == match.owner.id,
                                     enabled = viewModel.startingChatWith == null,
                                     onMessage = { viewModel.startChat(match) },
+                                    onObject = { reason -> viewModel.objectTo(group.requirement.id, match, reason) },
                                 )
                             }
                         }

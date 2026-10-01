@@ -21,6 +21,9 @@ object AppConfig {
 
     const val NOTIFICATION_CHANNEL_ID = "kampusagi_default"
 
+    /** Campaigns and discounts arrive on their own channel, only with the separate consent (6563). */
+    const val MARKETING_CHANNEL_ID = "kampusagi_marketing"
+
     /** Intent action of a tapped system notification: the app opens the notification list. */
     const val ACTION_OPEN_NOTIFICATIONS = "com.kampusagi.android.OPEN_NOTIFICATIONS"
 
@@ -38,6 +41,7 @@ object AppConfig {
     const val VERIFY_PURCHASE_FUNCTION = "verify-purchase"
     const val DELETE_ACCOUNT_FUNCTION = "delete-account"
     const val SUBMIT_COURSE_NOTE_FUNCTION = "submit-course-note"
+    const val EXPORT_MY_DATA_FUNCTION = "export-my-data"
     const val DELETE_ACCOUNT_CONFIRMATION = "DELETE"
 
     /** Public privacy policy page required by Google Play; empty when the build was made without it. */
@@ -45,4 +49,7 @@ object AppConfig {
 
     /** Terms of use accepted at sign-up; empty when the build was made without the website address. */
     val termsUrl: String = BuildConfig.TERMS_URL.takeIf { it.startsWith("https://") }.orEmpty()
+
+    /** The website; staff work in its /admin panel (MFA), not in the app. Empty when not configured. */
+    val websiteUrl: String = BuildConfig.WEBSITE_URL.takeIf { it.startsWith("https://") }.orEmpty()
 }

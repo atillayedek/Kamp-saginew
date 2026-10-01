@@ -52,7 +52,7 @@ jobs:
       - name: Type check
         run: deno check supabase/functions/*/index.ts
       - name: Tests
-        run: deno test supabase/functions/
+        run: deno test --allow-read supabase/functions/
 
   web:
     name: Web (landing + admin) lint, types, tests, build

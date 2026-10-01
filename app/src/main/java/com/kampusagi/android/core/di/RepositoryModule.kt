@@ -6,8 +6,8 @@ import com.kampusagi.android.data.push.PushRepositoryImpl
 import com.kampusagi.android.data.repository.ProfileMediaRepositoryImpl
 import com.kampusagi.android.data.repository.AccountRepositoryImpl
 import com.kampusagi.android.data.repository.AnnouncementRepositoryImpl
-import com.kampusagi.android.data.repository.AdminRepositoryImpl
 import com.kampusagi.android.data.repository.AuthRepositoryImpl
+import com.kampusagi.android.data.repository.ComplianceRepositoryImpl
 import com.kampusagi.android.data.repository.ChatRepositoryImpl
 import com.kampusagi.android.data.repository.CommunityRepositoryImpl
 import com.kampusagi.android.data.repository.GroupRepositoryImpl
@@ -23,8 +23,8 @@ import com.kampusagi.android.data.repository.VerificationRepositoryImpl
 import com.kampusagi.android.domain.repository.PushRepository
 import com.kampusagi.android.domain.repository.AccountRepository
 import com.kampusagi.android.domain.repository.AnnouncementRepository
-import com.kampusagi.android.domain.repository.AdminRepository
 import com.kampusagi.android.domain.repository.AuthRepository
+import com.kampusagi.android.domain.repository.ComplianceRepository
 import com.kampusagi.android.domain.repository.ChatRepository
 import com.kampusagi.android.domain.repository.CommunityRepository
 import com.kampusagi.android.domain.repository.DocumentReader
@@ -49,12 +49,12 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
     @Binds abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+    @Binds abstract fun bindComplianceRepository(impl: ComplianceRepositoryImpl): ComplianceRepository
     @Binds abstract fun bindProfileRepository(impl: ProfileRepositoryImpl): ProfileRepository
     @Binds abstract fun bindProfileMediaRepository(impl: ProfileMediaRepositoryImpl): ProfileMediaRepository
     @Binds abstract fun bindImageEncoder(impl: ContentResolverImageEncoder): ImageEncoder
     @Binds abstract fun bindUniversityRepository(impl: UniversityRepositoryImpl): UniversityRepository
     @Binds abstract fun bindVerificationRepository(impl: VerificationRepositoryImpl): VerificationRepository
-    @Binds abstract fun bindAdminRepository(impl: AdminRepositoryImpl): AdminRepository
     @Binds abstract fun bindCommunityRepository(impl: CommunityRepositoryImpl): CommunityRepository
     @Binds abstract fun bindRequirementRepository(impl: RequirementRepositoryImpl): RequirementRepository
     @Binds abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository

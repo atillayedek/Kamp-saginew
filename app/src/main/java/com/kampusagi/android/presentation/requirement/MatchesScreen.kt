@@ -10,17 +10,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -115,6 +122,7 @@ fun MatchesScreen(
                             starting = viewModel.startingChatWith == match.owner.id,
                             enabled = viewModel.startingChatWith == null,
                             onMessage = { viewModel.startChat(match) },
+                            onObject = { reason -> viewModel.objectTo(match, reason) },
                         )
                     }
                 }
@@ -124,7 +132,15 @@ fun MatchesScreen(
 }
 
 @Composable
-internal fun MatchCard(match: Match, starting: Boolean, enabled: Boolean, onMessage: () -> Unit) {
+internal fun MatchCard(
+    match: Match,
+    starting: Boolean,
+    enabled: Boolean,
+    onMessage: () -> Unit,
+    onObject: (reason: String?) -> Unit,
+) {
+    var explaining by rememberSaveable { mutableStateOf(false) }
+    var objecting by rememberSaveable { mutableStateOf(false) }
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -171,9 +187,65 @@ internal fun MatchCard(match: Match, starting: Boolean, enabled: Boolean, onMess
             if (match.tags.isNotEmpty()) {
                 Text(match.tags.joinToString("  ") { "#$it" }, style = MaterialTheme.typography.bodySmall)
             }
-            Button(onClick = onMessage, enabled = enabled) {
-                Text(stringResource(if (starting) R.string.admin_working else R.string.action_message))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = onMessage, enabled = enabled) {
+                    Text(stringResource(if (starting) R.string.admin_working else R.string.action_message))
+                }
+                TextButton(onClick = { explaining = true }) { Text(stringResource(R.string.match_why)) }
             }
         }
     }
+    if (explaining) {
+        AlertDialog(
+            onDismissRequest = { explaining = false },
+            title = { Text(stringResource(R.string.match_why)) },
+            text = { Text(matchExplanation(match)) },
+            confirmButton = { TextButton(onClick = { explaining = false }) { Text(stringResource(R.string.action_ok)) } },
+            dismissButton = {
+                TextButton(onClick = {
+                    explaining = false
+                    objecting = true
+                }) { Text(stringResource(R.string.match_object)) }
+            },
+        )
+    }
+    if (objecting) {
+        var reason by rememberSaveable { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { objecting = false },
+            title = { Text(stringResource(R.string.match_object)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    Text(stringResource(R.string.match_object_body), style = MaterialTheme.typography.bodyMedium)
+                    OutlinedTextField(
+                        value = reason,
+                        onValueChange = { if (it.length <= 500) reason = it },
+                        label = { Text(stringResource(R.string.match_object_reason)) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    objecting = false
+                    onObject(reason.trim().ifEmpty { null })
+                }) { Text(stringResource(R.string.match_object_confirm)) }
+            },
+            dismissButton = { TextButton(onClick = { objecting = false }) { Text(stringResource(R.string.action_cancel)) } },
+        )
+    }
+}
+
+/** Why the rules suggested this match: the same inputs find_matches scores, in plain words. */
+@Composable
+private fun matchExplanation(match: Match): String = buildString {
+    append(stringResource(R.string.match_why_rules))
+    append("\n\n")
+    append(
+        if (match.sharedTags.isNotEmpty()) stringResource(R.string.match_why_tags, match.sharedTags.joinToString(", "))
+        else stringResource(R.string.match_why_words),
+    )
+    if (match.startsAt != null) append("\n").append(stringResource(R.string.match_why_time))
+    if (match.locationText != null) append("\n").append(stringResource(R.string.match_why_place))
+    append("\n\n").append(stringResource(R.string.match_why_score, match.score))
 }

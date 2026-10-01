@@ -28,3 +28,7 @@ import kotlinx.serialization.Serializable
 @Serializable data class GroupInfoRoute(val groupId: String)
 @Serializable data object NotesRoute
 @Serializable data object UploadNoteRoute
+
+/** Privacy and KVKK; [section] opens straight at decisions or requests (from a notification). */
+@Serializable data class PrivacyRoute(val section: String? = null)
+@Serializable data class LegalDocumentRoute(val docType: String)

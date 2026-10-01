@@ -2,6 +2,8 @@ package com.kampusagi.android.presentation.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kampusagi.android.domain.model.AccountGate
+import com.kampusagi.android.domain.model.AccountGateState
 import com.kampusagi.android.domain.model.AccountStatus
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
@@ -10,6 +12,7 @@ import com.kampusagi.android.domain.model.AuthState
 import com.kampusagi.android.domain.model.Profile
 import com.kampusagi.android.domain.model.ProfileState
 import com.kampusagi.android.domain.repository.AuthRepository
+import com.kampusagi.android.domain.repository.ComplianceRepository
 import com.kampusagi.android.domain.repository.ProfileRepository
 import com.kampusagi.android.domain.repository.PushRepository
 import android.util.Log
@@ -40,7 +43,12 @@ enum class RootDestination {
     PROFILE_ERROR,
     PROFILE_SETUP,
     ACCOUNT_STATUS,
-    ADMIN_REVIEW,
+    /** The KVKK checks after sign-in could not be loaded. */
+    GATE_ERROR,
+    /** The person asked for their account to be deleted; they can cancel until the date. */
+    DELETION_PENDING,
+    /** A changed agreement must be accepted (or a changed notice read) before continuing. */
+    LEGAL_UPDATE,
     MAIN,
 }
 
@@ -49,6 +57,7 @@ data class AppUiState(
     val profile: Profile? = null,
     val profileError: AppError? = null,
     val isAdmin: Boolean = false,
+    val gate: AccountGate? = null,
 ) {
     val isLoading: Boolean get() = destination == RootDestination.LOADING
 }
@@ -62,13 +71,13 @@ class RootViewModel @Inject constructor(
     private val backgroundNotifier: BackgroundNotifier,
     private val pushRepository: PushRepository,
     private val crashReporter: CrashReporter,
+    private val compliance: ComplianceRepository,
     private val avatarLoader: AvatarLoader,
     private val photoLoader: PostPhotoLoader,
 ) : ViewModel() {
 
     private val passwordRecovery = MutableStateFlow(false)
     private val editingProfile = MutableStateFlow(false)
-    private val adminOpen = MutableStateFlow(false)
 
     /** Set when the app was opened from a system notification; the main screen shows the list. */
     private val openNotifications = MutableStateFlow(false)
@@ -81,9 +90,9 @@ class RootViewModel @Inject constructor(
         profileRepository.profileState,
         passwordRecovery,
         editingProfile,
-        adminOpen,
-    ) { auth, profileState, recovering, editing, admin ->
-        resolve(auth, profileState, recovering, editing, admin)
+        compliance.accountGate,
+    ) { auth, profileState, recovering, editing, gate ->
+        resolve(auth, profileState, recovering, editing, gate)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, AppUiState())
 
     private fun resolve(
@@ -91,7 +100,7 @@ class RootViewModel @Inject constructor(
         profileState: ProfileState?,
         recovering: Boolean,
         editing: Boolean,
-        admin: Boolean,
+        gateState: AccountGateState?,
     ): AppUiState {
         if (!authRepository.isBackendConfigured) return AppUiState(RootDestination.SETUP_REQUIRED)
         return when (auth) {
@@ -99,8 +108,13 @@ class RootViewModel @Inject constructor(
             AuthState.SignedOut -> AppUiState(RootDestination.AUTH)
             is AuthState.SignedIn -> when {
                 recovering -> AppUiState(RootDestination.PASSWORD_RECOVERY)
-                // Admins do not need to be verified students to review requests.
-                admin && auth.isAdmin -> AppUiState(RootDestination.ADMIN_REVIEW, isAdmin = true)
+                gateState == null || gateState is AccountGateState.Loading -> AppUiState(RootDestination.LOADING)
+                gateState is AccountGateState.Failed ->
+                    AppUiState(RootDestination.GATE_ERROR, profileError = gateState.error, isAdmin = auth.isAdmin)
+                gateState is AccountGateState.Ready && gateState.gate.deletionScheduledFor != null ->
+                    AppUiState(RootDestination.DELETION_PENDING, gate = gateState.gate)
+                gateState is AccountGateState.Ready && gateState.gate.pending.isNotEmpty() ->
+                    AppUiState(RootDestination.LEGAL_UPDATE, gate = gateState.gate, isAdmin = auth.isAdmin)
                 profileState == null || profileState is ProfileState.Loading -> AppUiState(RootDestination.LOADING)
                 profileState is ProfileState.Failed ->
                     AppUiState(RootDestination.PROFILE_ERROR, profileError = profileState.error, isAdmin = auth.isAdmin)
@@ -130,6 +144,7 @@ class RootViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collect { userId ->
                     if (userId != null) {
+                        compliance.refreshAccountGate()
                         // With FCM the system delivers notifications even when the app is closed;
                         // the Realtime notifier is only the fallback for builds without Firebase.
                         if (pushRepository.isConfigured) {
@@ -141,6 +156,7 @@ class RootViewModel @Inject constructor(
                         // Crashes recorded earlier on this device are sent under the signed-in account.
                         crashReporter.sendPending()
                     } else {
+                        compliance.clearAccountGate()
                         backgroundNotifier.stop()
                         avatarLoader.clear()
                         photoLoader.clear()
@@ -188,22 +204,31 @@ class RootViewModel @Inject constructor(
         editingProfile.value = false
     }
 
-    fun openAdminReview() {
-        adminOpen.value = true
+    fun retryGate() {
+        viewModelScope.launch { compliance.refreshAccountGate() }
     }
 
-    fun closeAdminReview() {
-        adminOpen.value = false
+    fun cancelDeletion() {
+        viewModelScope.launch {
+            when (val result = compliance.cancelDeletion()) {
+                is AppResult.Success -> compliance.refreshAccountGate()
+                is AppResult.Failure -> messageChannel.send(
+                    if (result.error == AppError.NETWORK) AppMessage.NETWORK_ERROR else AppMessage.GENERIC_ERROR,
+                )
+            }
+        }
     }
 
     fun signOut() {
         viewModelScope.launch {
-            adminOpen.value = false
             editingProfile.value = false
             passwordRecovery.value = false
             // This device must stop receiving the account's notifications.
             val unregistered = pushRepository.unregisterCurrentDevice()
             if (unregistered is AppResult.Failure) Log.w(TAG, "Push token not removed: ${unregistered.error}")
+            // 5651: the sign-out is recorded while the session still exists.
+            val logged = compliance.logSignOut()
+            if (logged is AppResult.Failure) Log.w(TAG, "Sign-out not logged: ${logged.error}")
             if (authRepository.signOut() is AppResult.Failure) messageChannel.send(AppMessage.SIGN_OUT_FAILED)
         }
     }

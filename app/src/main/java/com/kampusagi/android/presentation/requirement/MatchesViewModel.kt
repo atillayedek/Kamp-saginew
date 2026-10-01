@@ -11,6 +11,7 @@ import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.Match
 import com.kampusagi.android.domain.repository.ChatRepository
+import com.kampusagi.android.domain.repository.ComplianceRepository
 import com.kampusagi.android.domain.repository.RequirementRepository
 import com.kampusagi.android.presentation.main.MatchesRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,7 @@ class MatchesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: RequirementRepository,
     private val chatRepository: ChatRepository,
+    private val compliance: ComplianceRepository,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<MatchesRoute>()
@@ -60,6 +62,19 @@ class MatchesViewModel @Inject constructor(
                 is AppResult.Failure -> chatError = result.error
             }
             startingChatWith = null
+        }
+    }
+
+    /** KVKK md.11/1-g: the person objects to this automatically suggested match; it is not shown again. */
+    fun objectTo(match: Match, reason: String?) {
+        chatError = null
+        viewModelScope.launch {
+            when (val result = compliance.objectToMatch(route.requirementId, match.requirementId, reason)) {
+                is AppResult.Success -> (state as? MatchesState.Loaded)?.let { loaded ->
+                    state = MatchesState.Loaded(loaded.matches.filterNot { it.requirementId == match.requirementId })
+                }
+                is AppResult.Failure -> chatError = result.error
+            }
         }
     }
 

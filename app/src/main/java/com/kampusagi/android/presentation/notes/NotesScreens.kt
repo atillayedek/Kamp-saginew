@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -389,8 +390,14 @@ class UploadNoteViewModel @Inject constructor(
     var uploaded by mutableStateOf(false)
         private set
 
+    /** "Bu içeriğin hak sahibiyim veya paylaşma iznim var…" — required, never pre-ticked. */
+    var rightsDeclared by mutableStateOf(false)
+        private set
+
+    fun onRightsDeclaredChange(value: Boolean) { rightsDeclared = value }
+
     val canSubmit: Boolean
-        get() = !isUploading && pdf != null && GroupRules.normalizeCourseCode(courseCode) != null &&
+        get() = !isUploading && rightsDeclared && pdf != null && GroupRules.normalizeCourseCode(courseCode) != null &&
             GroupRules.isValidNoteText(courseName, GroupRules.MAX_COURSE_NAME) &&
             GroupRules.isValidNoteText(title, GroupRules.MAX_NOTE_TITLE) && description.length <= GroupRules.MAX_DESCRIPTION
 
@@ -417,7 +424,7 @@ class UploadNoteViewModel @Inject constructor(
         isUploading = true
         error = null
         viewModelScope.launch {
-            when (val result = repository.upload(NewCourseNote(courseCode, courseName, title, description.ifBlank { null }, bytes))) {
+            when (val result = repository.upload(NewCourseNote(courseCode, courseName, title, description.ifBlank { null }, bytes, rightsDeclared))) {
                 is AppResult.Success -> uploaded = true
                 is AppResult.Failure -> error = result.error
             }
@@ -491,6 +498,14 @@ fun UploadNoteScreen(onBack: () -> Unit, onUploaded: () -> Unit, viewModel: Uplo
                 enabled = enabled,
                 modifier = Modifier.fillMaxWidth(),
             )
+            Row(verticalAlignment = Alignment.Top) {
+                Checkbox(checked = viewModel.rightsDeclared, onCheckedChange = viewModel::onRightsDeclaredChange, enabled = enabled)
+                Text(
+                    stringResource(R.string.notes_rights_declaration),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 12.dp),
+                )
+            }
             viewModel.error?.let { Text(stringResource(it.messageRes()), color = MaterialTheme.colorScheme.error) }
             PrimaryButton(
                 text = stringResource(R.string.notes_upload),

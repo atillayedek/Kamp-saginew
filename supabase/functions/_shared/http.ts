@@ -35,3 +35,10 @@ export function withCors(response: Response): Response {
 export function preflight(): Response {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
+
+/** Removes e-mail addresses and long digit runs (phone, identity numbers) from text before it is logged. */
+export function redact(text: string): string {
+  return text
+    .replace(/[^\s@"'<>,;]+@[^\s@"'<>,;]+\.[^\s@"'<>,;]+/g, "[e-posta]")
+    .replace(/\d{10,}/g, "[sayı]");
+}

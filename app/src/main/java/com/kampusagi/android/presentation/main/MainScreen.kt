@@ -10,7 +10,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import android.Manifest
 import android.content.pm.PackageManager
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -35,6 +38,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kampusagi.android.R
+import com.kampusagi.android.domain.model.NotificationKind
+import com.kampusagi.android.presentation.legal.LegalDocumentScreen
+import com.kampusagi.android.presentation.privacy.PrivacyScreen
+import com.kampusagi.android.presentation.privacy.PrivacySections
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -130,15 +137,31 @@ fun MainScreen(
     }
     val mediaHost = hiltViewModel<AvatarHostViewModel>()
 
-    // Android 13+ asks once for permission to show system notifications.
+    // Android 13+: the app first explains why it wants to show notifications, then asks once.
     var notificationsAllowed by remember { mutableStateOf(notificationPermissionGranted(context)) }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         notificationsAllowed = granted
     }
-    LaunchedEffect(Unit) {
-        if (!notificationsAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
+    var explainNotifications by rememberSaveable {
+        mutableStateOf(!notificationsAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+    }
+    if (explainNotifications) {
+        AlertDialog(
+            onDismissRequest = { explainNotifications = false },
+            title = { Text(stringResource(R.string.notification_permission_title)) },
+            text = { Text(stringResource(R.string.notification_permission_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    explainNotifications = false
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }) { Text(stringResource(R.string.action_allow)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { explainNotifications = false }) { Text(stringResource(R.string.action_not_now)) }
+            },
+        )
     }
     LaunchedEffect(openNotificationsRequested) {
         if (openNotificationsRequested) {
@@ -393,6 +416,10 @@ fun MainScreen(
                                 ChatRoute(notification.conversationId, notification.actorName.orEmpty()),
                             )
                             notification.postId != null -> navController.navigate(PostDetailRoute(notification.postId))
+                            notification.kind == NotificationKind.DSR_ANSWERED ->
+                                navController.navigate(PrivacyRoute(PrivacySections.REQUESTS))
+                            notification.kind in MODERATION_KINDS ->
+                                navController.navigate(PrivacyRoute(PrivacySections.DECISIONS))
                         }
                     },
                 )
@@ -415,7 +442,10 @@ fun MainScreen(
                 EditProfileScreen(profile = profile, onBack = { navController.popBackStack() })
             }
             composable<PremiumRoute> {
-                PremiumScreen(onBack = { navController.popBackStack() })
+                PremiumScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenLegal = { navController.navigate(LegalDocumentRoute(it)) },
+                )
             }
             composable<SettingsRoute> {
                 SettingsScreen(
@@ -425,7 +455,17 @@ fun MainScreen(
                         conversationsViewModel.load()
                         navController.popBackStack()
                     },
+                    onOpenPrivacy = { navController.navigate(PrivacyRoute()) },
                 )
+            }
+            composable<PrivacyRoute> {
+                PrivacyScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenLegal = { navController.navigate(LegalDocumentRoute(it)) },
+                )
+            }
+            composable<LegalDocumentRoute> {
+                LegalDocumentScreen(onBack = { navController.popBackStack() })
             }
         }
     }
@@ -445,3 +485,9 @@ private fun TabPage(title: Int, content: @Composable () -> Unit) {
 private fun notificationPermissionGranted(context: android.content.Context): Boolean =
     Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
         ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+private val MODERATION_KINDS = setOf(
+    NotificationKind.CONTENT_REMOVED,
+    NotificationKind.ACCOUNT_SUSPENDED,
+    NotificationKind.APPEAL_DECIDED,
+)

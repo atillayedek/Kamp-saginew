@@ -1,6 +1,29 @@
 package com.kampusagi.android.presentation.auth
 
 import com.kampusagi.android.core.designsystem.icon.AppIcons
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.kampusagi.android.core.designsystem.theme.Spacing
+import com.kampusagi.android.domain.model.LegalDocTypes
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +54,7 @@ import com.kampusagi.android.presentation.common.messageRes
 fun SignInScreen(
     onCreateAccount: () -> Unit,
     onForgotPassword: () -> Unit,
+    onOpenLegal: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignInViewModel = hiltViewModel(),
 ) {
@@ -62,6 +86,15 @@ fun SignInScreen(
             onClick = viewModel::submit,
             loading = state.isSubmitting,
         )
+        // 5651 / KVKK: people are told before signing in that access records are kept.
+        Column {
+            Text(
+                viewModel.loginNotice ?: stringResource(R.string.sign_in_log_notice_fallback),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            LinkButton(stringResource(R.string.privacy_notice), { onOpenLegal(LegalDocTypes.PRIVACY_NOTICE) })
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -77,6 +110,7 @@ fun SignInScreen(
 fun SignUpScreen(
     onVerificationSent: (String) -> Unit,
     onBackToSignIn: () -> Unit,
+    onOpenLegal: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = hiltViewModel(),
 ) {
@@ -124,17 +158,24 @@ fun SignUpScreen(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        TermsConsent(
-            accepted = viewModel.acceptedTerms,
-            onAcceptedChange = viewModel::onAcceptedTermsChange,
-            termsUrl = viewModel.termsUrl,
-            privacyPolicyUrl = viewModel.privacyPolicyUrl,
-            enabled = !state.isSubmitting,
-        )
+        when (val legal = viewModel.legal) {
+            SignUpLegalState.Loading -> CircularProgressIndicator(modifier = Modifier.padding(Spacing.sm))
+            is SignUpLegalState.Failed -> {
+                ErrorBanner(legal.error)
+                SecondaryButton(text = stringResource(R.string.action_retry), onClick = viewModel::loadLegal)
+            }
+            is SignUpLegalState.Ready -> SignUpLegalSection(
+                viewModel = viewModel,
+                registerNotice = legal.config.registerLogNotice,
+                minAge = legal.config.minAge,
+                onOpenLegal = onOpenLegal,
+                enabled = !state.isSubmitting,
+            )
+        }
         PrimaryButton(
             text = stringResource(R.string.action_create_account),
             onClick = viewModel::submit,
-            enabled = viewModel.acceptedTerms,
+            enabled = viewModel.legal is SignUpLegalState.Ready && viewModel.noticeRead && viewModel.termsAccepted,
             loading = state.isSubmitting,
         )
         LinkButton(stringResource(R.string.action_have_account), onBackToSignIn, enabled = !state.isSubmitting)
@@ -254,39 +295,118 @@ fun PasswordRecoveryScreen(
     }
 }
 
-/** Required before sign-up: age (18+) and acceptance of the terms and privacy policy, each openable. */
+/**
+ * KVKK sign-up section: birth date (age check only, not stored), the log notice, "I have read the
+ * privacy notice" (information, not consent), the required terms + community rules box and each
+ * optional explicit consent on its own. Nothing is pre-ticked; refusing a consent changes nothing.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun TermsConsent(
-    accepted: Boolean,
-    onAcceptedChange: (Boolean) -> Unit,
-    termsUrl: String,
-    privacyPolicyUrl: String,
+private fun SignUpLegalSection(
+    viewModel: SignUpViewModel,
+    registerNotice: String,
+    minAge: Int,
+    onOpenLegal: (String) -> Unit,
     enabled: Boolean,
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    fun open(url: String) {
-        try {
-            context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
-        } catch (e: android.content.ActivityNotFoundException) {
-            android.util.Log.w("SignUp", "No browser to open $url", e)
-        }
-    }
-    androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.Top) {
-        androidx.compose.material3.Checkbox(checked = accepted, onCheckedChange = onAcceptedChange, enabled = enabled)
-        androidx.compose.foundation.layout.Column {
+    var pickDate by rememberSaveable { mutableStateOf(false) }
+    val errors = viewModel.state.inputErrors
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        OutlinedButton(onClick = { pickDate = true }, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = stringResource(R.string.sign_up_consent),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 12.dp),
+                viewModel.birthDate?.let { stringResource(R.string.sign_up_birth_date_value, it.format(DATE_FORMAT)) }
+                    ?: stringResource(R.string.sign_up_birth_date_pick, minAge),
             )
-            androidx.compose.foundation.layout.Row {
-                if (termsUrl.isNotEmpty()) {
-                    androidx.compose.material3.TextButton(onClick = { open(termsUrl) }) { Text(stringResource(R.string.terms_of_use)) }
-                }
-                if (privacyPolicyUrl.isNotEmpty()) {
-                    androidx.compose.material3.TextButton(onClick = { open(privacyPolicyUrl) }) { Text(stringResource(R.string.privacy_policy)) }
+        }
+        errors.messageFor(AuthInputError.BIRTH_DATE_REQUIRED, AuthInputError.UNDERAGE)?.let { ErrorLine(it) }
+
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(registerNotice, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(Spacing.sm))
+        }
+
+        ConsentRow(
+            checked = viewModel.noticeRead,
+            onCheckedChange = viewModel::onNoticeReadChange,
+            text = stringResource(R.string.sign_up_notice_read),
+            enabled = enabled,
+        ) {
+            LinkButton(stringResource(R.string.privacy_notice), { onOpenLegal(LegalDocTypes.PRIVACY_NOTICE) })
+            LinkButton(stringResource(R.string.privacy_policy), { onOpenLegal(LegalDocTypes.PRIVACY_POLICY) })
+        }
+        errors.messageFor(AuthInputError.NOTICE_NOT_READ)?.let { ErrorLine(it) }
+
+        ConsentRow(
+            checked = viewModel.termsAccepted,
+            onCheckedChange = viewModel::onTermsAcceptedChange,
+            text = stringResource(R.string.sign_up_terms_accept, minAge),
+            enabled = enabled,
+        ) {
+            LinkButton(stringResource(R.string.terms_of_use), { onOpenLegal(LegalDocTypes.TERMS) })
+            LinkButton(stringResource(R.string.community_rules), { onOpenLegal(LegalDocTypes.COMMUNITY_RULES) })
+        }
+        errors.messageFor(AuthInputError.TERMS_NOT_ACCEPTED)?.let { ErrorLine(it) }
+
+        if (viewModel.consentDocuments.isNotEmpty()) {
+            Text(
+                stringResource(R.string.sign_up_optional_consents),
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(top = Spacing.sm),
+            )
+            viewModel.consentDocuments.forEach { doc ->
+                ConsentRow(
+                    checked = viewModel.optionalConsents[doc.docType] == true,
+                    onCheckedChange = { viewModel.onConsentChange(doc.docType, it) },
+                    text = doc.title,
+                    enabled = enabled,
+                ) {
+                    LinkButton(stringResource(R.string.action_read), { onOpenLegal(doc.docType) })
                 }
             }
         }
     }
+    if (pickDate) {
+        val state = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+        DatePickerDialog(
+            onDismissRequest = { pickDate = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.onBirthDateChange(
+                        state.selectedDateMillis?.let { Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate() },
+                    )
+                    pickDate = false
+                }) { Text(stringResource(R.string.action_ok)) }
+            },
+            dismissButton = { TextButton(onClick = { pickDate = false }) { Text(stringResource(R.string.action_cancel)) } },
+        ) { DatePicker(state = state) }
+    }
 }
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ConsentRow(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    text: String,
+    enabled: Boolean,
+    links: @Composable () -> Unit,
+) {
+    Row(verticalAlignment = Alignment.Top) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
+        Column {
+            Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 12.dp))
+            FlowRow { links() }
+        }
+    }
+}
+
+@Composable
+private fun ErrorLine(text: String) {
+    Text(text, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+}
+
+private val DATE_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("tr"))

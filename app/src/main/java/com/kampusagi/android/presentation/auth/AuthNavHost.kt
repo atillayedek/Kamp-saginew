@@ -6,12 +6,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.kampusagi.android.presentation.legal.LegalDocumentScreen
 import kotlinx.serialization.Serializable
 
 @Serializable private data object SignInRoute
 @Serializable private data object SignUpRoute
 @Serializable private data object ForgotPasswordRoute
 @Serializable private data class VerifyEmailRoute(val email: String)
+@Serializable private data class LegalRoute(val docType: String)
 
 @Composable
 fun AuthNavHost(modifier: Modifier = Modifier) {
@@ -21,6 +23,7 @@ fun AuthNavHost(modifier: Modifier = Modifier) {
             SignInScreen(
                 onCreateAccount = { navController.navigate(SignUpRoute) },
                 onForgotPassword = { navController.navigate(ForgotPasswordRoute) },
+                onOpenLegal = { navController.navigate(LegalRoute(it)) },
             )
         }
         composable<SignUpRoute> {
@@ -31,7 +34,11 @@ fun AuthNavHost(modifier: Modifier = Modifier) {
                     }
                 },
                 onBackToSignIn = { navController.popBackStack() },
+                onOpenLegal = { navController.navigate(LegalRoute(it)) },
             )
+        }
+        composable<LegalRoute> {
+            LegalDocumentScreen(onBack = { navController.popBackStack() })
         }
         composable<VerifyEmailRoute> { entry ->
             VerifyEmailScreen(

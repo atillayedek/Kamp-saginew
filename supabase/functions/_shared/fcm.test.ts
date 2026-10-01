@@ -1,5 +1,11 @@
 import { assertEquals } from "jsr:@std/assert@1";
-import { announcementText, pushText, safeEqual, sendToDevice, sendToDevices } from "./fcm.ts";
+import { announcementText, channelId, pushText, safeEqual, sendToDevice, sendToDevices } from "./fcm.ts";
+
+Deno.test("campaigns go to the marketing channel, everything else to the default one", () => {
+  assertEquals(channelId({ channel: "marketing" }), "kampusagi_marketing");
+  assertEquals(channelId({ channel: "service" }), "kampusagi_default");
+  assertEquals(channelId({}), "kampusagi_default");
+});
 
 /** Test double for fetch. */
 function scriptedFetch(status: number, body: string) {

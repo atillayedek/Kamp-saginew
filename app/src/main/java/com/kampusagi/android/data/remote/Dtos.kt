@@ -14,12 +14,13 @@ data class ProfileDto(
     @SerialName("account_status") val accountStatus: String,
     val bio: String? = null,
     @SerialName("avatar_path") val avatarPath: String? = null,
+    @SerialName("show_full_name") val showFullName: Boolean = false,
     /** Embedded through the `university_id` foreign key. */
     val universities: UniversityNameDto? = null,
 ) {
     companion object {
         const val COLUMNS =
-            "id,email,full_name,username,university_id,department,account_status,bio,avatar_path,universities(name)"
+            "id,email,full_name,username,university_id,department,account_status,bio,avatar_path,show_full_name,universities(name)"
     }
 }
 
@@ -39,19 +40,6 @@ data class VerificationDto(
     val status: String,
     @SerialName("rejection_reason") val rejectionReason: String? = null,
     @SerialName("created_at") val createdAt: String,
-)
-
-@Serializable
-data class PendingVerificationDto(
-    @SerialName("verification_id") val verificationId: String,
-    @SerialName("user_id") val userId: String,
-    val email: String,
-    @SerialName("full_name") val fullName: String? = null,
-    val username: String? = null,
-    @SerialName("university_name") val universityName: String? = null,
-    val department: String? = null,
-    @SerialName("document_path") val documentPath: String,
-    @SerialName("submitted_at") val submittedAt: String,
 )
 
 @Serializable
@@ -238,26 +226,7 @@ data class BlockedUserDto(
 )
 
 @Serializable
-data class OpenReportDto(
-    @SerialName("report_id") val reportId: String,
-    @SerialName("target_kind") val targetKind: String,
-    @SerialName("target_excerpt") val targetExcerpt: String,
-    val reason: String,
-    val details: String? = null,
-    @SerialName("created_at") val createdAt: String,
-    @SerialName("report_count") val reportCount: Int,
-    @SerialName("reporter_username") val reporterUsername: String? = null,
-    @SerialName("target_user_id") val targetUserId: String,
-    @SerialName("target_full_name") val targetFullName: String? = null,
-    @SerialName("target_username") val targetUsername: String? = null,
-    @SerialName("target_account_status") val targetAccountStatus: String,
-)
-
-@Serializable
 data class DeleteAccountRequestDto(val confirm: String)
-
-@Serializable
-data class MarketingConsentDto(@SerialName("marketing_opt_in") val marketingOptIn: Boolean)
 
 @Serializable
 data class AvatarPathDto(

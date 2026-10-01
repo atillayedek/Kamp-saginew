@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.presentation.common.rememberPersonalDataGuard
 import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ fun PostDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
+    val personalData = rememberPersonalDataGuard()
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     val loaded = viewModel.state as? PostDetailState.Loaded
 
@@ -201,7 +203,7 @@ fun PostDetailScreen(
                         maxLines = 4,
                         modifier = Modifier.weight(1f),
                     )
-                    IconButton(onClick = viewModel::sendComment, enabled = viewModel.canSendComment) {
+                    IconButton(onClick = { personalData.send(viewModel.commentText, viewModel::sendComment) }, enabled = viewModel.canSendComment) {
                         Icon(AppIcons.Send, contentDescription = stringResource(R.string.action_send_comment))
                     }
                 }

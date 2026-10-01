@@ -11,11 +11,14 @@ import com.kampusagi.android.data.billing.PurchaseUpdate
 import com.kampusagi.android.domain.model.AppError
 import com.kampusagi.android.domain.model.AppResult
 import com.kampusagi.android.domain.model.AuthState
+import com.kampusagi.android.domain.model.LegalDocumentInfo
+import com.kampusagi.android.domain.model.LegalKind
 import com.kampusagi.android.domain.model.Plan
 import com.kampusagi.android.domain.model.StoreOffer
 import com.kampusagi.android.domain.model.StorePurchase
 import com.kampusagi.android.domain.model.SubscriptionStatus
 import com.kampusagi.android.domain.repository.AuthRepository
+import com.kampusagi.android.domain.repository.ComplianceRepository
 import com.kampusagi.android.domain.repository.PremiumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -41,7 +44,32 @@ class PremiumViewModel @Inject constructor(
     private val premiumRepository: PremiumRepository,
     private val billing: BillingGateway,
     private val authRepository: AuthRepository,
+    private val compliance: ComplianceRepository,
 ) : ViewModel() {
+
+    /** Pre-information form and distance contract (6502; Mesafeli Sözleşmeler Yönetmeliği). */
+    var purchaseDocuments by mutableStateOf<List<LegalDocumentInfo>>(emptyList())
+        private set
+
+    /** "I read and accept the pre-information form and the distance contract"; never pre-ticked. */
+    var contractAccepted by mutableStateOf(false)
+        private set
+
+    /** Express consent to immediate performance and loss of the right of withdrawal (md.15/1-ğ). */
+    var withdrawalWaived by mutableStateOf(false)
+        private set
+
+    val canBuy: Boolean
+        get() = purchaseDocuments.isNotEmpty() && contractAccepted && withdrawalWaived
+
+    fun onContractAcceptedChange(value: Boolean) {
+        contractAccepted = value
+    }
+
+    fun onWithdrawalWaivedChange(value: Boolean) {
+        withdrawalWaived = value
+    }
+
 
     var state by mutableStateOf<PremiumState>(PremiumState.Loading)
         private set
@@ -71,6 +99,12 @@ class PremiumViewModel @Inject constructor(
 
     fun load() {
         viewModelScope.launch {
+            when (val documents = compliance.legalDocuments()) {
+                is AppResult.Success -> purchaseDocuments = documents.value.filter { it.kind == LegalKind.PURCHASE }
+                is AppResult.Failure -> error = documents.error
+            }
+        }
+        viewModelScope.launch {
             val subscription = premiumRepository.subscription()
             val plans = premiumRepository.plans()
             state = when {
@@ -93,12 +127,26 @@ class PremiumViewModel @Inject constructor(
         }
     }
 
+    /** Records the acceptance of the purchase texts (version + SHA-256), then opens Google Play. */
     fun buy(activity: Activity, plan: Plan) {
         val userId = (authRepository.authState.value as? AuthState.SignedIn)?.userId ?: return
+        if (!canBuy || isWorking) return
         error = null
         message = null
-        val result = billing.launchPurchase(activity, plan.productId, userId)
-        if (result is AppResult.Failure) error = result.error
+        isWorking = true
+        viewModelScope.launch {
+            for (document in purchaseDocuments) {
+                val recorded = compliance.acknowledge(document, channel = "purchase")
+                if (recorded is AppResult.Failure) {
+                    error = recorded.error
+                    isWorking = false
+                    return@launch
+                }
+            }
+            isWorking = false
+            val result = billing.launchPurchase(activity, plan.productId, userId)
+            if (result is AppResult.Failure) error = result.error
+        }
     }
 
     /** Re-sends purchases Google Play knows about (new phone, renewal, interrupted verification). */

@@ -104,6 +104,8 @@ data class NewCourseNote(
     val title: String,
     val description: String?,
     val pdf: ByteArray,
+    /** The uploader declared holding the rights or a permission to share (FSEK); required. */
+    val rightsDeclared: Boolean,
 )
 
 /** Badges the server computes from real activity (`public.user_badges`). */

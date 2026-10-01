@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.group
 
+import com.kampusagi.android.presentation.common.rememberPersonalDataGuard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -351,6 +352,7 @@ private fun CannotPost(group: GroupDetail, onOpenPremium: () -> Unit) {
 
 @Composable
 private fun Composer(group: GroupDetail, viewModel: GroupChatViewModel) {
+    val personalData = rememberPersonalDataGuard()
     val pickPhoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { viewModel.onPhotoPicked(it.toString()) }
     }
@@ -420,7 +422,7 @@ private fun Composer(group: GroupDetail, viewModel: GroupChatViewModel) {
             if (viewModel.isSending) {
                 CircularProgressIndicator(modifier = Modifier.padding(Spacing.sm).size(24.dp))
             } else {
-                IconButton(onClick = viewModel::send, enabled = viewModel.canSend) {
+                IconButton(onClick = { personalData.send(viewModel.draft, viewModel::send) }, enabled = viewModel.canSend) {
                     Icon(AppIcons.Send, contentDescription = stringResource(R.string.action_send))
                 }
             }

@@ -1,10 +1,6 @@
 package com.kampusagi.android.presentation.settings
 
 import com.kampusagi.android.core.designsystem.icon.AppIcons
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,25 +18,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kampusagi.android.domain.model.ThemeMode
 import com.kampusagi.android.R
-import com.kampusagi.android.core.designsystem.component.LinkButton
 import com.kampusagi.android.core.designsystem.component.SecondaryButton
 import com.kampusagi.android.core.designsystem.theme.Spacing
 import com.kampusagi.android.domain.model.BlockedUser
@@ -50,12 +40,10 @@ import com.kampusagi.android.presentation.common.messageRes
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
-    var noBrowser by rememberSaveable { mutableStateOf(false) }
-
     Column(modifier = modifier.fillMaxSize()) {
         TopAppBar(
             title = { Text(stringResource(R.string.settings_title)) },
@@ -97,30 +85,12 @@ fun SettingsScreen(
 
             HorizontalDivider()
             Text(stringResource(R.string.settings_privacy_title), style = MaterialTheme.typography.titleMedium)
-            if (viewModel.privacyPolicyUrl.isEmpty()) {
-                Text(
-                    stringResource(R.string.settings_privacy_not_configured),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
-                LinkButton(text = stringResource(R.string.settings_privacy_open), onClick = {
-                    try {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.privacyPolicyUrl)))
-                        noBrowser = false
-                    } catch (e: ActivityNotFoundException) {
-                        Log.w("Settings", "No browser to open the privacy policy", e)
-                        noBrowser = true
-                    }
-                })
-                if (noBrowser) ErrorText(stringResource(R.string.settings_no_browser))
-            }
-
-            HorizontalDivider()
-            MarketingConsentSection()
-
-            HorizontalDivider()
-            DeleteAccountSection()
+            Text(
+                stringResource(R.string.settings_privacy_summary),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            SecondaryButton(text = stringResource(R.string.privacy_title), onClick = onOpenPrivacy)
         }
     }
 }
@@ -176,38 +146,13 @@ private fun ThemeMode.labelRes(): Int = when (this) {
     ThemeMode.DARK -> R.string.theme_dark
 }
 
-@Composable
-private fun MarketingConsentSection(viewModel: MarketingConsentViewModel = hiltViewModel()) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        Text(stringResource(R.string.settings_marketing_title), style = MaterialTheme.typography.titleMedium)
-        when (val state = viewModel.state) {
-            ConsentState.Loading -> CircularProgressIndicator(modifier = Modifier.padding(Spacing.sm))
-            is ConsentState.Failed -> {
-                ErrorText(stringResource(state.error.messageRes()))
-                SecondaryButton(text = stringResource(R.string.action_retry), onClick = viewModel::load)
-            }
-            is ConsentState.Loaded -> {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        stringResource(R.string.settings_marketing_summary),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f).padding(end = Spacing.sm),
-                    )
-                    Switch(checked = state.optIn, onCheckedChange = viewModel::set, enabled = !state.saving)
-                }
-                state.error?.let { ErrorText(stringResource(it.messageRes())) }
-            }
-        }
-    }
-}
-
 /** Account deletion, offered wherever a signed-in person can reach it. */
 @Composable
 fun DeleteAccountSection(modifier: Modifier = Modifier, viewModel: DeleteAccountViewModel = hiltViewModel()) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Text(stringResource(R.string.delete_account_title), style = MaterialTheme.typography.titleMedium)
         Text(
-            stringResource(R.string.delete_account_summary),
+            stringResource(R.string.delete_account_summary_grace),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

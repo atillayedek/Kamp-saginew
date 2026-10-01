@@ -9,16 +9,3 @@ data class Verification(
     val rejectionReason: String?,
     val createdAt: String,
 )
-
-/** A request waiting for an admin, as returned by `list_pending_verifications()`. */
-data class PendingVerification(
-    val verificationId: String,
-    val userId: String,
-    val email: String,
-    val fullName: String?,
-    val username: String?,
-    val universityName: String?,
-    val department: String?,
-    val documentPath: String,
-    val submittedAt: String,
-)

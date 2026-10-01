@@ -96,6 +96,7 @@ class NoteRepositoryImpl @Inject constructor(
                     put("course_name", note.courseName.trim())
                     put("title", note.title.trim())
                     put("description", note.description?.trim()?.ifEmpty { null })
+                    put("rights_declared", note.rightsDeclared)
                 },
             )
         }.getOrElse { return AppResult.Failure(it.toAppError()) }

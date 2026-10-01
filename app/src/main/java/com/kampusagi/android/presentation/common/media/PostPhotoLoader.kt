@@ -77,14 +77,14 @@ class PostPhotoLoader @Inject constructor(
                     BitmapFactory.decodeByteArray(result.value, 0, result.value.size)?.asImageBitmap()
                 }
                 if (image == null) {
-                    Log.w(TAG, "Photo $path is not a valid image")
+                    Log.w(TAG, "A post photo is not a valid image")
                     states[key] = PhotoState.Failed
                 } else if (states.containsKey(key)) {
                     remember(key, image)
                 }
             }
             is AppResult.Failure -> {
-                Log.w(TAG, "Photo $path could not be downloaded: ${result.error}")
+                Log.w(TAG, "A post photo could not be downloaded: ${result.error}")
                 if (states.containsKey(key)) states[key] = PhotoState.Failed
             }
         }
