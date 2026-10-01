@@ -3,15 +3,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { adminApi, type ReportAction } from "@/lib/admin-api";
+import { adminApi } from "@/lib/admin-api";
+import { withReason } from "@/lib/audit";
 import { errorMessage } from "@/lib/errors";
 import {
   formatDate,
   formatDateTime,
   formatMoney,
   formatNumber,
-  REPORT_REASON_LABELS,
-  REPORT_TARGET_LABELS,
   STATUS_LABELS,
 } from "@/lib/format";
 import { DailyBars } from "./DailyBars";
@@ -27,6 +26,7 @@ import {
   Stat,
   statusTone,
   useAsync,
+  useReason,
 } from "./ui";
 
 type Props = { client: SupabaseClient };
@@ -162,6 +162,7 @@ function RevenueCards({ revenue, withoutPrice }: {
 const PAGE = 25;
 
 export function UsersView({ client }: Props) {
+  const ask = useReason();
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("");
@@ -175,10 +176,12 @@ export function UsersView({ client }: Props) {
   const total = users.data?.[0]?.total_count ?? 0;
 
   async function reinstate(id: string) {
+    const reason = await ask("Hesabı yeniden etkinleştir", { confirmLabel: "Etkinleştir" });
+    if (!reason) return;
     setBusyId(id);
     setActionError(null);
     try {
-      await adminApi.reinstate(client, id);
+      await withReason(reason, () => adminApi.reinstate(client, id));
       users.reload();
     } catch (error) {
       console.error(error);
@@ -463,106 +466,6 @@ export function UniversitiesView({ client }: Props) {
           </Card>
         </div>
       ) : null}
-    </>
-  );
-}
-
-// Reports -------------------------------------------------------------------------
-
-const ACTION_LABELS: Record<ReportAction, string> = {
-  DISMISS: "Reddet (sorun yok)",
-  REMOVE_CONTENT: "İçeriği kaldır",
-  SUSPEND_USER: "Kullanıcıyı askıya al",
-};
-
-export function ReportsView({ client }: Props) {
-  const reports = useAsync(() => adminApi.openReports(client), "reports");
-  const [busy, setBusy] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<{ id: string; action: ReportAction } | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-
-  async function resolve(id: string, action: ReportAction) {
-    setBusy(id);
-    setActionError(null);
-    setConfirm(null);
-    try {
-      await adminApi.resolveReport(client, id, action);
-      reports.reload();
-    } catch (error) {
-      console.error(error);
-      setActionError(errorMessage(error));
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  return (
-    <>
-      <PageHeader
-        title="Şikayetler"
-        description="Açık şikayetler, en eskisi üstte. Aynı içerik için gelen tüm şikayetler birlikte kapanır."
-        action={<Button variant="secondary" onClick={reports.reload} busy={reports.loading}>Yenile</Button>}
-      />
-      {actionError ? <div className="mb-4"><ErrorBox message={actionError} /></div> : null}
-      {reports.error ? <ErrorBox message={reports.error} onRetry={reports.reload} /> : null}
-      {reports.loading && !reports.data ? <Loading /> : null}
-      {reports.data && reports.data.length === 0 ? (
-        <Card><Empty>Açık şikayet yok.</Empty></Card>
-      ) : null}
-      <div className="space-y-4">
-        {reports.data?.map((r) => (
-          <Card key={r.report_id}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="bad">{REPORT_REASON_LABELS[r.reason] ?? r.reason}</Badge>
-                <Badge>{REPORT_TARGET_LABELS[r.target_kind] ?? r.target_kind}</Badge>
-                {r.report_count > 1 ? <Badge tone="warn">{formatNumber(r.report_count)} şikayet</Badge> : null}
-              </div>
-              <span className="text-xs text-ink-3">{formatDateTime(r.created_at)}</span>
-            </div>
-            {r.target_excerpt ? (
-              <blockquote className="mt-4 rounded-lg border-l-4 border-line bg-surface-2 px-4 py-3 text-sm whitespace-pre-wrap">
-                {r.target_excerpt}
-              </blockquote>
-            ) : null}
-            {r.details ? <p className="mt-3 text-sm text-ink-2">Şikayet notu: {r.details}</p> : null}
-            <p className="mt-3 text-sm text-ink-2">
-              Şikayet edilen: <span className="font-medium text-ink">{r.target_full_name ?? "—"}</span>
-              {r.target_username ? ` (@${r.target_username})` : ""}{" "}
-              <Badge tone={statusTone(r.target_account_status)}>
-                {STATUS_LABELS[r.target_account_status] ?? r.target_account_status}
-              </Badge>
-              {r.reporter_username ? <span className="text-ink-3"> · şikayet eden @{r.reporter_username}</span> : null}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {(Object.keys(ACTION_LABELS) as ReportAction[])
-                .filter((a) => !(a === "REMOVE_CONTENT" && r.target_kind === "USER"))
-                .map((action) => (
-                  <Button
-                    key={action}
-                    variant={action === "DISMISS" ? "secondary" : "danger"}
-                    busy={busy === r.report_id && confirm === null}
-                    disabled={busy !== null}
-                    onClick={() => (action === "DISMISS" ? resolve(r.report_id, action) : setConfirm({ id: r.report_id, action }))}
-                  >
-                    {ACTION_LABELS[action]}
-                  </Button>
-                ))}
-            </div>
-            {confirm?.id === r.report_id ? (
-              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg bg-bad-soft px-4 py-3 text-sm text-bad">
-                <span className="flex-1">
-                  {confirm.action === "SUSPEND_USER"
-                    ? "Hesap askıya alınacak ve bu kişiyle ilgili tüm açık şikayetler kapanacak. Emin misin?"
-                    : "İçerik kaldırılacak. Emin misin?"}
-                </span>
-                <Button variant="danger" onClick={() => resolve(r.report_id, confirm.action)}>Evet, uygula</Button>
-                <Button variant="ghost" onClick={() => setConfirm(null)}>Vazgeç</Button>
-              </div>
-            ) : null}
-          </Card>
-        ))}
-      </div>
     </>
   );
 }

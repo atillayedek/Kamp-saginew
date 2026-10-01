@@ -60,3 +60,22 @@ describe("chart ticks", () => {
     expect(niceTicks(130)).toEqual([0, 100, 200]);
   });
 });
+
+describe("deadlines", () => {
+  const now = Date.parse("2026-10-02T10:00:00Z");
+  it("counts down and reports overdue", async () => {
+    const { timeLeft } = await import("./format");
+    expect(timeLeft("2026-10-03T08:30:00Z", now)).toEqual({ overdue: false, label: "22 sa 30 dk kaldı" });
+    expect(timeLeft("2026-10-05T12:00:00Z", now)).toEqual({ overdue: false, label: "3 gün 2 sa kaldı" });
+    expect(timeLeft("2026-10-02T09:00:00Z", now)).toEqual({ overdue: true, label: "1 sa 0 dk gecikti" });
+  });
+});
+
+describe("csv export", () => {
+  it("quotes, keeps Turkish text and flattens nested values", async () => {
+    const { toCsv } = await import("./compliance-api");
+    const csv = toCsv([{ a: "İçerik, \"alıntı\"", b: { x: 1 } }, { a: "düz", c: null }]);
+    expect(csv.startsWith("﻿")).toBe(true);
+    expect(csv).toBe("﻿a,b,c\r\n\"İçerik, \"\"alıntı\"\"\",\"{\"\"x\"\":1}\",\r\ndüz,,");
+  });
+});

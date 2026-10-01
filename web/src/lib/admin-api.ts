@@ -1,8 +1,10 @@
 // Typed calls to the admin RPCs and Edge Functions. Every call runs with the
-// signed-in admin's token; the database checks is_admin() on each one, so this
-// file grants nothing by itself.
+// signed-in staff member's token; the database checks the role (and MFA) on each one,
+// so this file grants nothing by itself. Calls started inside withReason() carry the
+// reason the database records in admin_audit_logs.
 
 import { FunctionsHttpError, type SupabaseClient } from "@supabase/supabase-js";
+import { auditHeaders } from "./audit";
 
 export interface Overview {
   total_users: number;
@@ -196,15 +198,20 @@ export interface BroadcastResult {
   status: string;
 }
 
-async function rpc<T>(client: SupabaseClient, name: string, args: Record<string, unknown> = {}): Promise<T> {
-  const { data, error } = await client.rpc(name, args);
+export async function rpc<T>(client: SupabaseClient, name: string, args: Record<string, unknown> = {}): Promise<T> {
+  let request = client.rpc(name, args);
+  for (const [header, value] of Object.entries(auditHeaders())) request = request.setHeader(header, value);
+  const { data, error } = await request;
   if (error) throw new Error(error.message);
   return data as T;
 }
 
 /** Edge Function errors carry {"error": "<code>"}; surface that code. */
 export async function invoke<T>(client: SupabaseClient, name: string, body: unknown, query = ""): Promise<T> {
-  const { data, error } = await client.functions.invoke(`${name}${query}`, { body: body as Record<string, unknown> });
+  const { data, error } = await client.functions.invoke(`${name}${query}`, {
+    body: body as Record<string, unknown>,
+    headers: auditHeaders(),
+  });
   if (error) {
     if (error instanceof FunctionsHttpError) {
       const payload = await (error.context as Response).json().catch(() => null) as { error?: string } | null;
@@ -230,12 +237,9 @@ export const adminApi = {
   pendingVerifications: (c: SupabaseClient) => rpc<PendingVerification[]>(c, "list_pending_verifications"),
   reviewVerification: (c: SupabaseClient, verificationId: string, approve: boolean, reason: string | null) =>
     rpc<void>(c, "review_student_verification", { p_verification_id: verificationId, p_approve: approve, p_reason: reason }),
-  /** Short-lived link to the private PDF; storage RLS lets only the owner and admins read it. */
-  documentUrl: async (c: SupabaseClient, path: string): Promise<string> => {
-    const { data, error } = await c.storage.from("student-documents").createSignedUrl(path, 300);
-    if (error || !data) throw new Error(error?.message ?? "document_unavailable");
-    return data.signedUrl;
-  },
+  /** 5-minute link to the private PDF through admin-document, which records every opening. */
+  documentUrl: async (c: SupabaseClient, verificationId: string): Promise<string> =>
+    (await invoke<{ url: string }>(c, "admin-document", { verification_id: verificationId })).url,
   openReports: (c: SupabaseClient) => rpc<Report[]>(c, "list_open_reports"),
   resolveReport: (c: SupabaseClient, reportId: string, action: ReportAction) =>
     rpc<void>(c, "resolve_report", { p_report_id: reportId, p_action: action }),
@@ -245,7 +249,8 @@ export const adminApi = {
   createAnnouncement: (c: SupabaseClient, title: string, body: string, universityId: string | null, endsAt: string) =>
     rpc<string>(c, "admin_create_announcement", { p_title: title, p_body: body, p_university_id: universityId, p_ends_at: endsAt }),
   endAnnouncement: (c: SupabaseClient, id: string) => rpc<void>(c, "admin_end_announcement", { p_announcement_id: id }),
-  pushAnnouncement: (c: SupabaseClient, id: string) => invoke<PushResult>(c, "admin-push", { announcement_id: id }),
+  pushAnnouncement: (c: SupabaseClient, id: string, marketing: boolean) =>
+    invoke<PushResult>(c, "admin-push", { announcement_id: id, marketing }),
   pushStatus: (c: SupabaseClient) => invoke<PushStatus>(c, "admin-push", { action: "status" }),
   pushSetup: (c: SupabaseClient) => invoke<PushStatus>(c, "admin-push", { action: "setup" }),
   plans: (c: SupabaseClient) => rpc<Plan[]>(c, "admin_list_plans"),

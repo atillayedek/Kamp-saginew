@@ -1,7 +1,8 @@
 "use client";
 
 import { AlertTriangle, Loader2, RefreshCw } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { isValidReason, MAX_REASON } from "@/lib/audit";
 import { errorMessage } from "@/lib/errors";
 
 export interface Async<T> {
@@ -176,3 +177,77 @@ export function PageHeader({ title, description, action }: { title: string; desc
 
 export const inputClass =
   "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-brand focus:outline-none";
+
+type AskReason = (title: string, options?: { hint?: string; initial?: string; confirmLabel?: string }) => Promise<string | null>;
+
+const ReasonContext = createContext<AskReason | null>(null);
+
+/**
+ * Asks the staff member why they are doing something. The answer is sent with the request
+ * (withReason) and stored in the audit log; cancelling aborts the action.
+ */
+export function useReason(): AskReason {
+  const ask = useContext(ReasonContext);
+  if (!ask) throw new Error("useReason outside ReasonProvider");
+  return ask;
+}
+
+interface ReasonRequest {
+  title: string;
+  hint?: string;
+  initial: string;
+  confirmLabel: string;
+  resolve: (value: string | null) => void;
+}
+
+export function ReasonProvider({ children }: { children: ReactNode }) {
+  const [request, setRequest] = useState<ReasonRequest | null>(null);
+  const [text, setText] = useState("");
+
+  const ask = useCallback<AskReason>((title, options) => new Promise((resolve) => {
+    setText(options?.initial ?? "");
+    setRequest({ title, hint: options?.hint, initial: options?.initial ?? "", confirmLabel: options?.confirmLabel ?? "Devam et", resolve });
+  }), []);
+
+  function close(value: string | null) {
+    request?.resolve(value);
+    setRequest(null);
+  }
+
+  return (
+    <ReasonContext.Provider value={ask}>
+      {children}
+      {request ? (
+        <div className="fixed inset-0 z-50 grid place-items-center p-4" role="dialog" aria-modal="true" aria-labelledby="reason-title">
+          <div className="absolute inset-0 bg-black/40" onClick={() => close(null)} />
+          <form
+            className="relative w-full max-w-md space-y-4 rounded-2xl border border-line bg-surface p-5 shadow-lg"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (isValidReason(text)) close(text.trim());
+            }}
+          >
+            <h2 id="reason-title" className="text-base font-semibold">{request.title}</h2>
+            <label className="block">
+              <span className="mb-1.5 block text-sm text-ink-2">
+                {request.hint ?? "Gerekçe (zorunlu). İşlemle birlikte değiştirilemez kayıtlara yazılır."}
+              </span>
+              <textarea
+                autoFocus
+                rows={3}
+                maxLength={MAX_REASON}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className={`${inputClass} resize-y`}
+              />
+            </label>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="ghost" onClick={() => close(null)}>Vazgeç</Button>
+              <Button type="submit" disabled={!isValidReason(text)}>{request.confirmLabel}</Button>
+            </div>
+          </form>
+        </div>
+      ) : null}
+    </ReasonContext.Provider>
+  );
+}

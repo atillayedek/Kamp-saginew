@@ -712,6 +712,8 @@ begin
         'pg_cron_installed', exists (select 1 from pg_extension where extname = 'pg_cron'),
         'pg_net_installed', exists (select 1 from pg_extension where extname = 'pg_net'),
         'functions_url_set', (select functions_url is not null from public.push_settings),
+        'documents_awaiting_destruction', (select count(*) from public.student_verifications
+                                           where status <> 'PENDING' and document_purged_at is null),
         'last_run', (select to_jsonb(r) from public.retention_runs r order by r.started_at desc limit 1)
     );
 end;
@@ -1043,6 +1045,38 @@ begin
     from public.copyright_notices n
     order by (n.status = 'OPEN') desc, n.created_at
     limit 200;
+end;
+$$;
+
+-- Finding the note a copyright notice is about (moderators; audited).
+create function public.admin_search_course_notes(p_query text)
+returns table (id uuid, course_code text, title text, author_username text, university_name text, created_at timestamptz,
+               deleted_at timestamptz)
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $$
+declare
+    v_query text := public.search_fold(btrim(coalesce(p_query, '')));
+begin
+    if not public.has_staff_role('moderator') then
+        raise exception using errcode = 'P0001', message = 'admin_required';
+    end if;
+    if char_length(v_query) < 2 then
+        return;
+    end if;
+    perform public.write_admin_audit('view.course_notes_search', 'course_notes', null,
+                                     coalesce(public.request_audit_reason(), 'Telif bildirimi incelemesi'),
+                                     jsonb_build_object('query', left(p_query, 100)));
+    return query
+    select n.id, n.course_code, n.title, p.username, u.name, n.created_at, n.deleted_at
+    from public.course_notes n
+    left join public.profiles p on p.id = n.author_id
+    left join public.universities u on u.id = n.university_id
+    where strpos(public.search_fold(n.title || ' ' || n.course_code || ' ' || n.course_name || ' ' || coalesce(p.username, '')), v_query) > 0
+    order by n.created_at desc
+    limit 30;
 end;
 $$;
 
@@ -1436,6 +1470,7 @@ begin
         'public.my_moderation_decisions()', 'public.submit_moderation_appeal(uuid, text)', 'public.admin_list_appeals()',
         'public.admin_decide_appeal(uuid, boolean, text)', 'public.admin_report_context(uuid)',
         'public.admin_list_copyright_notices()', 'public.admin_resolve_copyright_notice(uuid, text, text, uuid)',
+        'public.admin_search_course_notes(text)',
         'public.list_sensitive_terms()', 'public.object_to_match(uuid, uuid, text)', 'public.admin_list_match_objections()'
     ] loop
         execute format('revoke all on function %s from public, anon', f);

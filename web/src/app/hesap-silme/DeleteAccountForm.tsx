@@ -10,7 +10,8 @@ import { CONFIRM_WORD, isDeleteConfirmation } from "./confirm";
 
 /**
  * Signs in with a throw-away client (no stored session), calls the same
- * delete-account function the app uses, then signs out.
+ * delete-account function the app uses (which schedules the deletion after the
+ * grace period), then signs out.
  */
 export function DeleteAccountForm() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ export function DeleteAccountForm() {
   const [confirmText, setConfirmText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState<string | null>(null);
 
   if (backendState() !== "ready") {
     return (
@@ -28,10 +29,12 @@ export function DeleteAccountForm() {
     );
   }
 
-  if (done) {
+  if (scheduledFor) {
     return (
       <p className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink">
-        Hesabın ve tüm verilerin silindi. KampüsAğı&apos;nı kullandığın için teşekkürler.
+        Silme talebin alındı. Hesabın ve verilerin{" "}
+        <strong>{new Date(scheduledFor).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}</strong>{" "}
+        tarihinde kalıcı olarak silinecek. O güne kadar uygulamaya giriş yapıp vazgeçebilirsin.
       </p>
     );
   }
@@ -50,9 +53,11 @@ export function DeleteAccountForm() {
     try {
       const { error: signInError } = await client.auth.signInWithPassword({ email: email.trim(), password });
       if (signInError) throw new Error(signInError.message);
-      await invoke<{ deleted: boolean }>(client, "delete-account", { confirm: "DELETE" });
+      const result = await invoke<{ scheduled_for: string }>(client, "delete-account", { confirm: "DELETE" });
       setPassword("");
-      setDone(true);
+      setScheduledFor(result.scheduled_for);
+      const { error: signOutError } = await client.auth.signOut({ scope: "local" });
+      if (signOutError) console.error(signOutError);
     } catch (e) {
       console.error(e);
       setError(errorMessage(e));
@@ -82,7 +87,7 @@ export function DeleteAccountForm() {
       </label>
       {error ? <ErrorBox message={error} /> : null}
       <Button type="submit" variant="danger" busy={busy} disabled={!email || !password || !confirmText}>
-        Hesabımı kalıcı olarak sil
+        Hesabımın silinmesini iste
       </Button>
     </form>
   );

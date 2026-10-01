@@ -15,37 +15,53 @@ import {
   Megaphone,
   Menu,
   Moon,
+  Scale,
   Sun,
   Users,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { complianceApi, type StaffAccess, type StaffRole } from "@/lib/compliance-api";
 import { backendState } from "@/lib/config";
 import { errorMessage } from "@/lib/errors";
 import { supabase } from "@/lib/supabase";
 import { BroadcastView } from "./BroadcastView";
+import { ComplianceView } from "./ComplianceView";
 import { DocumentsView } from "./DocumentsView";
 import { ActivityView, AnnouncementsView, PremiumView } from "./GrowthViews";
-import { Button, ErrorBox, inputClass, Loading } from "./ui";
-import { OverviewView, PurchasesView, ReportsView, UniversitiesView, UsersView } from "./views";
+import { MfaGate } from "./MfaGate";
+import { ModerationView } from "./ModerationView";
+import { Button, ErrorBox, inputClass, Loading, ReasonProvider } from "./ui";
+import { OverviewView, PurchasesView, UniversitiesView, UsersView } from "./views";
 
+// Each section is shown only to the roles whose database functions it calls; superadmin sees all.
 const TABS = [
-  { id: "overview", label: "Genel bakış", icon: LayoutDashboard },
-  { id: "documents", label: "Belge onayları", icon: FileCheck },
-  { id: "users", label: "Kullanıcılar", icon: Users },
-  { id: "purchases", label: "Satın almalar", icon: CreditCard },
-  { id: "premium", label: "Premium hediye", icon: Gift },
-  { id: "activity", label: "Aktiflik", icon: Activity },
-  { id: "announcements", label: "Uygulama duyurusu", icon: Megaphone },
-  { id: "email", label: "Toplu e-posta", icon: Mail },
-  { id: "reports", label: "Şikayetler", icon: Flag },
-  { id: "universities", label: "Üniversiteler", icon: Building2 },
-] as const;
+  { id: "overview", label: "Genel bakış", icon: LayoutDashboard, roles: ["verifier", "moderator", "compliance"] },
+  { id: "documents", label: "Belge onayları", icon: FileCheck, roles: ["verifier"] },
+  { id: "reports", label: "Moderasyon", icon: Flag, roles: ["moderator"] },
+  { id: "users", label: "Kullanıcılar", icon: Users, roles: ["moderator"] },
+  { id: "compliance", label: "KVKK ve Uyum", icon: Scale, roles: ["compliance"] },
+  { id: "purchases", label: "Satın almalar", icon: CreditCard, roles: [] },
+  { id: "premium", label: "Premium hediye", icon: Gift, roles: [] },
+  { id: "activity", label: "Aktiflik", icon: Activity, roles: [] },
+  { id: "announcements", label: "Uygulama duyurusu", icon: Megaphone, roles: [] },
+  { id: "email", label: "Toplu e-posta", icon: Mail, roles: [] },
+  { id: "universities", label: "Üniversiteler", icon: Building2, roles: [] },
+] as const satisfies readonly { id: string; label: string; icon: unknown; roles: readonly StaffRole[] }[];
 
 type TabId = typeof TABS[number]["id"];
 
-function isAdmin(session: Session | null): boolean {
-  return session?.user.app_metadata?.role === "admin";
+const STAFF_ROLES: StaffRole[] = ["superadmin", "verifier", "moderator", "compliance"];
+
+/** Claims in the JWT only decide whether to try; the database decides what is allowed. */
+function hasStaffClaim(session: Session | null): boolean {
+  const meta = session?.user.app_metadata as { role?: unknown; roles?: unknown } | undefined;
+  if (meta?.role === "admin") return true;
+  return Array.isArray(meta?.roles) && meta.roles.some((r) => STAFF_ROLES.includes(r as StaffRole));
+}
+
+export function visibleTabs(roles: StaffRole[]) {
+  return TABS.filter((t) => roles.includes("superadmin") || t.roles.some((r) => roles.includes(r as StaffRole)));
 }
 
 export function AdminApp() {
@@ -61,9 +77,9 @@ function AdminGate({ client }: { client: SupabaseClient }) {
 
   useEffect(() => {
     let active = true;
-    // A signed-in account without the admin role is signed out immediately.
+    // A signed-in account without a staff role is signed out immediately.
     function accept(next: Session | null) {
-      if (next && !isAdmin(next)) {
+      if (next && !hasStaffClaim(next)) {
         setDenied(true);
         setSession(null);
         client.auth.signOut().catch((error: unknown) => console.error(error));
@@ -85,8 +101,76 @@ function AdminGate({ client }: { client: SupabaseClient }) {
   }, [client]);
 
   if (session === undefined) return <Centered><Loading label="Oturum kontrol ediliyor…" /></Centered>;
-  if (!session || !isAdmin(session)) return <SignIn client={client} denied={denied} onAttempt={() => setDenied(false)} />;
-  return <Shell client={client} email={session.user.email ?? ""} />;
+  if (!session || !hasStaffClaim(session)) return <SignIn client={client} denied={denied} onAttempt={() => setDenied(false)} />;
+  return <StaffGate client={client} email={session.user.email ?? ""} sessionKey={session.access_token} />;
+}
+
+/** Reads the roles and MFA rule from the database, asks for the second factor, then opens the panel. */
+function StaffGate({ client, email, sessionKey }: { client: SupabaseClient; email: string; sessionKey: string }) {
+  const [access, setAccess] = useState<{ key: string; value: StaffAccess | null; error: string | null } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    complianceApi.access(client).then(
+      (value) => active && setAccess({ key: sessionKey, value, error: null }),
+      (error: unknown) => {
+        console.error(error);
+        if (active) setAccess({ key: sessionKey, value: null, error: errorMessage(error) });
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [client, sessionKey]);
+
+  if (!access || access.key !== sessionKey) return <Centered><Loading label="Yetkiler kontrol ediliyor…" /></Centered>;
+  if (access.error || !access.value) {
+    return <Centered><div className="max-w-md"><ErrorBox message={access.error ?? "Yetkiler okunamadı."} /></div></Centered>;
+  }
+  if (access.value.roles.length === 0) {
+    return (
+      <Centered>
+        <div className="max-w-md space-y-3">
+          <ErrorBox message="Bu hesabın yönetim paneli rolü yok." />
+          <Button variant="secondary" onClick={() => client.auth.signOut().catch((e: unknown) => console.error(e))}>Çıkış yap</Button>
+        </div>
+      </Centered>
+    );
+  }
+  if (access.value.mfa_required && !access.value.mfa_satisfied) {
+    return <Centered><MfaGate client={client} email={email} /></Centered>;
+  }
+  return (
+    <ReasonProvider>
+      <Shell client={client} email={email} roles={access.value.roles} idleMinutes={access.value.idle_minutes} />
+    </ReasonProvider>
+  );
+}
+
+/** Signs out after `minutes` without keyboard, mouse, touch or scroll activity. */
+function useIdleSignOut(client: SupabaseClient, minutes: number) {
+  useEffect(() => {
+    if (!Number.isFinite(minutes) || minutes <= 0) return;
+    let timer = window.setTimeout(expire, minutes * 60_000);
+    function expire() {
+      client.auth.signOut().catch((error: unknown) => console.error(error));
+      try {
+        sessionStorage.setItem("kampusagi-admin-idle", "1");
+      } catch (error) {
+        console.warn("Idle note not saved", error);
+      }
+    }
+    function reset() {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(expire, minutes * 60_000);
+    }
+    const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "visibilitychange"] as const;
+    for (const e of events) window.addEventListener(e, reset, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      for (const e of events) window.removeEventListener(e, reset);
+    };
+  }, [client, minutes]);
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
@@ -109,6 +193,15 @@ function SignIn({ client, denied, onAttempt }: { client: SupabaseClient; denied:
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [idle] = useState(() => {
+    try {
+      const flagged = sessionStorage.getItem("kampusagi-admin-idle") === "1";
+      sessionStorage.removeItem("kampusagi-admin-idle");
+      return flagged;
+    } catch {
+      return false;
+    }
+  });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -144,6 +237,7 @@ function SignIn({ client, denied, onAttempt }: { client: SupabaseClient; denied:
               className={inputClass}
             />
           </label>
+          {idle ? <ErrorBox message="Hareketsiz kaldığın için oturum kapatıldı." /> : null}
           {denied ? <ErrorBox message="Bu hesabın yönetici yetkisi yok." /> : null}
           {error ? <ErrorBox message={error} /> : null}
           <Button type="submit" busy={busy} className="w-full">Giriş yap</Button>
@@ -181,8 +275,10 @@ function useTheme(): [string, () => void] {
   return [theme, toggle];
 }
 
-function Shell({ client, email }: { client: SupabaseClient; email: string }) {
-  const [tab, setTab] = useState<TabId>("overview");
+function Shell({ client, email, roles, idleMinutes }: { client: SupabaseClient; email: string; roles: StaffRole[]; idleMinutes: number }) {
+  const tabs = visibleTabs(roles);
+  const [tab, setTab] = useState<TabId>(tabs[0]?.id ?? "overview");
+  useIdleSignOut(client, idleMinutes);
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, toggleTheme] = useTheme();
   const [signOutError, setSignOutError] = useState<string | null>(null);
@@ -203,7 +299,7 @@ function Shell({ client, email }: { client: SupabaseClient; email: string }) {
 
   const nav = (
     <nav className="space-y-1" aria-label="Yönetim menüsü">
-      {TABS.map(({ id, label, icon: Icon }) => (
+      {tabs.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
           onClick={() => go(id)}
@@ -221,6 +317,7 @@ function Shell({ client, email }: { client: SupabaseClient; email: string }) {
   const footer = (
     <div className="space-y-2 border-t border-line pt-4">
       <p className="truncate px-3 text-xs text-ink-3" title={email}>{email}</p>
+      <p className="px-3 text-xs text-ink-3">Rol: {roles.join(", ")} · {idleMinutes} dk hareketsizlikte çıkış</p>
       <button onClick={toggleTheme} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-2 hover:text-ink">
         {theme === "dark" ? <Sun className="size-4" aria-hidden /> : <Moon className="size-4" aria-hidden />}
         {theme === "dark" ? "Açık tema" : "Koyu tema"}
@@ -275,7 +372,8 @@ function Shell({ client, email }: { client: SupabaseClient; email: string }) {
         {tab === "activity" ? <ActivityView client={client} /> : null}
         {tab === "announcements" ? <AnnouncementsView client={client} /> : null}
         {tab === "email" ? <BroadcastView client={client} adminEmail={email} /> : null}
-        {tab === "reports" ? <ReportsView client={client} /> : null}
+        {tab === "reports" ? <ModerationView client={client} /> : null}
+        {tab === "compliance" ? <ComplianceView client={client} /> : null}
         {tab === "universities" ? <UniversitiesView client={client} /> : null}
       </main>
     </div>

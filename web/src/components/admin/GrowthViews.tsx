@@ -4,10 +4,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { Copy, Search } from "lucide-react";
 import { useState } from "react";
 import { adminApi, type AdminUser } from "@/lib/admin-api";
+import { withReason } from "@/lib/audit";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatDateTime, formatNumber } from "@/lib/format";
 import { DailyBars } from "./DailyBars";
-import { Badge, Button, Card, Empty, ErrorBox, inputClass, Loading, PageHeader, Stat, useAsync } from "./ui";
+import { Badge, Button, Card, Empty, ErrorBox, inputClass, Loading, PageHeader, Stat, useAsync, useReason } from "./ui";
 
 type Props = { client: SupabaseClient };
 
@@ -84,15 +85,18 @@ function defaultEnd(): string {
 
 /** Whether phones receive notifications, and the one click that connects the database to dispatch-push. */
 function PushSetupCard({ client }: Props) {
+  const ask = useReason();
   const status = useAsync(() => adminApi.pushStatus(client), "push-status");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function setup() {
+    const reason = await ask("Bildirimleri ve otomatik imhayı etkinleştir", { initial: "İlk kurulum" });
+    if (!reason) return;
     setBusy(true);
     setError(null);
     try {
-      await adminApi.pushSetup(client);
+      await withReason(reason, () => adminApi.pushSetup(client));
       status.reload();
     } catch (err) {
       console.error(err);
@@ -132,6 +136,7 @@ function PushSetupCard({ client }: Props) {
 }
 
 export function AnnouncementsView({ client }: Props) {
+  const ask = useReason();
   const list = useAsync(() => adminApi.announcements(client), "announcements");
   const universities = useAsync(() => adminApi.universityOptions(client), "university-options");
   const [title, setTitle] = useState("");
@@ -148,10 +153,12 @@ export function AnnouncementsView({ client }: Props) {
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
+    const reason = await ask("Duyuruyu yayınla", { confirmLabel: "Yayınla" });
+    if (!reason) return;
     setBusy(true);
     setError(null);
     try {
-      await adminApi.createAnnouncement(client, title.trim(), body.trim(), universityId || null, new Date(endsAt).toISOString());
+      await withReason(reason, () => adminApi.createAnnouncement(client, title.trim(), body.trim(), universityId || null, new Date(endsAt).toISOString()));
       setTitle("");
       setBody("");
       list.reload();
@@ -163,10 +170,12 @@ export function AnnouncementsView({ client }: Props) {
   }
 
   async function end(id: string) {
+    const reason = await ask("Duyuruyu şimdi bitir", { confirmLabel: "Bitir" });
+    if (!reason) return;
     setEndingId(id);
     setError(null);
     try {
-      await adminApi.endAnnouncement(client, id);
+      await withReason(reason, () => adminApi.endAnnouncement(client, id));
       list.reload();
     } catch (err) {
       console.error(err);
@@ -176,12 +185,20 @@ export function AnnouncementsView({ client }: Props) {
   }
 
   async function push(id: string, title: string) {
-    if (!window.confirm(`"${title}" duyurusu hedefindeki öğrencilerin telefonlarına bildirim olarak gönderilsin mi? Bu yalnızca bir kez yapılabilir.`)) return;
+    // Campaigns and discounts are commercial messages: only people who consented receive them (6563).
+    const marketing = window.confirm(
+      `"${title}" bir kampanya / tanıtım içeriği mi?\n\nTamam: evet — yalnızca kampanya bildirimine açık rıza verenlere gider.\nİptal: hayır — hizmet duyurusu olarak hedefteki herkese gider.`,
+    );
+    const reason = await ask(`"${title}" telefonlara gönderilsin (yalnızca bir kez)`, {
+      initial: marketing ? "Kampanya bildirimi (açık rızası olanlara)" : "Hizmet duyurusu",
+      confirmLabel: "Gönder",
+    });
+    if (!reason) return;
     setPushingId(id);
     setError(null);
     setPushNote(null);
     try {
-      const result = await adminApi.pushAnnouncement(client, id);
+      const result = await withReason(reason, () => adminApi.pushAnnouncement(client, id, marketing));
       setPushNote(`${formatNumber(result.sent)} cihaza gönderildi` +
         (result.failed > 0 ? `, ${formatNumber(result.failed)} başarısız` : "") +
         (result.devices === 0 ? " (bu hedefte bildirime kayıtlı cihaz yok)" : "") + ".");
@@ -274,6 +291,7 @@ export function AnnouncementsView({ client }: Props) {
 // Premium gifts and promo codes -------------------------------------------------------------------
 
 export function PremiumView({ client }: Props) {
+  const ask = useReason();
   const plans = useAsync(() => adminApi.plans(client), "plans");
   const grants = useAsync(() => adminApi.grants(client), "grants");
   const codes = useAsync(() => adminApi.promoCodes(client), "promo-codes");
@@ -349,8 +367,10 @@ export function PremiumView({ client }: Props) {
                     <Button
                       variant="secondary"
                       onClick={async () => {
+                        const reason = await ask(`${c.code} kodunu kapat`, { confirmLabel: "Kapat" });
+                        if (!reason) return;
                         try {
-                          await adminApi.disablePromoCode(client, c.id);
+                          await withReason(reason, () => adminApi.disablePromoCode(client, c.id));
                           codes.reload();
                         } catch (err) {
                           console.error(err);
@@ -386,8 +406,10 @@ export function PremiumView({ client }: Props) {
                     <Button
                       variant="ghost"
                       onClick={async () => {
+                        const reason = await ask("Premium hediyesini geri al", { confirmLabel: "Geri al" });
+                        if (!reason) return;
                         try {
-                          await adminApi.revokeGrant(client, g.id);
+                          await withReason(reason, () => adminApi.revokeGrant(client, g.id));
                           grants.reload();
                         } catch (err) {
                           console.error(err);
@@ -428,6 +450,7 @@ function GrantForm({ client, plans, onDone, onError }: {
   onDone: (message: string) => void;
   onError: (message: string) => void;
 }) {
+  const ask = useReason();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<AdminUser[] | null>(null);
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -448,9 +471,11 @@ function GrantForm({ client, plans, onDone, onError }: {
 
   async function grant() {
     if (!user || !planId) return;
+    const reason = await ask(`${user.full_name ?? user.email} için Premium hediye et`, { initial: note.trim(), confirmLabel: "Hediye et" });
+    if (!reason) return;
     setBusy(true);
     try {
-      const expires = await adminApi.grantPremium(client, user.id, planId, days, note.trim() || null);
+      const expires = await withReason(reason, () => adminApi.grantPremium(client, user.id, planId, days, note.trim() || null));
       onDone(`${user.full_name ?? user.email} için Premium ${formatDate(expires)} tarihine kadar açıldı.`);
       setUser(null);
       setNote("");
@@ -516,6 +541,7 @@ function PromoForm({ client, plans, onDone, onError }: {
   onDone: (message: string) => void;
   onError: (message: string) => void;
 }) {
+  const ask = useReason();
   const [code, setCode] = useState("");
   const [planId, setPlanId] = useState("");
   const [days, setDays] = useState(30);
@@ -525,16 +551,18 @@ function PromoForm({ client, plans, onDone, onError }: {
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
+    const reason = await ask("Promosyon kodu oluştur", { confirmLabel: "Oluştur" });
+    if (!reason) return;
     setBusy(true);
     try {
-      const created = await adminApi.createPromoCode(
+      const created = await withReason(reason, () => adminApi.createPromoCode(
         client,
         code.trim() || null,
         planId,
         days,
         maxRedemptions,
         expiresAt ? new Date(expiresAt).toISOString() : null,
-      );
+      ));
       onDone(`Kod oluşturuldu: ${created}. Öğrenciler uygulamada Premium ekranından kullanabilir.`);
       setCode("");
     } catch (err) {

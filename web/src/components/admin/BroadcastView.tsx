@@ -3,10 +3,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { Megaphone, Send, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { withReason } from "@/lib/audit";
 import { adminApi, type BroadcastResult } from "@/lib/admin-api";
 import { errorMessage } from "@/lib/errors";
 import { AUDIENCE_LABELS, formatDateTime, formatNumber } from "@/lib/format";
-import { Badge, Button, Card, Empty, ErrorBox, inputClass, Loading, PageHeader, useAsync } from "./ui";
+import { Badge, Button, Card, Empty, ErrorBox, inputClass, Loading, PageHeader, useAsync, useReason } from "./ui";
 
 const MAX_SUBJECT = 150;
 const MAX_BODY = 20000;
@@ -14,6 +15,7 @@ const MAX_BODY = 20000;
 type Step = { kind: "edit" } | { kind: "confirm"; count: number } | { kind: "done"; result: BroadcastResult };
 
 export function BroadcastView({ client, adminEmail }: { client: SupabaseClient; adminEmail: string }) {
+  const ask = useReason();
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [audience, setAudience] = useState("ALL");
@@ -54,8 +56,10 @@ export function BroadcastView({ client, adminEmail }: { client: SupabaseClient; 
   }
 
   async function send() {
+    const reason = await ask("Toplu e-postayı gönder", { confirmLabel: "Gönder" });
+    if (!reason) return;
     const result = await run("send", () =>
-      adminApi.sendBroadcast(client, { subject, body, audience, marketing, test_only: false }));
+      withReason(reason, () => adminApi.sendBroadcast(client, { subject, body, audience, marketing, test_only: false })));
     if (result) {
       setStep({ kind: "done", result });
       history.reload();

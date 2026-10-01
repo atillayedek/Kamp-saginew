@@ -4,10 +4,17 @@ import type { ReactNode } from "react";
 import { config } from "@/lib/config";
 
 export const LEGAL_LINKS = [
+  { href: "/yasal/aydinlatma-metni", label: "KVKK aydınlatma metni" },
   { href: "/gizlilik", label: "Gizlilik politikası" },
   { href: "/kullanim-kosullari", label: "Kullanım koşulları" },
-  { href: "/cocuk-guvenligi", label: "Çocuk güvenliği standartları" },
+  { href: "/yasal/topluluk-kurallari", label: "Topluluk kuralları" },
+  { href: "/yasal/cerez-sdk-politikasi", label: "Çerez ve SDK politikası" },
+  { href: "/yasal/saklama-imha-politikasi", label: "Saklama ve imha" },
+  { href: "/yasal/basvuru-formu", label: "KVKK başvurusu" },
+  { href: "/telif-bildirimi", label: "Telif bildirimi" },
+  { href: "/cocuk-guvenligi", label: "Çocuk güvenliği" },
   { href: "/hesap-silme", label: "Hesap silme" },
+  { href: "/yasal", label: "Tüm metinler" },
 ] as const;
 
 /** The data controller and contact, or a visible notice that they are not configured yet. */

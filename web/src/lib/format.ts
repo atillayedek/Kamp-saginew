@@ -57,8 +57,27 @@ export const REPORT_REASON_LABELS: Record<string, string> = {
   HARASSMENT: "Taciz",
   INAPPROPRIATE: "Uygunsuz içerik",
   FAKE_PROFILE: "Sahte profil",
+  HATE_SPEECH: "Nefret / ayrımcılık",
+  PERSONAL_DATA_LEAK: "Kişisel veri ifşası",
+  PERSONALITY_RIGHTS: "Kişilik hakkı ihlali",
+  SEXUAL_CONTENT: "Cinsel içerik",
+  COPYRIGHT: "Telif ihlali",
   OTHER: "Diğer",
 };
+
+/** 5651 md.9 personality rights and personal data disclosures are handled first, within urgent_report_hours. */
+export const URGENT_REPORT_REASONS = new Set(["PERSONAL_DATA_LEAK", "PERSONALITY_RIGHTS"]);
+
+/** Whole hours (rounded down) and minutes left until `deadline`; negative when overdue. */
+export function timeLeft(deadline: string | number, now: number): { overdue: boolean; label: string } {
+  const ms = (typeof deadline === "number" ? deadline : new Date(deadline).getTime()) - now;
+  const abs = Math.abs(ms);
+  const days = Math.floor(abs / 86_400_000);
+  const hours = Math.floor((abs % 86_400_000) / 3_600_000);
+  const minutes = Math.floor((abs % 3_600_000) / 60_000);
+  const text = days > 0 ? `${days} gün ${hours} sa` : `${hours} sa ${minutes} dk`;
+  return { overdue: ms < 0, label: ms < 0 ? `${text} gecikti` : `${text} kaldı` };
+}
 
 export const REPORT_TARGET_LABELS: Record<string, string> = {
   POST: "Gönderi",

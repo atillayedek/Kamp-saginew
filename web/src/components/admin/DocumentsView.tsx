@@ -4,9 +4,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { Check, ExternalLink, FileText, X } from "lucide-react";
 import { useState } from "react";
 import { adminApi, type PendingVerification } from "@/lib/admin-api";
+import { withReason } from "@/lib/audit";
 import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatNumber } from "@/lib/format";
-import { Button, Card, Empty, ErrorBox, inputClass, Loading, PageHeader, useAsync } from "./ui";
+import { Button, Card, Empty, ErrorBox, inputClass, Loading, PageHeader, useAsync, useReason } from "./ui";
 
 const MIN_REASON = 3;
 const MAX_REASON = 500;
@@ -14,7 +15,8 @@ const MAX_REASON = 500;
 /**
  * Student document review: open the uploaded PDF, then approve or reject with a
  * reason. The database applies the decision to the document and the profile
- * together (review_student_verification), and only for admins.
+ * together (review_student_verification), only for verifiers in an MFA session.
+ * Opening a document and every decision are recorded with their reason.
  */
 export function DocumentsView({ client }: { client: SupabaseClient }) {
   const pending = useAsync(() => adminApi.pendingVerifications(client), "verifications");
@@ -42,6 +44,7 @@ export function DocumentsView({ client }: { client: SupabaseClient }) {
 }
 
 function ReviewCard({ client, item, onDone }: { client: SupabaseClient; item: PendingVerification; onDone: () => void }) {
+  const ask = useReason();
   const [url, setUrl] = useState<string | null>(null);
   const [opening, setOpening] = useState(false);
   const [rejecting, setRejecting] = useState(false);
@@ -51,10 +54,16 @@ function ReviewCard({ client, item, onDone }: { client: SupabaseClient; item: Pe
   const reasonValid = reason.trim().length >= MIN_REASON && reason.trim().length <= MAX_REASON;
 
   async function open() {
+    const why = await ask("Öğrenci belgesini aç", {
+      initial: "Öğrenci doğrulama incelemesi",
+      hint: "Gerekçe (zorunlu). Belgenin her açılışı gerekçesiyle kayıt altına alınır.",
+      confirmLabel: "Belgeyi aç",
+    });
+    if (!why) return;
     setOpening(true);
     setError(null);
     try {
-      setUrl(await adminApi.documentUrl(client, item.document_path));
+      setUrl(await withReason(why, () => adminApi.documentUrl(client, item.verification_id)));
     } catch (e) {
       console.error(e);
       setError(errorMessage(e));
@@ -64,10 +73,15 @@ function ReviewCard({ client, item, onDone }: { client: SupabaseClient; item: Pe
   }
 
   async function decide(approve: boolean) {
+    const why = await ask(approve ? "Belgeyi onayla" : "Belgeyi reddet", {
+      initial: approve ? "Belge geçerli; ad, üniversite ve bölüm profille eşleşiyor." : `Ret: ${reason.trim()}`,
+      confirmLabel: approve ? "Onayla" : "Reddet",
+    });
+    if (!why) return;
     setBusy(approve ? "approve" : "reject");
     setError(null);
     try {
-      await adminApi.reviewVerification(client, item.verification_id, approve, approve ? null : reason.trim());
+      await withReason(why, () => adminApi.reviewVerification(client, item.verification_id, approve, approve ? null : reason.trim()));
       onDone();
     } catch (e) {
       console.error(e);
