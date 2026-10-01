@@ -44,7 +44,7 @@ CI `android` job'ı: `testDebugUnitTest lintRelease assembleDebug bundleRelease`
 | `NoPersonalDataInLogsTest` | Kaynaklardaki `Log.*` çağrılarına e-posta, telefon, mesaj/belge içeriği geçmez |
 | `FunctionErrorTest` | Yeni KVKK hata kodları Türkçe mesaja çevrilir |
 
-Sonuç: bkz. aşağıdaki "CI sonucu".
+Sonuç: **PASS** (CI `6402e65`).
 
 ## 5. Sır taraması
 
@@ -68,4 +68,16 @@ KVKK RPC'leri oturum ister, yeni Edge Function'lar oturumsuz çağrıyı reddede
 
 ## CI sonucu
 
-Bu bölüm her push'tan sonra güncellenir; durum PR #1'in kontrol listesindedir.
+CI `6402e65` (çalıştırma 105, 2026-10-01): **PASS** — tüm job'lar yeşil:
+
+| Job | Sonuç |
+|---|---|
+| Database migrations and SQL tests (001–020) | PASS |
+| Edge Function type check and tests (44) | PASS |
+| Web lint, types, tests, build | PASS |
+| Leaked secret scan (dosyalar + geçmiş) | PASS |
+| Live Supabase checks (read-only) | PASS |
+| Android: testDebugUnitTest, lintRelease, assembleDebug, bundleRelease, imza kontrolü | PASS |
+| Test APK yayını (`apk-build-105`) | PASS |
+
+Web üretim dağıtımı (Vercel) aynı commit'ten: READY.
