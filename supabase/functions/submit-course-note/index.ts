@@ -1,10 +1,12 @@
 // POST /functions/v1/submit-course-note
-//   {"path": "<user id>/<uuid>.pdf", "course_code": "MAT101", "course_name": "...", "title": "...", "description": "..."}
+//   {"path": "<user id>/<uuid>.pdf", "course_code": "MAT101", "course_name": "...", "title": "...", "description": "...",
+//    "rights_declared": true}
 //
 // Called by the app after it uploaded a PDF to the private `course-notes`
 // bucket. Checks that the stored bytes are a real PDF within 20 MB, then
 // records the note with the service role; it is then visible to students of
-// the uploader's university. Invalid uploads are deleted.
+// the uploader's university. Invalid uploads are deleted. The uploader must declare that
+// they hold the rights to the content (rights_declared, recorded with the note).
 
 import { authenticate, readJson } from "../_shared/auth.ts";
 import { errorResponse, json } from "../_shared/http.ts";
@@ -41,6 +43,7 @@ Deno.serve(async (request) => {
     p_description: input.description,
     p_path: input.path,
     p_size: bytes.length,
+    p_rights_declared: input.rightsDeclared,
   });
   if (error) {
     const mapped = mapNoteError(error.message);

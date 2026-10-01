@@ -1,12 +1,15 @@
-// POST /functions/v1/admin-push   (admins only, JWT app_metadata.role)
-//   {"action": "status"}            -> is push set up?
+// POST /functions/v1/admin-push   (staff in an MFA session; the database checks the role)
+//   {"action": "status"}            -> is push (and the daily retention job) set up?
 //   {"action": "setup"}             -> records this project's functions URL so the
-//                                      database can call dispatch-push (D56)
-//   {"announcement_id": "<uuid>"}   -> sends an active announcement to the phones of
-//                                      the approved students it is meant for, once
+//                                      database can call dispatch-push (D56) and
+//                                      retention-run (D57); superadmin or compliance
+//   {"announcement_id": "<uuid>", "marketing": false}
+//                                   -> superadmin: sends an active announcement to the phones of
+//                                      the approved students it is meant for, once. A marketing
+//                                      announcement goes only to people with the push consent.
 // Tokens FCM no longer knows are removed.
 
-import { authenticate, readJson } from "../_shared/auth.ts";
+import { auditReason, authenticate, readJson, recordStaffAction, staffRoles } from "../_shared/auth.ts";
 import { announcementText, fcmAccessToken, sendToDevices } from "../_shared/fcm.ts";
 import { parseServiceAccount } from "../_shared/google-auth.ts";
 import { errorResponse, json, preflight, requireEnv, withCors } from "../_shared/http.ts";
@@ -23,12 +26,12 @@ async function handle(request: Request): Promise<Response> {
 
   const caller = await authenticate(request);
   if (!caller) return errorResponse("not_authenticated", 401);
-  if (!caller.isAdmin) return errorResponse("admin_required", 403);
-
   const input = await readJson(request);
   const fcmConfigured = parseServiceAccount(Deno.env.get("FCM_SERVICE_ACCOUNT")) !== null;
 
   if (input?.action === "status" || input?.action === "setup") {
+    const roles = await staffRoles(caller, input.action === "setup" ? ["compliance"] : ["verifier", "moderator", "compliance"]);
+    if (!roles) return errorResponse("admin_required", 403);
     if (input.action === "setup") {
       const url = `${requireEnv("SUPABASE_URL").replace(/\/+$/, "")}/functions/v1`;
       const { error } = await caller.admin.rpc("set_push_functions_url", { p_url: url });
@@ -50,8 +53,13 @@ async function handle(request: Request): Promise<Response> {
     });
   }
 
+  const roles = await staffRoles(caller, ["superadmin"]);
+  if (!roles) return errorResponse("admin_required", 403);
   const announcementId = input?.announcement_id;
   if (typeof announcementId !== "string" || !UUID.test(announcementId)) return errorResponse("invalid_request", 400);
+  const marketing = input?.marketing === true;
+  const reason = auditReason(request);
+  if (!reason) return errorResponse("audit_reason_required", 400);
 
   const account = parseServiceAccount(Deno.env.get("FCM_SERVICE_ACCOUNT"));
   if (!account) {
@@ -68,7 +76,10 @@ async function handle(request: Request): Promise<Response> {
   }
 
   // Claimed only after FCM is reachable, so a configuration error does not use up the one push.
-  const { data, error } = await caller.admin.rpc("claim_announcement_push", { p_announcement_id: announcementId });
+  const { data, error } = await caller.admin.rpc("claim_announcement_push", {
+    p_announcement_id: announcementId,
+    p_marketing: marketing,
+  });
   if (error) {
     for (const code of ["announcement_already_pushed", "announcement_not_found"]) {
       if (error.message.includes(code)) return errorResponse(code, 409);
@@ -78,10 +89,15 @@ async function handle(request: Request): Promise<Response> {
   }
   const target = (data as { title: string; body: string; tokens: string[] }[])[0];
   const tokens = target?.tokens ?? [];
+  await recordStaffAction(caller, roles, request, "push.announcement", { type: "announcements", id: announcementId }, reason, {
+    marketing,
+    devices: tokens.length,
+  });
 
   const results = await sendToDevices(fetch, account.projectId, accessToken, tokens, {
     ...announcementText(target.title, target.body),
-    data: { kind: "ANNOUNCEMENT", announcement_id: announcementId },
+    // The app shows marketing on its own channel with a way to turn it off (6563).
+    data: { kind: "ANNOUNCEMENT", announcement_id: announcementId, channel: marketing ? "marketing" : "service" },
   });
   const sent = results.filter((r) => r === "sent").length;
   const unregistered = tokens.filter((_, i) => results[i] === "unregistered");

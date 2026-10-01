@@ -23,7 +23,7 @@ export function requireEnv(name: string): string {
 // cookies, so any origin may call; the token decides what is allowed.
 export const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-audit-reason",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 

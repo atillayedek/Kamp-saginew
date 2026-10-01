@@ -3,7 +3,8 @@
 // Called by the app after it uploaded the PDF to the private
 // `student-documents` bucket. Verifies the caller, checks the stored bytes are
 // a real PDF within the size limit, then records the request with the service
-// role. Invalid uploads are deleted so they never reach an admin.
+// role. Invalid uploads are deleted so they never reach an admin. The document's SHA-256
+// is kept so the verdict stays verifiable after the file is destroyed.
 
 import { authenticate, readJson } from "../_shared/auth.ts";
 import { errorResponse, json } from "../_shared/http.ts";
@@ -26,7 +27,8 @@ Deno.serve(async (request) => {
   const { data: file, error: downloadError } = await admin.storage.from(BUCKET).download(path);
   if (downloadError || !file) return errorResponse("document_not_found", 404);
 
-  const check = checkDocument(new Uint8Array(await file.arrayBuffer()));
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const check = checkDocument(bytes);
   if (check !== "ok") {
     const { error: removeError } = await admin.storage.from(BUCKET).remove([path]);
     if (removeError) console.error("Could not remove rejected upload", removeError.message);
@@ -42,6 +44,12 @@ Deno.serve(async (request) => {
     if (mapped.status >= 500) console.error("submit_student_document failed", submitError.message);
     return errorResponse(mapped.code, mapped.status);
   }
+
+  // Only the fingerprint outlives the file (KVKK: the PDF is destroyed after the verdict).
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  const sha256 = Array.from(digest, (b) => b.toString(16).padStart(2, "0")).join("");
+  const { error: hashError } = await admin.rpc("set_student_document_sha256", { p_user_id: userId, p_path: path, p_sha256: sha256 });
+  if (hashError) console.error("set_student_document_sha256 failed", hashError.message);
 
   return json({ verification_id: verificationId }, 201);
 });

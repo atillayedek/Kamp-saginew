@@ -30,6 +30,11 @@ Deno.test("send maps FCM answers", async () => {
 Deno.test("push texts never include message content", () => {
   assertEquals(pushText("NEW_MESSAGE", "Ayşe Yılmaz"), { title: "Yeni mesaj", body: "Ayşe Yılmaz sana mesaj gönderdi." });
   assertEquals(pushText("NEW_COMMENT", null)?.body, "Bir öğrenci gönderine yorum yaptı.");
+  // Moderation and KVKK outcomes never carry the content or the reason on the lock screen.
+  for (const kind of ["CONTENT_REMOVED", "ACCOUNT_SUSPENDED", "APPEAL_DECIDED", "DSR_ANSWERED"]) {
+    assertEquals(typeof pushText(kind, "Ayşe")?.title, "string");
+    assertEquals(pushText(kind, "Ayşe")?.body.includes("Ayşe"), false);
+  }
   assertEquals(pushText("VERIFICATION_APPROVED", null)?.title, "Hesabın onaylandı");
   assertEquals(pushText("UNKNOWN", null), null);
 });

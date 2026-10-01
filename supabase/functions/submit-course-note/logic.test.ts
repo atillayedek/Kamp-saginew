@@ -3,7 +3,7 @@ import { checkNote, mapNoteError, MAX_NOTE_BYTES, parseNoteRequest } from "./log
 
 const USER = "0b8e2f7c-3c1a-4a55-9d7e-2f1e4b6a9c10";
 const PATH = `${USER}/1b8e2f7c-3c1a-4a55-9d7e-2f1e4b6a9c10.pdf`;
-const valid = { path: PATH, course_code: " MAT 101 ", course_name: "Matematik I", title: "Vize özeti", description: "  " };
+const valid = { path: PATH, course_code: " MAT 101 ", course_name: "Matematik I", title: "Vize özeti", description: "  ", rights_declared: true };
 
 Deno.test("accepts a complete request and trims it", () => {
   assertEquals(parseNoteRequest(valid, USER), {
@@ -12,7 +12,16 @@ Deno.test("accepts a complete request and trims it", () => {
     courseName: "Matematik I",
     title: "Vize özeti",
     description: null,
+    rightsDeclared: true,
   });
+});
+
+Deno.test("the uploader must declare the rights to the content", () => {
+  assertEquals(parseNoteRequest({ ...valid, rights_declared: false }, USER), null);
+  assertEquals(parseNoteRequest({ ...valid, rights_declared: "true" }, USER), null);
+  const { rights_declared: _omitted, ...withoutDeclaration } = valid;
+  assertEquals(parseNoteRequest(withoutDeclaration, USER), null);
+  assertEquals(mapNoteError("rights_declaration_required"), { code: "rights_declaration_required", status: 400 });
 });
 
 Deno.test("the file must be in the caller's own folder", () => {

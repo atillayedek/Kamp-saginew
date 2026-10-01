@@ -696,6 +696,27 @@ begin
 end;
 $$;
 
+-- Whether the daily destruction is scheduled and how the last run went.
+create function public.admin_retention_status()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+    if not public.has_staff_role('compliance') then
+        raise exception using errcode = 'P0001', message = 'admin_required';
+    end if;
+    return jsonb_build_object(
+        'pg_cron_installed', exists (select 1 from pg_extension where extname = 'pg_cron'),
+        'pg_net_installed', exists (select 1 from pg_extension where extname = 'pg_net'),
+        'functions_url_set', (select functions_url is not null from public.push_settings),
+        'last_run', (select to_jsonb(r) from public.retention_runs r order by r.started_at desc limit 1)
+    );
+end;
+$$;
+
 create function public.admin_retention_report(p_days integer default 30)
 returns table (day date, data_category text, reason text, method text, item_count bigint)
 language plpgsql
@@ -1058,6 +1079,41 @@ begin
 end;
 $$;
 
+-- Marketing pushes reach only people who gave the separate consent (6563 sayılı Kanun) ---------------------------
+
+alter table public.announcements add column push_marketing boolean;
+
+create function public.claim_announcement_push(p_announcement_id uuid, p_marketing boolean)
+returns table (title text, body text, tokens text[])
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+    v_announcement public.announcements%rowtype;
+begin
+    update public.announcements a
+    set pushed_at = now(), push_marketing = coalesce(p_marketing, false)
+    where a.id = p_announcement_id and a.pushed_at is null and a.ends_at > now()
+    returning a.* into v_announcement;
+    if not found then
+        if exists (select 1 from public.announcements a where a.id = p_announcement_id and a.pushed_at is not null) then
+            raise exception using errcode = 'P0001', message = 'announcement_already_pushed';
+        end if;
+        raise exception using errcode = 'P0001', message = 'announcement_not_found';
+    end if;
+
+    return query
+    select v_announcement.title, v_announcement.body, coalesce(array_agg(t.token), '{}')
+    from public.device_tokens t
+    join public.profiles p on p.id = t.user_id
+    where p.account_status = 'APPROVED'
+      and p.deletion_requested_at is null
+      and (not coalesce(p_marketing, false) or p.marketing_push_opt_in)
+      and (v_announcement.university_id is null or p.university_id = v_announcement.university_id);
+end;
+$$;
+
 -- Course notes: the uploader's rights declaration ---------------------------------------------------------------
 
 alter table public.course_notes add column rights_declared_at timestamptz;
@@ -1376,6 +1432,7 @@ begin
         'public.admin_save_breach(uuid, timestamptz, text, text[], integer, text, timestamptz, timestamptz, boolean)',
         'public.admin_list_breaches()', 'public.request_account_deletion()', 'public.cancel_account_deletion()',
         'public.my_account_deletion()', 'public.set_show_full_name(boolean)', 'public.admin_retention_report(integer)',
+        'public.admin_retention_status()',
         'public.my_moderation_decisions()', 'public.submit_moderation_appeal(uuid, text)', 'public.admin_list_appeals()',
         'public.admin_decide_appeal(uuid, boolean, text)', 'public.admin_report_context(uuid)',
         'public.admin_list_copyright_notices()', 'public.admin_resolve_copyright_notice(uuid, text, text, uuid)',
@@ -1390,6 +1447,7 @@ begin
         'public.set_student_document_sha256(uuid, text, text)', 'public.retention_due()',
         'public.record_document_purged(uuid)', 'public.record_export_deleted(uuid)', 'public.record_inactive_notice(uuid)',
         'public.prepare_account_deletion(uuid, text)', 'public.record_retention_run(timestamptz, jsonb, text)',
+        'public.claim_announcement_push(uuid, boolean)',
         'public.create_course_note(uuid, text, text, text, text, text, bigint, boolean)'
     ] loop
         execute format('revoke all on function %s from public, anon, authenticated', f);

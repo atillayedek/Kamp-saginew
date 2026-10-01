@@ -100,6 +100,14 @@ export function pushText(kind: string, actorName: string | null): { title: strin
       return { title: "Hesabın onaylandı", body: "Öğrenci doğrulaman tamamlandı. KampüsAğı'na hoş geldin!" };
     case "VERIFICATION_REJECTED":
       return { title: "Belgen onaylanmadı", body: "Nedenini görmek ve yeni belge yüklemek için uygulamayı aç." };
+    case "CONTENT_REMOVED":
+      return { title: "İçeriğin kaldırıldı", body: "Gerekçesini görmek ve itiraz etmek için uygulamayı aç." };
+    case "ACCOUNT_SUSPENDED":
+      return { title: "Hesabın askıya alındı", body: "Gerekçesini görmek ve itiraz etmek için uygulamayı aç." };
+    case "APPEAL_DECIDED":
+      return { title: "İtirazın sonuçlandı", body: "Sonucu görmek için uygulamayı aç." };
+    case "DSR_ANSWERED":
+      return { title: "KVKK başvurun yanıtlandı", body: "Yanıtı görmek için uygulamayı aç." };
     default:
       return null;
   }

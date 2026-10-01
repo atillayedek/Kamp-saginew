@@ -1,12 +1,13 @@
 // POST /functions/v1/admin-broadcast
 //   {"subject": "...", "body": "...", "audience": "ALL", "marketing": false, "test_only": false}
 //
-// Sends an e-mail to a group of students through Resend. Admins only (JWT
-// app_metadata.role). Marketing mail goes only to people who opted in and
+// Sends an e-mail to a group of students through Resend. Superadmins only, in an
+// MFA session, with a reason (x-audit-reason); every send is recorded in
+// admin_audit_logs. Marketing mail goes only to people who opted in and
 // carries a signed unsubscribe link; suspended accounts never receive mail.
 // With test_only the mail goes to the calling admin alone and is not logged.
 
-import { authenticate, readJson } from "../_shared/auth.ts";
+import { auditReason, authenticate, readJson, recordStaffAction, staffRoles } from "../_shared/auth.ts";
 import {
   broadcastStatus,
   isValidSender,
@@ -31,10 +32,13 @@ async function handle(request: Request): Promise<Response> {
 
   const caller = await authenticate(request);
   if (!caller) return errorResponse("not_authenticated", 401);
-  if (!caller.isAdmin) return errorResponse("admin_required", 403);
+  const roles = await staffRoles(caller, ["superadmin"]);
+  if (!roles) return errorResponse("admin_required", 403);
 
   const input = parseBroadcastRequest(await readJson(request));
   if (!input) return errorResponse("invalid_request", 400);
+  const reason = auditReason(request);
+  if (!reason && !input.testOnly) return errorResponse("audit_reason_required", 400);
 
   const apiKey = Deno.env.get("RESEND_API_KEY");
   const from = Deno.env.get("RESEND_FROM");
@@ -100,6 +104,14 @@ async function handle(request: Request): Promise<Response> {
   }).select("id").single();
   if (insertError || !row) {
     console.error("Could not log the broadcast", insertError?.message);
+    return errorResponse("server_error", 500);
+  }
+
+  if (!await recordStaffAction(caller, roles, request, "email.broadcast", { type: "email_broadcasts", id: row.id }, reason!, {
+    audience: input.audience,
+    marketing: input.marketing,
+    recipients: recipients.length,
+  })) {
     return errorResponse("server_error", 500);
   }
 

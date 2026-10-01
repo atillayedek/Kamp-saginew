@@ -77,7 +77,8 @@ else
   failures=$((failures + 1))
 fi
 rm -f "$unsub_body"
-for fn in submit-student-document verify-purchase delete-account admin-broadcast submit-course-note admin-push; do
+for fn in submit-student-document verify-purchase delete-account admin-broadcast submit-course-note admin-push \
+          admin-document export-my-data; do
   check "function $fn: requires a signed-in user" 401 '"error":"not_authenticated"' \
     -X POST "${SUPABASE_URL}/functions/v1/${fn}" "${anon[@]}" -d '{}'
 done
@@ -85,6 +86,16 @@ done
 # The push webhook refuses calls without its secret (or says push is not set up yet).
 check "function dispatch-push: requires the webhook secret" 401 '"error":"not_authenticated"' \
   -X POST "${SUPABASE_URL}/functions/v1/dispatch-push" "${anon[@]}" -d '{}'
+check "function retention-run: requires the webhook secret" 401 '"error":"not_authenticated"' \
+  -X POST "${SUPABASE_URL}/functions/v1/retention-run" "${anon[@]}" -d '{}'
+
+# KVKK: logs are never readable from the API, legal texts always are.
+for table in consent_logs access_logs admin_audit_logs deletion_logs data_subject_requests breach_register; do
+  check "rest: ${table} not readable by signed-out callers" 401 'permission denied' \
+    "${SUPABASE_URL}/rest/v1/${table}?select=*&limit=1" "${anon[@]}"
+done
+check "rest: active legal texts are public" 200 'aydinlatma_metni' \
+  -X POST "${SUPABASE_URL}/rest/v1/rpc/list_legal_documents" "${anon[@]}" -d '{}'
 
 if [ "$failures" -gt 0 ]; then
   echo "${failures} live check(s) failed"

@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert@1";
-import { collectUserFiles, isConfirmed, PAGE_SIZE } from "./logic.ts";
+import { collectUserFiles, isConfirmed, PAGE_SIZE } from "./user-files.ts";
 
 const USER = "0b8e2f7c-3c1a-4a55-9d7e-2f1e4b6a9c10";
 

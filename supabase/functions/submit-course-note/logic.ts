@@ -13,12 +13,15 @@ export interface NoteRequest {
   courseName: string;
   title: string;
   description: string | null;
+  /** The uploader declared that they hold the rights or have permission (FSEK). */
+  rightsDeclared: true;
 }
 
 /** The request body, or null when a field is missing or out of range. The path must be in the caller's folder. */
 export function parseNoteRequest(raw: Record<string, unknown> | null, userId: string): NoteRequest | null {
   if (!raw) return null;
-  const { path, course_code: courseCode, course_name: courseName, title, description } = raw;
+  const { path, course_code: courseCode, course_name: courseName, title, description, rights_declared: rightsDeclared } = raw;
+  if (rightsDeclared !== true) return null;
   if (typeof path !== "string" || PATH.exec(path)?.[1] !== userId) return null;
   if (typeof courseCode !== "string" || typeof courseName !== "string" || typeof title !== "string") return null;
   if (description !== undefined && description !== null && typeof description !== "string") return null;
@@ -26,7 +29,7 @@ export function parseNoteRequest(raw: Record<string, unknown> | null, userId: st
   const d = typeof description === "string" ? description.trim() : "";
   if (code.length < 2 || code.length > 20) return null;
   if (name.length < 2 || name.length > 120 || t.length < 2 || t.length > 120 || d.length > 500) return null;
-  return { path, courseCode: code, courseName: name, title: t, description: d === "" ? null : d };
+  return { path, courseCode: code, courseName: name, title: t, description: d === "" ? null : d, rightsDeclared: true };
 }
 
 export function checkNote(bytes: Uint8Array): PdfCheck {
@@ -42,6 +45,8 @@ export function mapNoteError(message: string | undefined): { code: string; statu
       return { code: "invalid_document_path", status: 400 };
     case "invalid_note":
       return { code: "invalid_note", status: 400 };
+    case "rights_declaration_required":
+      return { code: "rights_declaration_required", status: 400 };
     case "rate_limited":
       return { code: "rate_limited", status: 429 };
     default:
