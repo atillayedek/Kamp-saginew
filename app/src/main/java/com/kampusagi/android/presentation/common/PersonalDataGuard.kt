@@ -49,7 +49,8 @@ class PersonalDataGuard {
 fun rememberPersonalDataGuard(): PersonalDataGuard {
     val guard = remember { PersonalDataGuard() }
     if (guard.found.isNotEmpty()) {
-        val kinds = guard.found.joinToString(", ") { kind ->
+        // map is inline, so stringResource may be called inside it (joinToString's lambda is not).
+        val kinds = guard.found.map { kind ->
             stringResource(
                 when (kind) {
                     PersonalDataDetector.Kind.TC_IDENTITY_NUMBER -> R.string.personal_data_tc
@@ -57,7 +58,7 @@ fun rememberPersonalDataGuard(): PersonalDataGuard {
                     PersonalDataDetector.Kind.PHONE_NUMBER -> R.string.personal_data_phone
                 },
             )
-        }
+        }.joinToString(", ")
         AlertDialog(
             onDismissRequest = guard::dismiss,
             title = { Text(stringResource(R.string.personal_data_warning_title)) },
