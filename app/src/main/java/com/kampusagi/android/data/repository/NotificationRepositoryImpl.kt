@@ -3,7 +3,6 @@ package com.kampusagi.android.data.repository
 import android.util.Log
 import com.kampusagi.android.data.remote.NotificationDto
 import com.kampusagi.android.data.remote.SupabaseProvider
-import com.kampusagi.android.data.remote.UnknownStatusException
 import com.kampusagi.android.data.remote.safeCall
 import com.kampusagi.android.data.remote.toAppError
 import com.kampusagi.android.domain.model.AppError
@@ -37,10 +36,15 @@ class NotificationRepositoryImpl @Inject constructor(
     override suspend fun notifications(): AppResult<List<AppNotification>> = call { client ->
         client.postgrest.rpc("list_notifications", JsonObject(emptyMap()))
             .decodeList<NotificationDto>()
-            .map {
+            .mapNotNull {
+                // A kind added on the server after this app version is skipped, not an error for the whole list.
+                val kind = NotificationKind.entries.firstOrNull { k -> k.name == it.kind } ?: run {
+                    Log.w(TAG, "Skipping notification of unknown kind ${it.kind}")
+                    return@mapNotNull null
+                }
                 AppNotification(
                     id = it.id,
-                    kind = NotificationKind.entries.firstOrNull { k -> k.name == it.kind } ?: throw UnknownStatusException(it.kind),
+                    kind = kind,
                     createdAt = it.createdAt,
                     read = it.readAt != null,
                     actorName = it.actorFullName ?: it.actorUsername?.let { name -> "@$name" },

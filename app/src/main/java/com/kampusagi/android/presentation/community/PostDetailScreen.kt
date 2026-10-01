@@ -1,5 +1,7 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.presentation.common.MentionSuggestionList
+import com.kampusagi.android.presentation.common.LinkedBodyText
 import com.kampusagi.android.presentation.common.rememberPersonalDataGuard
 import com.kampusagi.android.core.designsystem.icon.AppIcons
 import androidx.compose.foundation.clickable
@@ -123,7 +125,7 @@ fun PostDetailScreen(
                             ) {
                                 AuthorLine(post.author, post.createdAt, modifier = Modifier.clickable { onOpenAuthor(post.author.id) })
                                 PostLabels(post)
-                                Text(post.body, style = MaterialTheme.typography.bodyLarge)
+                                LinkedBodyText(post.body, style = MaterialTheme.typography.bodyLarge)
                             }
                             PostMedia(post.media)
                             PostAttachments(post, callbacks)
@@ -192,6 +194,11 @@ fun PostDetailScreen(
                         modifier = Modifier.padding(horizontal = Spacing.md),
                     )
                 }
+                MentionSuggestionList(
+                    viewModel.mentions.suggestions,
+                    onPick = viewModel::pickMention,
+                    modifier = Modifier.padding(horizontal = Spacing.sm),
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().padding(Spacing.sm),
@@ -258,7 +265,7 @@ private fun CommentRow(
     ) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             AuthorLine(comment.author, comment.createdAt, modifier = Modifier.clickable { onOpenAuthor(comment.author.id) })
-            Text(comment.body, style = MaterialTheme.typography.bodyMedium)
+            LinkedBodyText(comment.body, style = MaterialTheme.typography.bodyMedium)
         }
         if (comment.isMine) {
             IconButton(onClick = onDelete, enabled = enabled) {

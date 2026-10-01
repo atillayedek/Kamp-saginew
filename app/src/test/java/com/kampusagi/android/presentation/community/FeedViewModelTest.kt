@@ -6,12 +6,14 @@ import com.kampusagi.android.domain.model.Author
 import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
+import com.kampusagi.android.domain.model.MentionSuggestion
 import com.kampusagi.android.domain.model.NewPost
 import com.kampusagi.android.domain.model.PersonSummary
 import com.kampusagi.android.domain.model.Poll
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
+import com.kampusagi.android.domain.model.TagCount
 import com.kampusagi.android.domain.model.UserProfile
 import com.kampusagi.android.domain.repository.CommunityRepository
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +65,10 @@ private class ScriptedCommunityRepository : CommunityRepository {
     override suspend fun searchPeople(query: String): AppResult<List<PersonSummary>> = AppResult.Success(emptyList())
     override suspend fun userProfile(userId: String): AppResult<UserProfile> = AppResult.Failure(AppError.NOT_FOUND)
     override suspend fun userPosts(userId: String, cursor: FeedCursor?): AppResult<FeedPage> = AppResult.Success(FeedPage(emptyList(), null))
+    override suspend fun tagPosts(tag: String, cursor: FeedCursor?): AppResult<FeedPage> = AppResult.Success(FeedPage(emptyList(), null))
+    override suspend fun popularTags(): AppResult<List<TagCount>> = AppResult.Success(emptyList())
+    override suspend fun suggestMentions(query: String, scope: PostScope): AppResult<List<MentionSuggestion>> = AppResult.Success(emptyList())
+    override suspend fun resolveUsername(username: String): AppResult<String> = AppResult.Failure(AppError.NOT_FOUND)
     override suspend fun downloadPhoto(path: String): AppResult<ByteArray> = AppResult.Failure(AppError.NOT_FOUND)
 }
 

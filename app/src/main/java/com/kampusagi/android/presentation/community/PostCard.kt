@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.presentation.common.LinkedBodyText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -142,7 +143,7 @@ fun PostCard(post: Post, callbacks: PostCallbacks, modifier: Modifier = Modifier
         ) {
             AuthorLine(post.author, post.createdAt, modifier = Modifier.clickable { callbacks.onOpenAuthor(post.author.id) })
             PostLabels(post)
-            Text(post.body, style = MaterialTheme.typography.bodyLarge, maxLines = 12, overflow = TextOverflow.Ellipsis)
+            LinkedBodyText(post.body, style = MaterialTheme.typography.bodyLarge, maxLines = 12, overflow = TextOverflow.Ellipsis)
         }
         PostMedia(post.media)
         Column(

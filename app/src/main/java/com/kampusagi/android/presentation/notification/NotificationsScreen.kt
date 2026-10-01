@@ -118,6 +118,7 @@ private fun AppNotification.text(): String {
     return when (kind) {
         NotificationKind.NEW_MESSAGE -> stringResource(R.string.notification_new_message, who)
         NotificationKind.NEW_COMMENT -> stringResource(R.string.notification_new_comment, who)
+        NotificationKind.MENTIONED -> stringResource(R.string.notification_mentioned, who)
         NotificationKind.VERIFICATION_APPROVED -> stringResource(R.string.notification_verification_approved)
         NotificationKind.VERIFICATION_REJECTED -> stringResource(R.string.notification_verification_rejected)
         NotificationKind.CONTENT_REMOVED -> stringResource(R.string.notification_content_removed)

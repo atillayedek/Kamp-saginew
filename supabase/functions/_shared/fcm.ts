@@ -102,6 +102,8 @@ export function pushText(kind: string, actorName: string | null): { title: strin
       return { title: "Yeni mesaj", body: `${who} sana mesaj gönderdi.` };
     case "NEW_COMMENT":
       return { title: "Yeni yorum", body: `${who} gönderine yorum yaptı.` };
+    case "MENTIONED":
+      return { title: "Senden bahsedildi", body: `${who} seni bir gönderide etiketledi.` };
     case "VERIFICATION_APPROVED":
       return { title: "Hesabın onaylandı", body: "Öğrenci doğrulaman tamamlandı. KampüsAğı'na hoş geldin!" };
     case "VERIFICATION_REJECTED":

@@ -24,6 +24,8 @@ data class MessageCursor(val createdAt: String, val id: String)
 enum class NotificationKind {
     NEW_MESSAGE,
     NEW_COMMENT,
+    /** Someone wrote "@username" for the person in a post or comment; opens the post. */
+    MENTIONED,
     VERIFICATION_APPROVED,
     VERIFICATION_REJECTED,
     /** A moderator removed the person's content; the reason and the appeal are in Privacy → decisions. */

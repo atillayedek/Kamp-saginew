@@ -1,5 +1,6 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.presentation.common.MentionSuggestionList
 import com.kampusagi.android.presentation.common.rememberPersonalDataGuard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -111,6 +112,7 @@ fun CreatePostScreen(
                 enabled = enabled,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 140.dp),
             )
+            MentionSuggestionList(viewModel.mentions.suggestions, onPick = viewModel::pickMention)
 
             PhotoPicker(
                 photos = viewModel.photos,

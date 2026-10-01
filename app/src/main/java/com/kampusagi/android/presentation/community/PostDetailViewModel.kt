@@ -1,5 +1,8 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.presentation.common.MentionSuggester
+import com.kampusagi.android.domain.model.PostScope
+import com.kampusagi.android.domain.model.MentionSuggestion
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,6 +48,9 @@ class PostDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val postId = savedStateHandle.toRoute<PostDetailRoute>().postId
+
+    /** People offered while "@name" is typed at the end of a comment. */
+    val mentions = MentionSuggester(repository, viewModelScope)
 
     var state by mutableStateOf<PostDetailState>(PostDetailState.Loading)
         private set
@@ -106,6 +112,13 @@ class PostDetailViewModel @Inject constructor(
     fun onCommentTextChange(value: String) {
         if (value.length <= PostTextValidator.MAX_COMMENT_LENGTH) commentText = value
         actionError = null
+        // A comment can only reach people who can see the post.
+        val scope = (state as? PostDetailState.Loaded)?.post?.scope ?: PostScope.UNIVERSITY
+        mentions.onTextChanged(commentText, scope)
+    }
+
+    fun pickMention(suggestion: MentionSuggestion) {
+        onCommentTextChange(mentions.complete(commentText, suggestion))
     }
 
     fun sendComment() = runAction {

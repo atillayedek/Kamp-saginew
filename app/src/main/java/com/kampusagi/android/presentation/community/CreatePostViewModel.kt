@@ -1,5 +1,8 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.domain.model.MentionSuggestion
+import com.kampusagi.android.domain.repository.CommunityRepository
+import com.kampusagi.android.presentation.common.MentionSuggester
 import android.graphics.BitmapFactory
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +50,11 @@ class CreatePostViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val createPost: CreatePostUseCase,
     private val imageEncoder: ImageEncoder,
+    community: CommunityRepository,
 ) : ViewModel() {
+
+    /** People offered while "@name" is typed at the end of the text. */
+    val mentions = MentionSuggester(community, viewModelScope)
 
     var scope by mutableStateOf(savedStateHandle.toRoute<CreatePostRoute>().scope)
         private set
@@ -111,6 +118,7 @@ class CreatePostViewModel @Inject constructor(
 
     fun onScopeChange(value: PostScope) {
         scope = value
+        mentions.onTextChanged(body, scope)
     }
 
     fun onCategoryChange(value: PostCategory) {
@@ -121,6 +129,11 @@ class CreatePostViewModel @Inject constructor(
     fun onBodyChange(value: String) {
         if (value.length <= PostTextValidator.MAX_POST_LENGTH) body = value
         error = null
+        mentions.onTextChanged(body, scope)
+    }
+
+    fun pickMention(suggestion: MentionSuggestion) {
+        onBodyChange(mentions.complete(body, suggestion))
     }
 
     fun onPhotosPicked(uris: List<String>) {

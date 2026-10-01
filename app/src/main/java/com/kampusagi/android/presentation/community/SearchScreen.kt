@@ -1,5 +1,12 @@
 package com.kampusagi.android.presentation.community
 
+import com.kampusagi.android.domain.usecase.BodyLinks
+import com.kampusagi.android.domain.model.TagCount
+import androidx.compose.material3.AssistChip
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Arrangement
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +81,26 @@ class SearchViewModel @Inject constructor(
     var people by mutableStateOf<PeopleState>(PeopleState.Idle)
         private set
 
+    /** Most used #tags of the week, offered before anything is typed. */
+    var popularTags by mutableStateOf<List<TagCount>>(emptyList())
+        private set
+
+    /** The tag key when the query is a "#tag", to open its page directly. */
+    val typedTag: String? get() = query.trim().takeIf { it.startsWith("#") }?.let(BodyLinks::tagKey)
+
     private var searchJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            popularTags = when (val result = repository.popularTags()) {
+                is AppResult.Success -> result.value
+                is AppResult.Failure -> {
+                    Log.w(TAG, "Popular tags failed: ${result.error}")
+                    emptyList()
+                }
+            }
+        }
+    }
 
     val hasQuery: Boolean get() = query.trim().length >= MIN_QUERY
 
@@ -112,18 +138,20 @@ class SearchViewModel @Inject constructor(
     }
 
     private companion object {
+        const val TAG = "SearchViewModel"
         const val MIN_QUERY = 2
         const val MAX_QUERY = 64
         const val DEBOUNCE_MS = 350L
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(
     onBack: () -> Unit,
     onOpenPost: (String) -> Unit,
     onOpenPerson: (String) -> Unit,
+    onOpenTag: (String) -> Unit,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val focus = remember { FocusRequester() }
@@ -159,7 +187,32 @@ fun SearchScreen(
                 )
             }
         }
+        viewModel.typedTag?.let { tag ->
+            AssistChip(
+                onClick = { onOpenTag(tag) },
+                label = { Text(stringResource(R.string.search_open_tag, tag)) },
+                modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
+            )
+        }
         if (!viewModel.hasQuery) {
+            if (viewModel.popularTags.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.search_popular_tags),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(start = Spacing.md, end = Spacing.md, top = Spacing.md),
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    modifier = Modifier.padding(horizontal = Spacing.md),
+                ) {
+                    viewModel.popularTags.forEach { tag ->
+                        AssistChip(
+                            onClick = { onOpenTag(tag.tag) },
+                            label = { Text(stringResource(R.string.search_tag_chip, tag.tag, tag.postCount)) },
+                        )
+                    }
+                }
+            }
             MessageView(
                 icon = AppIcons.Search,
                 title = stringResource(R.string.search_title),

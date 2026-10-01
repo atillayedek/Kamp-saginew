@@ -110,7 +110,7 @@ private fun knownCode(text: String): AppError? = when {
     "event_ended" in text -> AppError.EVENT_ENDED
     "too_many_saved_posts" in text -> AppError.TOO_MANY_SAVED
     "invalid_media" in text || "invalid_poll" in text || "invalid_event" in text || "invalid_price" in text -> AppError.INVALID_INPUT
-    "invalid_query" in text -> AppError.INVALID_INPUT
+    "invalid_query" in text || "invalid_tag" in text -> AppError.INVALID_INPUT
     "poll_not_found" in text || "event_not_found" in text || "listing_not_found" in text -> AppError.NOT_FOUND
     "rate_limited" in text -> AppError.RATE_LIMITED
     "sensitive_tag" in text -> AppError.SENSITIVE_TAG

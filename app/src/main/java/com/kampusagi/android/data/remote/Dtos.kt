@@ -101,6 +101,20 @@ data class PersonDto(
 )
 
 @Serializable
+data class MentionSuggestionDto(
+    @SerialName("user_id") val userId: String,
+    val username: String,
+    @SerialName("display_name") val displayName: String? = null,
+    val university: String? = null,
+)
+
+@Serializable
+data class TagCountDto(
+    val tag: String,
+    @SerialName("post_count") val postCount: Long,
+)
+
+@Serializable
 data class UserProfileDto(
     @SerialName("user_id") val userId: String,
     @SerialName("full_name") val fullName: String? = null,

@@ -22,6 +22,10 @@ import kotlinx.serialization.Serializable
 @Serializable data object SavedPostsRoute
 @Serializable data object EventsRoute
 @Serializable data class UserProfileRoute(val userId: String)
+/** Posts with a #tag; [tag] is the folded key ("kampus"). */
+@Serializable data class TagPostsRoute(val tag: String)
+/** "@username" tapped in a post or comment; resolves to [UserProfileRoute]. */
+@Serializable data class MentionRoute(val username: String)
 @Serializable data class DiscoverGroupsRoute(val kind: GroupKind)
 @Serializable data class CreateGroupRoute(val kind: GroupKind)
 @Serializable data class GroupRoute(val groupId: String)

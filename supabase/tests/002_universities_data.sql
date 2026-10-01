@@ -1,9 +1,10 @@
 -- The universities data migration loads the product owner's list completely.
 
--- 1. Every institution from supabase/data/province-universities.json is present and active.
+-- 1. Every institution from supabase/data/province-universities.json is present and active
+--    (Northern Cyprus universities, city "… (KKTC)", are checked in 021).
 begin;
-select tests.assert_equals((select count(*) from public.universities), 206::bigint, 'institution count');
-select tests.assert_equals((select count(distinct city) from public.universities), 81::bigint, 'province count');
+select tests.assert_equals((select count(*) from public.universities where city not like '% (KKTC)'), 206::bigint, 'institution count');
+select tests.assert_equals((select count(distinct city) from public.universities where city not like '% (KKTC)'), 81::bigint, 'province count');
 select tests.assert_equals((select count(*) from public.universities where not is_active), 0::bigint, 'all active');
 rollback;
 
@@ -31,7 +32,7 @@ begin;
 create temp table ids as select tests.create_user('liste@example.edu.tr') as a;
 grant select on ids to authenticated;
 select tests.act_as((select a from ids));
-select tests.assert_equals((select count(*) from public.universities), 206::bigint, 'visible to signed-in users');
+select tests.assert_equals((select count(*) from public.universities), 225::bigint, 'visible to signed-in users (206 + 19 KKTC)');
 select tests.reset_role();
 select tests.act_as_anon();
 select tests.assert_equals((select count(*) from public.universities), 0::bigint, 'hidden from anon');

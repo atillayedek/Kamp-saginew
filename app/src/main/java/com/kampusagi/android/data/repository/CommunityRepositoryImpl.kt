@@ -3,10 +3,12 @@ package com.kampusagi.android.data.repository
 import android.util.Log
 import com.kampusagi.android.core.config.AppConfig
 import com.kampusagi.android.data.remote.CommentDto
+import com.kampusagi.android.data.remote.MentionSuggestionDto
 import com.kampusagi.android.data.remote.PersonDto
 import com.kampusagi.android.data.remote.PollDto
 import com.kampusagi.android.data.remote.PostDto
 import com.kampusagi.android.data.remote.SupabaseProvider
+import com.kampusagi.android.data.remote.TagCountDto
 import com.kampusagi.android.data.remote.UnknownStatusException
 import com.kampusagi.android.data.remote.UserProfileDto
 import com.kampusagi.android.data.remote.safeCall
@@ -19,6 +21,7 @@ import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Listing
+import com.kampusagi.android.domain.model.MentionSuggestion
 import com.kampusagi.android.domain.model.NewPost
 import com.kampusagi.android.domain.model.PersonSummary
 import com.kampusagi.android.domain.model.Poll
@@ -26,6 +29,7 @@ import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostEvent
 import com.kampusagi.android.domain.model.PostScope
+import com.kampusagi.android.domain.model.TagCount
 import com.kampusagi.android.domain.model.UserProfile
 import com.kampusagi.android.domain.repository.CommunityRepository
 import io.github.jan.supabase.SupabaseClient
@@ -241,6 +245,35 @@ class CommunityRepositoryImpl @Inject constructor(
         page(posts)
     }
 
+    override suspend fun tagPosts(tag: String, cursor: FeedCursor?): AppResult<FeedPage> = call { client ->
+        val posts = client.postgrest.rpc(
+            "list_tag_posts",
+            buildJsonObject {
+                put("p_tag", tag)
+                put("p_before_created_at", cursor?.createdAt)
+                put("p_before_id", cursor?.id)
+                put("p_limit", PAGE_SIZE)
+            },
+        ).decodeList<PostDto>().map { it.toDomain() }
+        page(posts)
+    }
+
+    override suspend fun popularTags(): AppResult<List<TagCount>> = call { client ->
+        client.postgrest.rpc("popular_tags", buildJsonObject { put("p_limit", POPULAR_TAGS) })
+            .decodeList<TagCountDto>()
+            .map { TagCount(it.tag, it.postCount) }
+    }
+
+    override suspend fun suggestMentions(query: String, scope: PostScope): AppResult<List<MentionSuggestion>> = call { client ->
+        client.postgrest.rpc("suggest_mentions", params("p_query" to query, "p_scope" to scope.name))
+            .decodeList<MentionSuggestionDto>()
+            .map { MentionSuggestion(it.userId, it.username, it.displayName, it.university) }
+    }
+
+    override suspend fun resolveUsername(username: String): AppResult<String> = call { client ->
+        client.postgrest.rpc("resolve_username", params("p_username" to username)).decodeAs<String>()
+    }
+
     override suspend fun downloadPhoto(path: String): AppResult<ByteArray> = call { client ->
         client.storage.from(AppConfig.POST_MEDIA_BUCKET).downloadAuthenticated(path)
     }
@@ -292,6 +325,7 @@ class CommunityRepositoryImpl @Inject constructor(
 
     companion object {
         const val PAGE_SIZE = 20
+        private const val POPULAR_TAGS = 12
         private const val TAG = "CommunityRepository"
     }
 }

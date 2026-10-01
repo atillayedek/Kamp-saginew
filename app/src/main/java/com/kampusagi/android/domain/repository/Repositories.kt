@@ -23,6 +23,7 @@ import com.kampusagi.android.domain.model.Comment
 import com.kampusagi.android.domain.model.FeedCursor
 import com.kampusagi.android.domain.model.FeedPage
 import com.kampusagi.android.domain.model.Match
+import com.kampusagi.android.domain.model.MentionSuggestion
 import com.kampusagi.android.domain.model.MessageCursor
 import com.kampusagi.android.domain.model.NewPost
 import com.kampusagi.android.domain.model.PersonSummary
@@ -32,6 +33,7 @@ import com.kampusagi.android.domain.model.Plan
 import com.kampusagi.android.domain.model.StoreOffer
 import com.kampusagi.android.domain.model.StorePurchase
 import com.kampusagi.android.domain.model.SubscriptionStatus
+import com.kampusagi.android.domain.model.TagCount
 import com.kampusagi.android.domain.model.Post
 import com.kampusagi.android.domain.model.PostCategory
 import com.kampusagi.android.domain.model.PostScope
@@ -157,6 +159,18 @@ interface CommunityRepository {
     suspend fun searchPeople(query: String): AppResult<List<PersonSummary>>
     suspend fun userProfile(userId: String): AppResult<UserProfile>
     suspend fun userPosts(userId: String, cursor: FeedCursor?): AppResult<FeedPage>
+
+    /** Visible posts with a #tag ([tag] with or without "#", any case), newest first. */
+    suspend fun tagPosts(tag: String, cursor: FeedCursor?): AppResult<FeedPage>
+
+    /** Most used tags of the last week among posts the person can see. */
+    suspend fun popularTags(): AppResult<List<TagCount>>
+
+    /** People to offer after "@"; university-only posts offer classmates only. */
+    suspend fun suggestMentions(query: String, scope: PostScope): AppResult<List<MentionSuggestion>>
+
+    /** Profile id behind "@username", under the profile visibility rules. */
+    suspend fun resolveUsername(username: String): AppResult<String>
 
     /** Downloads a post photo with the signed-in session; the bucket is private. */
     suspend fun downloadPhoto(path: String): AppResult<ByteArray>

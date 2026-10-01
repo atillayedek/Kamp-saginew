@@ -68,6 +68,8 @@ Belge içeriği (T.C. kimlik no, fotoğraf, adres) okunmaz, OCR yapılmaz, ayrı
 | Biyografi, profil fotoğrafı | `profiles.bio`, Storage `avatars/` | Profil | md.5/2-c | Üyelik | Kişi, Öğrenci |
 | Gönderiler, fotoğraflar, anket/etkinlik/ilan | `posts`, `post_media` (+ Storage `post-media/`), `polls`, `poll_options`, `post_events`, `post_listings` | Akış | md.5/2-c | Kişi silene kadar / hesapla | Kişi, Öğrenci (görünürlük kuralı), M (yalnızca şikâyet alıntısı) |
 | Yorumlar, beğeniler, oylar, katılımlar, kaydedilenler | `comments`, `post_likes`, `poll_votes`, `event_attendees`, `saved_posts` | Akış | md.5/2-c | Hesapla | Kişi, Öğrenci (kaydedilenler yalnızca kişi) |
+| Konu etiketleri (#) | `post_tags` (gönderi metninden türetilir, katlanmış anahtar) | Etiket sayfası, popüler etiketler | md.5/2-c | Gönderiyle birlikte (CASCADE) | Yalnızca fonksiyonlar; Öğrenci gönderiyi görebiliyorsa |
+| Kişi etiketleri (@) | `post_mentions`, `comment_mentions` (+ `notifications` `MENTIONED`) | Etiketlenen kişiye bildirim | md.5/2-c | Gönderi/yorum ya da hesap silinince (CASCADE) | Yalnızca fonksiyonlar (API kapalı); etiketlenen kişi bildirimini görür |
 | İhtiyaç ilanları (başlık, açıklama, etiket, yer metni, tarih) | `requirements` | Eşleşme | md.5/2-c | Kişi kapatana/silene kadar / hesapla | Kişi, eşleşen öğrenciler |
 | Eşleşme itirazları | `match_objections` | md.11/1-g | md.5/2-ç | Hesapla | Kişi (etkisi), U/S |
 | Ders notları (PDF) + telif beyanı zamanı | `course_notes` (+ Storage `course-notes/`) | Not paylaşımı | md.5/2-c | Kişi silene kadar / hesapla | Kişi, aynı üniversitedeki Öğrenci, M (arama loglanır) |

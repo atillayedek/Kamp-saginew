@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -93,7 +94,7 @@ fun EventsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PostListPage(
+internal fun PostListPage(
     title: String,
     emptyIcon: ImageVector,
     emptyTitle: String,
@@ -102,6 +103,7 @@ private fun PostListPage(
     onBack: () -> Unit,
     onOpenPost: (String) -> Unit,
     onOpenAuthor: (String) -> Unit,
+    onReachEnd: (() -> Unit)? = null,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
@@ -132,7 +134,7 @@ private fun PostListPage(
             is PostListState.Loaded -> if (state.posts.isEmpty()) {
                 MessageView(icon = emptyIcon, title = emptyTitle, body = emptyBody)
             } else {
-                PostLazyList(state.posts, viewModel.interactor, onOpenPost, onOpenAuthor)
+                PostLazyList(state.posts, viewModel.interactor, onOpenPost, onOpenAuthor, onReachEnd = onReachEnd)
             }
         }
     }
@@ -146,10 +148,15 @@ fun PostLazyList(
     onOpenPost: (String) -> Unit,
     onOpenAuthor: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onReachEnd: (() -> Unit)? = null,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(posts, key = { it.id }) { post ->
             PostCard(post = post, callbacks = interactor.callbacks(post, onOpen = { onOpenPost(post.id) }, onOpenAuthor = onOpenAuthor))
+        }
+        if (onReachEnd != null) {
+            // Asks for the next page when the end of the list comes into view.
+            item(key = "end") { LaunchedEffect(posts.size) { onReachEnd() } }
         }
     }
 }

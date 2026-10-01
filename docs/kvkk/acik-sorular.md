@@ -66,3 +66,9 @@ Kod tarafında karar verilemeyen, uydurulmaması gereken her şey. Her madde kod
 - **S18 — pg_cron** projede açık değilse (Dashboard → Database → Extensions) erişim kaydı kopyalama ve günlük imha
   zamanlanmaz; panel → KVKK → İmha durumu gösterir. Açılınca panel → KVKK → İmha → "Zamanlamayı kur"
   (bkz. DEPLOYMENT.md §4).
+- **S19 — KKTC üniversiteleri listesi** (D68) en iyi bilgiyle 19 kurum olarak eklendi; adlar, şehirler ve boş bırakılan alan
+  adları ürün sahibince doğrulanmalı (YÖK'ün tanıdığı KKTC üniversiteleri listesiyle). Eksik/yanlış olan panelden ya da yeni
+  migration'la düzeltilir.
+- **S20 — KKTC'deki kullanıcılar.** KKTC'nin kendi kişisel veri mevzuatı (Kişisel Verilerin Korunması Yasası, 89/2007)
+  KKTC'de yerleşik öğrenciler için ayrıca uygulanabilir; aydınlatma metni ve yurt dışı aktarım değerlendirmesi avukatla
+  gözden geçirilmeli.

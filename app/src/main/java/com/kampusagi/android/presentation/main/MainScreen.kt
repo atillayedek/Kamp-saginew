@@ -82,6 +82,10 @@ import com.kampusagi.android.presentation.community.CreatePostScreen
 import com.kampusagi.android.presentation.community.FeedScreen
 import com.kampusagi.android.presentation.community.FeedViewModel
 import com.kampusagi.android.presentation.community.PostDetailScreen
+import com.kampusagi.android.presentation.community.MentionScreen
+import com.kampusagi.android.presentation.community.TagPostsScreen
+import com.kampusagi.android.presentation.common.BodyLinkHandler
+import com.kampusagi.android.presentation.common.LocalBodyLinks
 import com.kampusagi.android.presentation.notification.NotificationsScreen
 import com.kampusagi.android.presentation.notification.NotificationsViewModel
 import com.kampusagi.android.presentation.premium.PremiumScreen
@@ -226,246 +230,272 @@ fun MainScreen(
             }
         },
     ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = FeedRoute,
-            modifier = Modifier.fillMaxSize().padding(padding),
-        ) {
-            composable<FeedRoute> {
-                FeedScreen(
-                    viewModel = feedViewModel,
-                    onOpenPost = { navController.navigate(PostDetailRoute(it.id)) },
-                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
-                    onCreatePost = { navController.navigate(CreatePostRoute(it)) },
-                    onOpenSearch = { navController.navigate(SearchRoute) },
-                    onOpenEvents = { navController.navigate(EventsRoute) },
-                    unreadNotifications = notificationsViewModel.unreadCount,
-                    announcements = announcementsViewModel.announcements,
-                    onDismissAnnouncement = announcementsViewModel::dismiss,
-                    onOpenNotifications = {
-                        notificationsViewModel.load()
-                        navController.navigate(NotificationsRoute) { launchSingleTop = true }
-                    },
-                )
-            }
-            composable<PostDetailRoute> {
-                PostDetailScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
-                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
-                )
-            }
-            composable<SearchRoute> {
-                SearchScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
-                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
-                )
-            }
-            composable<SavedPostsRoute> {
-                SavedPostsScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
-                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
-                )
-            }
-            composable<EventsRoute> {
-                EventsScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
-                    onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
-                )
-            }
-            composable<UserProfileRoute> {
-                UserProfileScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenPost = { navController.navigate(PostDetailRoute(it)) },
-                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
-                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
-                    onEditOwnProfile = { navController.navigate(EditProfileRoute) },
-                )
-            }
-            composable<CreatePostRoute> {
-                CreatePostScreen(
-                    onBack = { navController.popBackStack() },
-                    onCreated = { scope ->
-                        feedViewModel.onPostCreated(scope)
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable<RequirementsRoute> {
-                TabPage(title = R.string.tab_requirements) {
-                    RequirementsScreen(
-                        viewModel = requirementsViewModel,
-                        onCreate = { navController.navigate(CreateRequirementRoute) },
-                        onOpenMatches = { navController.navigate(MatchesRoute(it.id, it.title)) },
+        val bodyLinks = remember(navController) {
+            BodyLinkHandler(
+                onTag = { navController.navigate(TagPostsRoute(it)) },
+                onMention = { navController.navigate(MentionRoute(it)) },
+            )
+        }
+        CompositionLocalProvider(LocalBodyLinks provides bodyLinks) {
+            NavHost(
+                navController = navController,
+                startDestination = FeedRoute,
+                modifier = Modifier.fillMaxSize().padding(padding),
+            ) {
+                composable<FeedRoute> {
+                    FeedScreen(
+                        viewModel = feedViewModel,
+                        onOpenPost = { navController.navigate(PostDetailRoute(it.id)) },
+                        onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                        onCreatePost = { navController.navigate(CreatePostRoute(it)) },
+                        onOpenSearch = { navController.navigate(SearchRoute) },
+                        onOpenEvents = { navController.navigate(EventsRoute) },
+                        unreadNotifications = notificationsViewModel.unreadCount,
+                        announcements = announcementsViewModel.announcements,
+                        onDismissAnnouncement = announcementsViewModel::dismiss,
+                        onOpenNotifications = {
+                            notificationsViewModel.load()
+                            navController.navigate(NotificationsRoute) { launchSingleTop = true }
+                        },
                     )
                 }
-            }
-            composable<MatchesRoute> {
-                MatchesScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
-                )
-            }
-            composable<MyMatchesRoute> {
-                MyMatchesScreen(
-                    onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
-                    onCreateRequirement = { navController.navigate(CreateRequirementRoute) },
-                )
-            }
-            composable<ConversationsRoute> {
-                InboxScreen(
-                    groupsViewModel = groupsViewModel,
-                    unreadMessages = conversationsViewModel.unreadTotal,
-                    messages = {
-                        ConversationsScreen(
-                            viewModel = conversationsViewModel,
-                            onOpen = { navController.navigate(ChatRoute(it.id, it.other.displayName())) },
+                composable<PostDetailRoute> {
+                    PostDetailScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                        onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                    )
+                }
+                composable<SearchRoute> {
+                    SearchScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                        onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                        onOpenTag = { navController.navigate(TagPostsRoute(it)) },
+                    )
+                }
+                composable<SavedPostsRoute> {
+                    SavedPostsScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                        onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                    )
+                }
+                composable<EventsRoute> {
+                    EventsScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                        onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                    )
+                }
+                composable<UserProfileRoute> {
+                    UserProfileScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                        onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                        onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                        onEditOwnProfile = { navController.navigate(EditProfileRoute) },
+                    )
+                }
+                composable<TagPostsRoute> {
+                    TagPostsScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenPost = { navController.navigate(PostDetailRoute(it)) },
+                        onOpenAuthor = { navController.navigate(UserProfileRoute(it)) },
+                    )
+                }
+                composable<MentionRoute> {
+                    MentionScreen(
+                        onBack = { navController.popBackStack() },
+                        onFound = { userId ->
+                            navController.navigate(UserProfileRoute(userId)) {
+                                popUpTo<MentionRoute> { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable<CreatePostRoute> {
+                    CreatePostScreen(
+                        onBack = { navController.popBackStack() },
+                        onCreated = { scope ->
+                            feedViewModel.onPostCreated(scope)
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                composable<RequirementsRoute> {
+                    TabPage(title = R.string.tab_requirements) {
+                        RequirementsScreen(
+                            viewModel = requirementsViewModel,
+                            onCreate = { navController.navigate(CreateRequirementRoute) },
+                            onOpenMatches = { navController.navigate(MatchesRoute(it.id, it.title)) },
                         )
-                    },
-                    onOpenGroup = { navController.navigate(GroupRoute(it)) },
-                    onDiscover = { navController.navigate(DiscoverGroupsRoute(it)) },
-                    onCreate = { navController.navigate(CreateGroupRoute(it)) },
-                )
-            }
-            composable<DiscoverGroupsRoute> {
-                DiscoverGroupsScreen(
-                    onBack = { navController.popBackStack() },
-                    onJoined = {
-                        groupsViewModel.load()
-                        navController.navigate(GroupRoute(it)) { popUpTo<DiscoverGroupsRoute> { inclusive = true } }
-                    },
-                )
-            }
-            composable<CreateGroupRoute> {
-                CreateGroupScreen(
-                    onBack = { navController.popBackStack() },
-                    onCreated = {
-                        groupsViewModel.load()
-                        navController.navigate(GroupRoute(it)) { popUpTo<CreateGroupRoute> { inclusive = true } }
-                    },
-                    onOpenPremium = { navController.navigate(PremiumRoute) },
-                )
-            }
-            composable<GroupRoute> {
-                GroupChatScreen(
-                    onBack = {
-                        groupsViewModel.load()
-                        navController.popBackStack()
-                    },
-                    onOpenInfo = { navController.navigate(GroupInfoRoute(it)) },
-                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
-                    onOpenPremium = { navController.navigate(PremiumRoute) },
-                )
-            }
-            composable<GroupInfoRoute> {
-                GroupInfoScreen(
-                    onBack = { navController.popBackStack() },
-                    onClosed = {
-                        groupsViewModel.load()
-                        navController.popBackStack(ConversationsRoute, inclusive = false)
-                    },
-                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
-                )
-            }
-            composable<NotesRoute> {
-                NotesScreen(
-                    onBack = { navController.popBackStack() },
-                    onUpload = { navController.navigate(UploadNoteRoute) },
-                    onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
-                )
-            }
-            composable<UploadNoteRoute> {
-                UploadNoteScreen(
-                    onBack = { navController.popBackStack() },
-                    onUploaded = { navController.popBackStack() },
-                )
-            }
-            composable<ChatRoute> {
-                ChatScreen(
-                    onBack = {
-                        conversationsViewModel.load()
-                        navController.popBackStack()
-                    },
-                    onBlocked = {
-                        conversationsViewModel.load()
-                        feedViewModel.refresh()
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable<CreateRequirementRoute> {
-                CreateRequirementScreen(
-                    onBack = { navController.popBackStack() },
-                    onPublished = {
-                        requirementsViewModel.load()
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable<NotificationsRoute> {
-                NotificationsScreen(
-                    onBack = { navController.popBackStack() },
-                    viewModel = notificationsViewModel,
-                    notificationsAllowed = notificationsAllowed,
-                    onOpen = { notification ->
-                        when {
-                            notification.conversationId != null -> navController.navigate(
-                                ChatRoute(notification.conversationId, notification.actorName.orEmpty()),
+                    }
+                }
+                composable<MatchesRoute> {
+                    MatchesScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                    )
+                }
+                composable<MyMatchesRoute> {
+                    MyMatchesScreen(
+                        onOpenChat = { id, title -> navController.navigate(ChatRoute(id, title)) },
+                        onCreateRequirement = { navController.navigate(CreateRequirementRoute) },
+                    )
+                }
+                composable<ConversationsRoute> {
+                    InboxScreen(
+                        groupsViewModel = groupsViewModel,
+                        unreadMessages = conversationsViewModel.unreadTotal,
+                        messages = {
+                            ConversationsScreen(
+                                viewModel = conversationsViewModel,
+                                onOpen = { navController.navigate(ChatRoute(it.id, it.other.displayName())) },
                             )
-                            notification.postId != null -> navController.navigate(PostDetailRoute(notification.postId))
-                            notification.kind == NotificationKind.DSR_ANSWERED ->
-                                navController.navigate(PrivacyRoute(PrivacySections.REQUESTS))
-                            notification.kind in MODERATION_KINDS ->
-                                navController.navigate(PrivacyRoute(PrivacySections.DECISIONS))
-                        }
-                    },
-                )
-            }
-            composable<ProfileRoute> {
-                ProfileTab(
-                    profile = profile,
-                    isAdmin = isAdmin,
-                    onOpenAdmin = onOpenAdmin,
-                    onOpenPremium = { navController.navigate(PremiumRoute) },
-                    onOpenSettings = { navController.navigate(SettingsRoute) },
-                    onEditProfile = { navController.navigate(EditProfileRoute) },
-                    onOpenSaved = { navController.navigate(SavedPostsRoute) },
-                    onOpenMyPosts = { navController.navigate(UserProfileRoute(profile.id)) },
-                    onOpenNotes = { navController.navigate(NotesRoute) },
-                    onSignOut = onSignOut,
-                )
-            }
-            composable<EditProfileRoute> {
-                EditProfileScreen(profile = profile, onBack = { navController.popBackStack() })
-            }
-            composable<PremiumRoute> {
-                PremiumScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenLegal = { navController.navigate(LegalDocumentRoute(it)) },
-                )
-            }
-            composable<SettingsRoute> {
-                SettingsScreen(
-                    onBack = {
-                        // Unblocked people reappear in the feed and chats.
-                        feedViewModel.refresh()
-                        conversationsViewModel.load()
-                        navController.popBackStack()
-                    },
-                    onOpenPrivacy = { navController.navigate(PrivacyRoute()) },
-                )
-            }
-            composable<PrivacyRoute> {
-                PrivacyScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenLegal = { navController.navigate(LegalDocumentRoute(it)) },
-                )
-            }
-            composable<LegalDocumentRoute> {
-                LegalDocumentScreen(onBack = { navController.popBackStack() })
+                        },
+                        onOpenGroup = { navController.navigate(GroupRoute(it)) },
+                        onDiscover = { navController.navigate(DiscoverGroupsRoute(it)) },
+                        onCreate = { navController.navigate(CreateGroupRoute(it)) },
+                    )
+                }
+                composable<DiscoverGroupsRoute> {
+                    DiscoverGroupsScreen(
+                        onBack = { navController.popBackStack() },
+                        onJoined = {
+                            groupsViewModel.load()
+                            navController.navigate(GroupRoute(it)) { popUpTo<DiscoverGroupsRoute> { inclusive = true } }
+                        },
+                    )
+                }
+                composable<CreateGroupRoute> {
+                    CreateGroupScreen(
+                        onBack = { navController.popBackStack() },
+                        onCreated = {
+                            groupsViewModel.load()
+                            navController.navigate(GroupRoute(it)) { popUpTo<CreateGroupRoute> { inclusive = true } }
+                        },
+                        onOpenPremium = { navController.navigate(PremiumRoute) },
+                    )
+                }
+                composable<GroupRoute> {
+                    GroupChatScreen(
+                        onBack = {
+                            groupsViewModel.load()
+                            navController.popBackStack()
+                        },
+                        onOpenInfo = { navController.navigate(GroupInfoRoute(it)) },
+                        onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                        onOpenPremium = { navController.navigate(PremiumRoute) },
+                    )
+                }
+                composable<GroupInfoRoute> {
+                    GroupInfoScreen(
+                        onBack = { navController.popBackStack() },
+                        onClosed = {
+                            groupsViewModel.load()
+                            navController.popBackStack(ConversationsRoute, inclusive = false)
+                        },
+                        onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                    )
+                }
+                composable<NotesRoute> {
+                    NotesScreen(
+                        onBack = { navController.popBackStack() },
+                        onUpload = { navController.navigate(UploadNoteRoute) },
+                        onOpenPerson = { navController.navigate(UserProfileRoute(it)) },
+                    )
+                }
+                composable<UploadNoteRoute> {
+                    UploadNoteScreen(
+                        onBack = { navController.popBackStack() },
+                        onUploaded = { navController.popBackStack() },
+                    )
+                }
+                composable<ChatRoute> {
+                    ChatScreen(
+                        onBack = {
+                            conversationsViewModel.load()
+                            navController.popBackStack()
+                        },
+                        onBlocked = {
+                            conversationsViewModel.load()
+                            feedViewModel.refresh()
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                composable<CreateRequirementRoute> {
+                    CreateRequirementScreen(
+                        onBack = { navController.popBackStack() },
+                        onPublished = {
+                            requirementsViewModel.load()
+                            navController.popBackStack()
+                        },
+                    )
+                }
+                composable<NotificationsRoute> {
+                    NotificationsScreen(
+                        onBack = { navController.popBackStack() },
+                        viewModel = notificationsViewModel,
+                        notificationsAllowed = notificationsAllowed,
+                        onOpen = { notification ->
+                            when {
+                                notification.conversationId != null -> navController.navigate(
+                                    ChatRoute(notification.conversationId, notification.actorName.orEmpty()),
+                                )
+                                notification.postId != null -> navController.navigate(PostDetailRoute(notification.postId))
+                                notification.kind == NotificationKind.DSR_ANSWERED ->
+                                    navController.navigate(PrivacyRoute(PrivacySections.REQUESTS))
+                                notification.kind in MODERATION_KINDS ->
+                                    navController.navigate(PrivacyRoute(PrivacySections.DECISIONS))
+                            }
+                        },
+                    )
+                }
+                composable<ProfileRoute> {
+                    ProfileTab(
+                        profile = profile,
+                        isAdmin = isAdmin,
+                        onOpenAdmin = onOpenAdmin,
+                        onOpenPremium = { navController.navigate(PremiumRoute) },
+                        onOpenSettings = { navController.navigate(SettingsRoute) },
+                        onEditProfile = { navController.navigate(EditProfileRoute) },
+                        onOpenSaved = { navController.navigate(SavedPostsRoute) },
+                        onOpenMyPosts = { navController.navigate(UserProfileRoute(profile.id)) },
+                        onOpenNotes = { navController.navigate(NotesRoute) },
+                        onSignOut = onSignOut,
+                    )
+                }
+                composable<EditProfileRoute> {
+                    EditProfileScreen(profile = profile, onBack = { navController.popBackStack() })
+                }
+                composable<PremiumRoute> {
+                    PremiumScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenLegal = { navController.navigate(LegalDocumentRoute(it)) },
+                    )
+                }
+                composable<SettingsRoute> {
+                    SettingsScreen(
+                        onBack = {
+                            // Unblocked people reappear in the feed and chats.
+                            feedViewModel.refresh()
+                            conversationsViewModel.load()
+                            navController.popBackStack()
+                        },
+                        onOpenPrivacy = { navController.navigate(PrivacyRoute()) },
+                    )
+                }
+                composable<PrivacyRoute> {
+                    PrivacyScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenLegal = { navController.navigate(LegalDocumentRoute(it)) },
+                    )
+                }
+                composable<LegalDocumentRoute> {
+                    LegalDocumentScreen(onBack = { navController.popBackStack() })
+                }
             }
         }
     }

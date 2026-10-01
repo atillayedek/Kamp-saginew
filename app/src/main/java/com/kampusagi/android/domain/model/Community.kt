@@ -101,3 +101,14 @@ data class UserProfile(
     val postCount: Int,
     val isMe: Boolean,
 )
+
+/** Someone offered while typing "@" in a post or comment; [displayName] is masked unless they show it. */
+data class MentionSuggestion(
+    val userId: String,
+    val username: String,
+    val displayName: String?,
+    val university: String?,
+)
+
+/** A #tag with how many visible posts used it in the last seven days. */
+data class TagCount(val tag: String, val postCount: Long)
