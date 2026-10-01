@@ -124,6 +124,14 @@ export interface Announcement {
   push_sent: number | null;
 }
 
+export interface PushStatus {
+  /** FCM_SERVICE_ACCOUNT secret is present on the Edge Functions. */
+  fcm_configured: boolean;
+  /** The database knows where dispatch-push is and pg_net is installed. */
+  trigger_ready: boolean;
+  pg_net_installed: boolean;
+}
+
 export interface PushResult {
   devices: number;
   sent: number;
@@ -238,6 +246,8 @@ export const adminApi = {
     rpc<string>(c, "admin_create_announcement", { p_title: title, p_body: body, p_university_id: universityId, p_ends_at: endsAt }),
   endAnnouncement: (c: SupabaseClient, id: string) => rpc<void>(c, "admin_end_announcement", { p_announcement_id: id }),
   pushAnnouncement: (c: SupabaseClient, id: string) => invoke<PushResult>(c, "admin-push", { announcement_id: id }),
+  pushStatus: (c: SupabaseClient) => invoke<PushStatus>(c, "admin-push", { action: "status" }),
+  pushSetup: (c: SupabaseClient) => invoke<PushStatus>(c, "admin-push", { action: "setup" }),
   plans: (c: SupabaseClient) => rpc<Plan[]>(c, "admin_list_plans"),
   grants: (c: SupabaseClient) => rpc<PremiumGrant[]>(c, "admin_list_grants", { p_limit: 100 }),
   grantPremium: (c: SupabaseClient, userId: string, planId: string, days: number, note: string | null) =>

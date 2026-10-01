@@ -1,13 +1,15 @@
-// POST /functions/v1/admin-push  {"announcement_id": "<uuid>"}
-//
-// Sends an active in-app announcement to the phones of the approved students it
-// is meant for, once. Admins only (JWT app_metadata.role). Tokens FCM no
-// longer knows are removed.
+// POST /functions/v1/admin-push   (admins only, JWT app_metadata.role)
+//   {"action": "status"}            -> is push set up?
+//   {"action": "setup"}             -> records this project's functions URL so the
+//                                      database can call dispatch-push (D56)
+//   {"announcement_id": "<uuid>"}   -> sends an active announcement to the phones of
+//                                      the approved students it is meant for, once
+// Tokens FCM no longer knows are removed.
 
 import { authenticate, readJson } from "../_shared/auth.ts";
 import { announcementText, fcmAccessToken, sendToDevices } from "../_shared/fcm.ts";
 import { parseServiceAccount } from "../_shared/google-auth.ts";
-import { errorResponse, json, preflight, withCors } from "../_shared/http.ts";
+import { errorResponse, json, preflight, requireEnv, withCors } from "../_shared/http.ts";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -23,7 +25,32 @@ async function handle(request: Request): Promise<Response> {
   if (!caller) return errorResponse("not_authenticated", 401);
   if (!caller.isAdmin) return errorResponse("admin_required", 403);
 
-  const announcementId = (await readJson(request))?.announcement_id;
+  const input = await readJson(request);
+  const fcmConfigured = parseServiceAccount(Deno.env.get("FCM_SERVICE_ACCOUNT")) !== null;
+
+  if (input?.action === "status" || input?.action === "setup") {
+    if (input.action === "setup") {
+      const url = `${requireEnv("SUPABASE_URL").replace(/\/+$/, "")}/functions/v1`;
+      const { error } = await caller.admin.rpc("set_push_functions_url", { p_url: url });
+      if (error) {
+        console.error("set_push_functions_url failed", error.message);
+        return errorResponse("server_error", 500);
+      }
+    }
+    const { data, error } = await caller.admin.rpc("push_status");
+    if (error) {
+      console.error("push_status failed", error.message);
+      return errorResponse("server_error", 500);
+    }
+    const status = (data as { trigger_ready: boolean; pg_net_installed: boolean }[])[0];
+    return json({
+      fcm_configured: fcmConfigured,
+      trigger_ready: status?.trigger_ready ?? false,
+      pg_net_installed: status?.pg_net_installed ?? false,
+    });
+  }
+
+  const announcementId = input?.announcement_id;
   if (typeof announcementId !== "string" || !UUID.test(announcementId)) return errorResponse("invalid_request", 400);
 
   const account = parseServiceAccount(Deno.env.get("FCM_SERVICE_ACCOUNT"));

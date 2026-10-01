@@ -82,6 +82,55 @@ function defaultEnd(): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+/** Whether phones receive notifications, and the one click that connects the database to dispatch-push. */
+function PushSetupCard({ client }: Props) {
+  const status = useAsync(() => adminApi.pushStatus(client), "push-status");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function setup() {
+    setBusy(true);
+    setError(null);
+    try {
+      await adminApi.pushSetup(client);
+      status.reload();
+    } catch (err) {
+      console.error(err);
+      setError(errorMessage(err));
+    }
+    setBusy(false);
+  }
+
+  const s = status.data;
+  return (
+    <Card title="Telefon bildirimleri">
+      {status.error ? <ErrorBox message={status.error} onRetry={status.reload} /> : null}
+      {!s && status.loading ? <Loading /> : null}
+      {s ? (
+        <div className="space-y-3 text-sm">
+          <div className="flex flex-wrap gap-2">
+            {s.fcm_configured ? <Badge tone="good">Firebase anahtarı var</Badge> : <Badge tone="warn">Firebase anahtarı yok</Badge>}
+            {s.trigger_ready ? <Badge tone="good">Otomatik gönderim açık</Badge> : <Badge tone="warn">Otomatik gönderim kapalı</Badge>}
+          </div>
+          {!s.fcm_configured ? (
+            <p className="text-ink-2">
+              Supabase → Edge Functions → Secrets bölümüne <code>FCM_SERVICE_ACCOUNT</code> adıyla Firebase hizmet hesabı JSON&apos;unu ekle
+              (Firebase → Proje ayarları → Hizmet hesapları → Yeni özel anahtar oluştur).
+            </p>
+          ) : null}
+          {!s.pg_net_installed ? (
+            <p className="text-ink-2">Veritabanında pg_net eklentisi yok: Supabase → Database → Extensions → pg_net&apos;i aç, sonra tekrar dene.</p>
+          ) : null}
+          {s.pg_net_installed && !s.trigger_ready ? (
+            <Button onClick={setup} busy={busy}>Bildirimleri etkinleştir</Button>
+          ) : null}
+          {error ? <ErrorBox message={error} /> : null}
+        </div>
+      ) : null}
+    </Card>
+  );
+}
+
 export function AnnouncementsView({ client }: Props) {
   const list = useAsync(() => adminApi.announcements(client), "announcements");
   const universities = useAsync(() => adminApi.universityOptions(client), "university-options");
@@ -150,6 +199,7 @@ export function AnnouncementsView({ client }: Props) {
         title="Uygulama içi duyuru"
         description="Duyuru, uygulamayı açık olan öğrencilere anında, diğerlerine uygulamayı açtıklarında akışın en üstünde gösterilir. Öğrenci kapatabilir. İstersen bir kez telefonlara bildirim olarak da gönderebilirsin."
       />
+      <div className="mb-6"><PushSetupCard client={client} /></div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
         <Card title="Yeni duyuru">
           <form onSubmit={create} className="space-y-4">

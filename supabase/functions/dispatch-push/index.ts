@@ -1,8 +1,10 @@
 // POST /functions/v1/dispatch-push
 //
-// Called by a Supabase Database Webhook on INSERT into public.notifications
-// with header `x-webhook-secret: <PUSH_WEBHOOK_SECRET>`. Sends the notification
-// to the person's devices through FCM and forgets tokens FCM no longer knows.
+// Called by the database itself (trigger notifications_dispatch_push, pg_net) on
+// INSERT into public.notifications with header `x-webhook-secret`, a secret the
+// database generated and only the service role can read (D56). Sends the
+// notification to the person's devices through FCM and forgets tokens FCM no
+// longer knows.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { fcmAccessToken, pushText, safeEqual, sendToDevices } from "../_shared/fcm.ts";
@@ -14,9 +16,17 @@ let cachedToken: { token: string; expiresAt: number } | null = null;
 Deno.serve(async (request) => {
   if (request.method !== "POST") return errorResponse("method_not_allowed", 405);
 
-  const secret = Deno.env.get("PUSH_WEBHOOK_SECRET");
   const provided = request.headers.get("x-webhook-secret") ?? "";
-  if (!secret || !safeEqual(provided, secret)) return errorResponse("not_authenticated", 401);
+  if (!provided) return errorResponse("not_authenticated", 401);
+  const admin = createClient(requireEnv("SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
+    auth: { persistSession: false },
+  });
+  const { data: secret, error: secretError } = await admin.rpc("push_webhook_secret");
+  if (secretError || typeof secret !== "string") {
+    console.error("push_webhook_secret failed", secretError?.message ?? "no secret");
+    return errorResponse("server_error", 500);
+  }
+  if (!safeEqual(provided, secret)) return errorResponse("not_authenticated", 401);
 
   let notificationId: unknown;
   try {
@@ -34,9 +44,6 @@ Deno.serve(async (request) => {
     return errorResponse("push_not_configured", 503);
   }
 
-  const admin = createClient(requireEnv("SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
-    auth: { persistSession: false },
-  });
   const { data, error } = await admin.rpc("push_payload", { p_notification_id: notificationId });
   if (error) {
     console.error("push_payload failed", error.message);

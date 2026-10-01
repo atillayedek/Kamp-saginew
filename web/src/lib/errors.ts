@@ -33,6 +33,7 @@ const MESSAGES: Record<string, string> = {
   confirmation_required: "Silmeyi onaylamak için kutuya SİL yaz.",
   account_deletion_failed: "Hesap silinemedi. Biraz sonra tekrar dene; sorun sürerse bize yaz.",
   push_not_configured: "Anlık bildirim yapılandırılmamış (Supabase secret FCM_SERVICE_ACCOUNT).",
+  invalid_functions_url: "Proje adresi okunamadı. Edge Function ortamını kontrol et.",
   push_failed: "Firebase'e bağlanılamadı. Service account anahtarını kontrol et.",
   announcement_already_pushed: "Bu duyuru telefonlara zaten gönderildi.",
   server_error: "Sunucu hatası. Biraz sonra tekrar dene.",

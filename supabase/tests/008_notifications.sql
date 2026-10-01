@@ -175,3 +175,28 @@ select tests.assert_equals(
 );
 select tests.reset_role();
 rollback;
+
+-- 7. Automatic push dispatch (D56): secret and URL stay server-side; a push problem never blocks a notification.
+begin;
+select tests.act_as((select a from people));
+select tests.expect_error($$select public.push_webhook_secret()$$, 'permission denied for function push_webhook_secret');
+select tests.expect_error($$select * from public.push_status()$$, 'permission denied for function push_status');
+select tests.expect_error($$select count(*) from public.push_settings$$, 'permission denied for table push_settings');
+select tests.reset_role();
+select tests.act_as_service();
+select tests.assert_equals(char_length(public.push_webhook_secret()), 64, 'secret generated');
+select tests.assert_equals((select trigger_ready from public.push_status()), false, 'not ready before setup');
+select tests.expect_error($$select public.set_push_functions_url('http://evil.example.com')$$, 'invalid_functions_url');
+select public.set_push_functions_url('https://abcdefgh.supabase.co/functions/v1');
+select tests.reset_role();
+-- pg_net is not installed in the test database: the trigger skips and the notification is still created.
+select tests.act_as((select b from people));
+create temp table conv7 as select public.start_conversation((select a from people)) as id;
+select public.send_message((select id from conv7), gen_random_uuid(), 'push denemesi');
+select tests.reset_role();
+select tests.assert_equals(
+    (select count(*) from public.notifications where user_id = (select a from people) and kind = 'NEW_MESSAGE'),
+    1::bigint,
+    'notification created without pg_net'
+);
+rollback;

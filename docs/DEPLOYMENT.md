@@ -53,13 +53,13 @@ Firebase projesi: `kampusaginew`, Android uygulaması `com.kampusagi.android`.
    `GOOGLE_SERVICES_JSON` = Firebase'den indirilen `google-services.json` dosyasının **içeriği**. Build yalnızca istemciye açık
    değerleri (proje kimliği, uygulama kimliği, API anahtarı, gönderici numarası) okur. Yerelde dosyayı `app/google-services.json`
    olarak koy (git'e girmez). Yoksa uygulama derlenir, push kapalı kalır ve bildirimler yalnızca uygulama açıkken Realtime ile gelir.
-2. **Edge Function secret'ları (Supabase → Edge Functions → Secrets):**
-   - `FCM_SERVICE_ACCOUNT`: Firebase → Proje ayarları → Hizmet hesapları → "Yeni özel anahtar oluştur" ile inen JSON'un tamamı.
-   - `PUSH_WEBHOOK_SECRET`: rastgele uzun bir değer (`openssl rand -hex 32`).
-3. **Database Webhook (Supabase → Database → Webhooks → Create):** tablo `public.notifications`, olay `INSERT`,
-   tür "Supabase Edge Functions" → `dispatch-push`, yöntem POST, HTTP başlığı `x-webhook-secret: <PUSH_WEBHOOK_SECRET>`.
-4. `dispatch-push` JWT doğrulamasız çalışır (`config.toml`), yalnızca bu başlıkla kabul eder. `admin-push` yalnızca yöneticiye açıktır;
-   admin paneli → Duyurular → "Telefonlara gönder" ile aktif bir duyuru hedefindeki onaylı öğrencilere **bir kez** gönderilir.
+2. **Edge Function secret'ı (Supabase → Edge Functions → Secrets):** `FCM_SERVICE_ACCOUNT` = Firebase → Proje ayarları →
+   Hizmet hesapları → "Yeni özel anahtar oluştur" ile inen JSON'un tamamı. Gizli anahtardır; sohbete/repoya yazılmaz.
+3. **Admin paneli → Duyurular → "Telefon bildirimleri" → "Bildirimleri etkinleştir"** (bir kez). Bu, projenin fonksiyon adresini
+   veritabanına kaydeder; bundan sonra veritabanı her yeni bildirimi pg_net ile `dispatch-push`'a kendisi gönderir (D56).
+   Webhook veya elle üretilen gizli değer gerekmez: doğrulama değerini veritabanı üretir ve yalnızca sunucu tarafında kalır.
+   Kart "pg_net yok" derse Supabase → Database → Extensions → pg_net açılır.
+4. `admin-push` yalnızca yöneticiye açıktır; aktif bir duyuru "Telefonlara gönder" ile hedefindeki onaylı öğrencilere **bir kez** gönderilir.
 5. Kilit ekranında mesaj içeriği gösterilmez ("X sana mesaj gönderdi"). FCM'nin tanımadığı cihaz belirteçleri otomatik silinir.
 
 ### Premium (Google Play Billing)
