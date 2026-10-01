@@ -25,7 +25,7 @@ Otomatik devam: saatlik Routine (`KampüsAğı fazlarına otomatik devam`) bu ot
 | 16 | Premium kanallar (D46), çalışma grupları (D47), ders notu arşivi (D48), rozetler (D49) | Bitti — CI yeşil `51306ab` (DB 16 test dosyası, Edge Function 40 test, web, Android birim testleri + lint + APK/AAB, canlı kontrol) |
 | 17 | Admin: uygulama içi duyuru (D50), aktiflik istatistikleri (D51), Premium hediye ve promosyon kodu (D52); Premium fiyatı Play'de 100 TL (D45) | Bitti — CI yeşil `c55372e` (DB 17 test dosyası, Edge Function, web, Android birim testleri + lint + APK/AAB, canlı kontrol). Cihazda deneme: kullanıcı tarafından yapılacak |
 | 18 | Yapay zekâsız kurallı eşleştirme (D54): form + önerilen etiketler, `create_requirement`, puanlı `find_matches`, eşanlamlılar; OpenAI kaldırıldı | Bitti — CI yeşil `308a228` (DB 17 test dosyası, Deno 29 test, web, Android unit test + lintRelease + APK + AAB) |
-| 19 | Push bildirimleri FCM ile (D55, D56): cihaz belirteçleri, veritabanından otomatik `dispatch-push` (pg_net), admin "Bildirimleri etkinleştir" + "Telefonlara gönder", Android FCM | CI bekleniyor (yerel: DB 17 test dosyası PASS, Deno 34 test PASS, web PASS) |
+| 19 | Push bildirimleri FCM ile (D55, D56): cihaz belirteçleri, veritabanından otomatik `dispatch-push` (pg_net), admin "Bildirimleri etkinleştir" + "Telefonlara gönder", Android FCM | Kod bitti — CI yeşil `3d23948` (DB, Deno 34 test, web, Android unit test + lint + APK + AAB, canlı kontroller). Uçtan uca push: NOT RUN (Firebase secret'ları bekleniyor) |
 
 ## Son doğrulamalar
 
