@@ -1356,12 +1356,17 @@ $$;
 
 -- Scheduling (pg_cron where available) -----------------------------------------------------------------
 
+-- A missing or restricted pg_cron must not stop the deployment: the panel shows whether the
+-- schedule exists (admin_retention_status) and says how to enable it.
 do $$
 begin
     if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
         create extension if not exists pg_cron;
         perform cron.schedule('kvkk-sync-access-logs', '*/5 * * * *', 'select public.sync_auth_access_logs()');
     end if;
+exception
+    when others then
+        raise warning 'pg_cron schedule for access logs not created: %', sqlerrm;
 end;
 $$;
 

@@ -693,6 +693,9 @@ begin
     if exists (select 1 from pg_extension where extname = 'pg_cron') then
         perform cron.schedule('kvkk-daily-retention', '17 3 * * *', 'select public.run_daily_retention()');
     end if;
+exception
+    when others then
+        raise warning 'pg_cron schedule for retention not created: %', sqlerrm;
 end;
 $$;
 
