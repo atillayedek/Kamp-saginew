@@ -1,3 +1,4 @@
+import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import java.util.Base64
 import java.util.Properties
@@ -76,16 +77,21 @@ fun firebaseClient(packageName: String): FirebaseClient? {
     }
     if (text.isBlank()) return null
     @Suppress("UNCHECKED_CAST")
-    val root = JsonSlurper().parseText(text) as Map<String, Any?>
+    // CHAR_BUFFER returns plain Strings (the default parser hands back lazy character views).
+    val root = JsonSlurper().setType(JsonParserType.CHAR_BUFFER).parseText(text) as Map<String, Any?>
     val info = root["project_info"] as? Map<String, Any?> ?: return null
     val clients = root["client"] as? List<Map<String, Any?>> ?: return null
-    val client = clients.firstOrNull {
-        ((it["client_info"] as? Map<*, *>)?.get("android_client_info") as? Map<*, *>)?.get("package_name") == packageName
-    } ?: throw GradleException("google-services.json has no Android app with package $packageName.")
-    val appId = (client["client_info"] as Map<*, *>)["mobilesdk_app_id"] as? String
-    val apiKey = ((client["api_key"] as? List<*>)?.firstOrNull() as? Map<*, *>)?.get("current_key") as? String
-    val projectId = info["project_id"] as? String
-    val senderId = info["project_number"] as? String
+    fun packageOf(client: Map<String, Any?>): String? =
+        ((client["client_info"] as? Map<*, *>)?.get("android_client_info") as? Map<*, *>)?.get("package_name")?.toString()
+    val client = clients.firstOrNull { packageOf(it) == packageName }
+        ?: throw GradleException(
+            "google-services.json has no Android app with package $packageName " +
+                "(found: ${clients.map { packageOf(it) ?: "?" }}). Add the app in Firebase and download the file again.",
+        )
+    val appId = (client["client_info"] as? Map<*, *>)?.get("mobilesdk_app_id")?.toString()
+    val apiKey = ((client["api_key"] as? List<*>)?.firstOrNull() as? Map<*, *>)?.get("current_key")?.toString()
+    val projectId = info["project_id"]?.toString()
+    val senderId = info["project_number"]?.toString()
     if (appId == null || apiKey == null || projectId == null || senderId == null) {
         throw GradleException("google-services.json is missing project_id, project_number, mobilesdk_app_id or api_key.")
     }
