@@ -177,3 +177,36 @@ jobs:
             app/build/outputs/mapping/release/mapping.txt
             app/build/reports/lint-results-release.html
             app/build/reports/tests/testDebugUnitTest/
+
+  # Every green push build of the app is published as a GitHub pre-release with
+  # the installable debug APK, so testers download one file instead of a zip.
+  # The release AAB stays an artifact: it is for Google Play, not for phones.
+  publish-apk:
+    name: Publish test APK as a GitHub release
+    needs: android
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
+          path: outputs
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: apk-build-${{ github.run_number }}
+        run: |
+          apk="$(find outputs -name '*.apk' | head -n 1)"
+          if [ -z "$apk" ]; then
+            echo "::error::No APK in the build outputs."
+            exit 1
+          fi
+          cp "$apk" "KampusAgi-build-${{ github.run_number }}.apk"
+          gh release create "$TAG" "KampusAgi-build-${{ github.run_number }}.apk" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "KampüsAğı test sürümü (build ${{ github.run_number }})" \
+            --notes "Telefona kurulabilir test APK'sı (debug imzalı). Commit: ${GITHUB_SHA::7}, dal: ${GITHUB_REF_NAME}. Google Play'e yüklenecek imzalı AAB değildir."
