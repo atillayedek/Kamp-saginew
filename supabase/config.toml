@@ -1,0 +1,46 @@
+# Supabase CLI configuration for local development and deploys.
+# The project ref is passed on the command line (`supabase link --project-ref ...`).
+project_id = "kampusagi"
+
+[auth]
+site_url = "kampusagi://auth-callback"
+additional_redirect_urls = ["kampusagi://auth-callback", "kampusagi://auth-callback?type=recovery"]
+
+[auth.email]
+enable_confirmations = true
+
+[functions.submit-student-document]
+verify_jwt = true
+
+[functions.dispatch-push]
+# Called by a Database Webhook with x-webhook-secret, not by a signed-in user.
+verify_jwt = false
+
+[functions.admin-push]
+verify_jwt = true
+
+[functions.verify-purchase]
+verify_jwt = true
+
+[functions.delete-account]
+verify_jwt = true
+
+[functions.admin-broadcast]
+verify_jwt = true
+
+[functions.submit-course-note]
+verify_jwt = true
+
+# Opened from e-mail links and mail clients without a session; the HMAC signature is the check.
+[functions.email-unsubscribe]
+verify_jwt = false
+
+[functions.admin-document]
+verify_jwt = true
+
+[functions.export-my-data]
+verify_jwt = true
+
+# Called by the database (pg_cron + pg_net) with x-webhook-secret, not by a signed-in user.
+[functions.retention-run]
+verify_jwt = false

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols Rounded "forum-fill" (Apache License 2.0), converted from @material-symbols/svg-400. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M850-123q-5 0-10.5-2t-10.5-7L721-240H300q-25 0-42.5-17.5T240-300v-80h440q25 0 42.5-17.5T740-440v-280h80q25 0 42.5 17.5T880-660v507q0 14-9.5 22t-20.5 8ZM110-322q-11 0-20.5-8T80-352v-468q0-25 17.5-42.5T140-880h480q25 0 42.5 17.5T680-820v320q0 25-17.5 42.5T620-440H240L131-331q-5 5-10.5 7t-10.5 2Z" />
+    </group>
+</vector>

@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KampüsAğı</string>
+
+    <!-- Actions -->
+    <string name="action_sign_in">Giriş yap</string>
+    <string name="action_sign_out">Çıkış yap</string>
+    <string name="action_create_account">Hesap oluştur</string>
+    <string name="action_have_account">Zaten hesabın var mı? Giriş yap</string>
+    <string name="action_forgot_password">Şifremi unuttum</string>
+    <string name="action_back_to_sign_in">Girişe dön</string>
+    <string name="action_resend_email">E-postayı tekrar gönder</string>
+    <string name="action_send_reset_link">Sıfırlama bağlantısı gönder</string>
+    <string name="action_save_password">Şifreyi kaydet</string>
+    <string name="action_save_profile">Profili kaydet</string>
+    <string name="action_edit_profile">Profili düzenle</string>
+    <string name="action_refresh_status">Durumu yenile</string>
+    <string name="action_retry">Tekrar dene</string>
+    <string name="action_cancel">Vazgeç</string>
+
+    <!-- Fields -->
+    <string name="field_email">E-posta</string>
+    <string name="field_email_hint_student">Üniversite e-posta adresini kullanman önerilir.</string>
+    <string name="field_password">Şifre</string>
+    <string name="field_new_password">Yeni şifre</string>
+    <string name="field_password_confirmation">Şifre (tekrar)</string>
+    <string name="field_full_name">Ad soyad</string>
+    <string name="field_username">Kullanıcı adı</string>
+    <string name="field_username_hint">3–30 karakter; küçük harf, rakam, nokta ve alt çizgi.</string>
+    <string name="field_university">Üniversite</string>
+    <string name="field_department">Bölüm</string>
+    <string name="password_rule">Şifre en az %1$d karakter olmalı.</string>
+    <string name="cd_show_password">Şifreyi göster</string>
+    <string name="cd_hide_password">Şifreyi gizle</string>
+
+    <!-- Input validation -->
+    <string name="input_email_invalid">Geçerli bir e-posta adresi gir.</string>
+    <string name="input_password_required">Şifreni gir.</string>
+    <string name="input_password_too_short">Şifre çok kısa.</string>
+    <string name="input_passwords_do_not_match">Şifreler aynı değil.</string>
+    <string name="input_full_name_invalid">Ad soyad 2–100 karakter olmalı.</string>
+    <string name="input_username_invalid">Kullanıcı adı 3–30 karakter olmalı; yalnızca küçük harf, rakam, nokta ve alt çizgi.</string>
+    <string name="input_university_required">Üniversiteni seç.</string>
+    <string name="input_department_invalid">Bölüm 2–120 karakter olmalı.</string>
+
+    <!-- Errors -->
+    <string name="error_network">İnternet bağlantısı yok ya da sunucuya ulaşılamıyor. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="error_invalid_credentials">E-posta ya da şifre hatalı.</string>
+    <string name="error_email_not_confirmed">E-posta adresin henüz doğrulanmamış. Gelen kutundaki bağlantıya dokun.</string>
+    <string name="error_email_in_use">Bu e-posta ile zaten bir hesap var.</string>
+    <string name="error_weak_password">Bu şifre yeterince güçlü değil. Daha uzun ya da farklı bir şifre dene.</string>
+    <string name="error_same_password">Yeni şifre eskisiyle aynı olamaz.</string>
+    <string name="error_rate_limited">Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.</string>
+    <string name="error_session_expired">Oturumunun süresi doldu. Lütfen tekrar giriş yap.</string>
+    <string name="error_not_configured">Bu sürüm sunucuya bağlı değil.</string>
+    <string name="error_username_taken">Bu kullanıcı adı alınmış.</string>
+    <string name="error_university_not_found">Seçilen üniversite artık listede yok. Listeyi yenileyip tekrar seç.</string>
+    <string name="error_profile_locked">Doğrulama başladığı için profil bilgilerin artık değiştirilemez.</string>
+    <string name="error_invalid_input">Girilen bilgilerden biri geçersiz. Alanları kontrol et.</string>
+    <string name="error_document_too_large">Belge 10 MB\'tan büyük olamaz.</string>
+    <string name="error_document_not_pdf">Seçilen dosya geçerli bir PDF değil.</string>
+    <string name="error_document_unreadable">Seçilen dosya okunamadı. Başka bir dosya dene.</string>
+    <string name="error_verification_not_allowed">Şu an yeni belge yüklenemez. Durumunu yenileyip tekrar dene.</string>
+    <string name="error_admin_required">Bu işlem için yönetici yetkisi gerekiyor.</string>
+    <string name="error_rejection_reason_required">Ret nedeni 3–500 karakter olmalı.</string>
+    <string name="error_verification_not_pending">Bu başvuru zaten sonuçlandırılmış.</string>
+    <string name="error_account_not_approved">Bu özellik yalnızca doğrulanmış öğrenciler içindir.</string>
+    <string name="error_push_not_configured">Anlık bildirimler bu sürümde yapılandırılmamış.</string>
+    <string name="error_requirement_daily_limit">Bugün çok fazla ilan açtın. Yarın tekrar dene.</string>
+    <string name="error_too_many_active_requirements">Aktif ilan sınırına ulaştın. Önce eski bir ilanı kapat.</string>
+    <string name="error_recipient_not_available">Bu öğrenciye şu an mesaj gönderilemiyor.</string>
+    <string name="error_billing_unavailable">Google Play ödeme hizmetine ulaşılamadı. Tekrar dene.</string>
+    <string name="error_billing_not_configured">Satın alma doğrulaması henüz yapılandırılmamış.</string>
+    <string name="error_plan_not_available">Bu plan şu an sunulmuyor.</string>
+    <string name="error_purchase_not_active">Satın alma aktif değil ya da süresi dolmuş.</string>
+    <string name="error_purchase_not_for_account">Bu satın alma başka bir KampüsAğı hesabına ait.</string>
+    <string name="error_purchase_cancelled">Satın alma iptal edildi.</string>
+    <string name="error_not_found">İstenen kayıt bulunamadı.</string>
+    <string name="error_server">Sunucuda bir sorun oluştu. Biraz sonra tekrar dene.</string>
+    <string name="error_unknown">Beklenmeyen bir hata oluştu. Tekrar dene.</string>
+
+    <!-- Snackbar messages -->
+    <string name="message_email_confirmed">E-posta adresin doğrulandı.</string>
+    <string name="message_link_expired">Bağlantının süresi dolmuş ya da daha önce kullanılmış. Yeni bir bağlantı iste.</string>
+    <string name="message_password_updated">Şifren güncellendi.</string>
+    <string name="message_sign_out_failed">Çıkış yapılamadı. Tekrar dene.</string>
+
+    <!-- Setup -->
+    <string name="setup_required_title">Sunucu bağlantısı yapılandırılmamış</string>
+    <string name="setup_required_body">Bu sürüm sunucu bilgileri olmadan derlendi, bu yüzden giriş ve kayıt çalışmaz. Yayın sürümleri SUPABASE_URL ve SUPABASE_ANON_KEY ile derlenmelidir.</string>
+
+    <!-- Auth -->
+    <string name="sign_in_title">KampüsAğı\'na hoş geldin</string>
+    <string name="sign_in_subtitle">Doğrulanmış üniversite öğrencileriyle bağlantı kur.</string>
+    <string name="sign_up_title">Hesap oluştur</string>
+    <string name="sign_up_subtitle">Kayıttan sonra e-posta adresini doğrulayacak, ardından öğrenci belgeni yükleyeceksin.</string>
+    <string name="verify_email_title">E-postanı kontrol et</string>
+    <string name="verify_email_body">%1$s adresine bir doğrulama bağlantısı gönderdik. Bağlantıya bu cihazda dokunduğunda hesabın açılır.</string>
+    <string name="verify_email_resent">Doğrulama e-postası tekrar gönderildi.</string>
+    <string name="forgot_password_title">Şifreni sıfırla</string>
+    <string name="forgot_password_subtitle">Hesabının e-posta adresini gir, sana bir sıfırlama bağlantısı gönderelim.</string>
+    <string name="forgot_password_sent_title">Bağlantı gönderildi</string>
+    <string name="forgot_password_sent_body">%1$s adresiyle kayıtlı bir hesap varsa şifre sıfırlama bağlantısı gönderildi.</string>
+    <string name="new_password_title">Yeni şifre belirle</string>
+    <string name="new_password_subtitle">Hesabın için yeni bir şifre seç.</string>
+
+    <!-- Profile -->
+    <string name="profile_setup_title">Profilini tamamla</string>
+    <string name="profile_setup_subtitle">Bu bilgiler öğrenci belgenle karşılaştırılarak doğrulanır. Doğrulama başladıktan sonra değiştirilemez.</string>
+    <string name="profile_error_title">Profilin yüklenemedi</string>
+    <string name="universities_loading">Üniversite listesi yükleniyor…</string>
+    <string name="universities_empty">Henüz kayıtlı üniversite yok. Liste yönetici tarafından eklendiğinde burada görünecek.</string>
+    <string name="universities_search">Üniversite ya da şehir ara</string>
+    <string name="universities_no_match">Aramana uyan üniversite yok.</string>
+
+    <!-- Account status -->
+    <string name="status_document_required_title">Öğrenci belgen gerekli</string>
+    <string name="status_document_required_body">Hesabının etkinleşmesi için öğrenci belgeni yükleyip yönetici onayı alman gerekiyor.</string>
+    <string name="status_pending_title">Belgen inceleniyor</string>
+    <string name="status_pending_body">Öğrenci belgen bir yönetici tarafından inceleniyor. Sonuçlandığında hesabın güncellenecek.</string>
+    <string name="status_approved_title">Hesabın onaylandı</string>
+    <string name="status_approved_body">Öğrenci doğrulaman tamamlandı.</string>
+    <string name="status_rejected_title">Belgen onaylanmadı</string>
+    <string name="status_rejected_body">Yüklediğin belge doğrulanamadı.</string>
+    <string name="status_suspended_title">Hesabın askıya alındı</string>
+    <string name="status_suspended_body">Hesabın bir yönetici tarafından askıya alındı.</string>
+    <!-- Student document -->
+    <string name="action_upload_document">Öğrenci belgesi yükle (PDF)</string>
+    <string name="document_requirements">Güncel tarihli öğrenci belgeni PDF olarak yükle (en fazla 10 MB). Belgedeki ad ve üniversite profilinle aynı olmalı.</string>
+    <string name="rejection_reason">Ret nedeni: %1$s</string>
+
+    <!-- Admin -->
+    <string name="action_open_admin">Yönetim paneli (web, iki adımlı doğrulama)</string>
+    <string name="cd_back">Geri</string>
+    <string name="admin_working">İşleniyor…</string>
+    <!-- Main -->
+    <string name="tab_community">Topluluk</string>
+    <string name="tab_profile">Profil</string>
+    <string name="profile_verified">Doğrulanmış öğrenci</string>
+
+    <!-- Community -->
+    <string name="scope_general">Genel</string>
+    <string name="scope_university">Üniversitem</string>
+    <string name="feed_load_failed">Gönderiler yüklenemedi</string>
+    <string name="feed_empty_title">Henüz gönderi yok.</string>
+    <string name="feed_empty_general">İlk gönderiyi sen paylaş.</string>
+    <string name="feed_empty_university">Üniversitenden henüz kimse paylaşım yapmadı. İlk gönderiyi sen paylaş.</string>
+    <string name="feed_end">Hepsi bu kadar.</string>
+    <string name="action_new_post">Gönderi</string>
+    <string name="action_share">Paylaş</string>
+    <string name="create_post_title">Yeni gönderi</string>
+    <string name="create_post_placeholder">Ne paylaşmak istiyorsun? #konu ekleyebilir, @kullanıcıadı ile birini etiketleyebilirsin.</string>
+    <string name="create_post_general_hint">Tüm doğrulanmış öğrenciler görür.</string>
+    <string name="create_post_university_hint">Yalnızca üniversitendeki doğrulanmış öğrenciler görür.</string>
+    <string name="post_title">Gönderi</string>
+    <string name="post_load_failed">Gönderi yüklenemedi</string>
+    <string name="comments_empty">Henüz yorum yok.</string>
+    <string name="comment_hint">Yorum yaz</string>
+    <string name="action_send_comment">Yorumu gönder</string>
+    <string name="action_delete_comment">Yorumu sil</string>
+    <string name="action_delete_post">Gönderiyi sil</string>
+    <string name="delete_post_title">Gönderi silinsin mi?</string>
+    <string name="delete_post_body">Gönderi ve yorumları artık kimseye görünmeyecek.</string>
+    <string name="author_unknown">Öğrenci</string>
+    <string name="cd_like">Beğen</string>
+    <string name="cd_unlike">Beğeniyi geri al</string>
+    <string name="cd_comments">Yorumlar</string>
+
+    <!-- Time -->
+    <string name="time_just_now">şimdi</string>
+    <plurals name="time_minutes">
+        <item quantity="one">%d dk önce</item>
+        <item quantity="other">%d dk önce</item>
+    </plurals>
+    <plurals name="time_hours">
+        <item quantity="one">%d sa önce</item>
+        <item quantity="other">%d sa önce</item>
+    </plurals>
+    <plurals name="time_days">
+        <item quantity="one">%d gün önce</item>
+        <item quantity="other">%d gün önce</item>
+    </plurals>
+    <!-- Requirements -->
+    <string name="tab_requirements">İhtiyaç</string>
+    <string name="requirements_load_failed">İhtiyaçların yüklenemedi</string>
+    <string name="requirements_empty_title">Henüz ihtiyaç paylaşmadın.</string>
+    <string name="requirements_empty_body">Ne aradığını kendi cümlelerinle yaz; ilanını oluşturalım ve seninle eşleşebilecek öğrencileri bulalım.</string>
+    <string name="action_new_requirement">Yeni ihtiyaç</string>
+    <string name="action_close_requirement">İlanı kapat</string>
+    <string name="requirement_active">Aktif</string>
+    <string name="requirement_closed">Kapalı</string>
+    <string name="requirement_starts_at">Zaman: %1$s</string>
+    <string name="requirement_location">Yer: %1$s</string>
+    <string name="create_requirement_title">İhtiyaç oluştur</string>
+    <string name="create_requirement_intro">Neye ihtiyacın var? Kategori ve etiket seç; aynı etiketi seçen öğrencilerle eşleşirsin.</string>
+    <string name="action_publish_requirement">Yayınla</string>
+    <string name="field_requirement_title">Başlık</string>
+    <string name="field_requirement_description">Açıklama (isteğe bağlı)</string>
+    <string name="field_requirement_category">Kategori</string>
+    <string name="field_requirement_tags">Etiketler (en fazla 8)</string>
+    <string name="field_requirement_custom_tag">Başka etiket</string>
+    <string name="action_add_tag">Ekle</string>
+    <string name="cd_remove_tag">%1$s etiketini kaldır</string>
+    <string name="requirement_pick_date">Tarih (isteğe bağlı)</string>
+    <string name="requirement_pick_time">Saat</string>
+    <string name="error_requirement_time_invalid">Tarih en fazla bir yıl sonrası olabilir.</string>
+    <string name="match_shared_tags">Ortak: %1$s</string>
+    <string name="field_requirement_location">Yer (isteğe bağlı)</string>
+    <string name="field_requirement_participants">Kaç kişi (isteğe bağlı, 1–50)</string>
+    <string name="cd_remove_time">Zamanı kaldır</string>
+    <string name="category_sports">Spor</string>
+    <string name="category_study">Ders</string>
+    <string name="category_project">Proje</string>
+    <string name="category_transport">Ulaşım</string>
+    <string name="category_item">Eşya</string>
+    <string name="category_event">Etkinlik</string>
+    <string name="category_housing">Barınma</string>
+    <string name="category_other">Diğer</string>
+    <!-- Matches -->
+    <string name="action_show_matches">Eşleşmeler</string>
+    <string name="matches_title">Eşleşmeler</string>
+    <string name="matches_load_failed">Eşleşmeler yüklenemedi</string>
+    <string name="matches_empty_title">Henüz eşleşme bulunamadı.</string>
+    <string name="matches_empty_body">Üniversitende benzer bir ihtiyaç paylaşıldığında burada görünecek.</string>
+    <string name="matches_score_explained" formatted="false">Uyum; ortak etiketlere (%50), başlık ve açıklamadaki ortak kelimelere (%25), zamanın yakınlığına (%15) ve yere (%10) göre hesaplanır. Yalnızca üniversitendeki aynı kategorideki aktif ilanlar gösterilir.</string>
+    <string name="match_score">%%%1$d uyum</string>
+    <!-- Chat -->
+    <string name="tab_chat">Sohbet</string>
+    <string name="action_message">Mesaj gönder</string>
+    <string name="conversations_load_failed">Sohbetler yüklenemedi</string>
+    <string name="conversations_empty_title">Henüz mesajınız yok.</string>
+    <string name="conversations_empty_body">Bir ihtiyacının eşleşmelerinden \"Mesaj gönder\" ile sohbet başlatabilirsin.</string>
+    <string name="chat_you_prefix">Sen: %1$s</string>
+    <string name="chat_no_messages_yet">Henüz mesaj yok</string>
+    <string name="chat_load_failed">Mesajlar yüklenemedi</string>
+    <string name="chat_empty_title">İlk mesajı sen gönder.</string>
+    <string name="chat_empty_body">Mesajların yalnızca bu sohbetteki iki kişiye görünür.</string>
+    <string name="chat_input_hint">Mesaj yaz</string>
+    <string name="action_send_message">Gönder</string>
+    <string name="chat_load_older">Önceki mesajlar</string>
+    <string name="chat_status_sending">Gönderiliyor…</string>
+    <string name="chat_status_failed">Gönderilemedi · Tekrar denemek için dokun</string>
+    <string name="chat_status_sent">Gönderildi</string>
+    <string name="chat_status_read">Okundu</string>
+    <!-- Notifications -->
+    <string name="tab_notifications">Bildirimler</string>
+    <string name="notification_channel_name">KampüsAğı bildirimleri</string>
+    <string name="notifications_load_failed">Bildirimler yüklenemedi</string>
+    <string name="notifications_empty_title">Henüz bildiriminiz yok.</string>
+    <string name="notifications_empty_body">Mesaj, yorum ve doğrulama sonuçları burada görünür.</string>
+    <string name="action_mark_all_read">Tümünü okundu işaretle</string>
+    <string name="notification_new_message">%1$s sana mesaj gönderdi.</string>
+    <string name="notification_new_comment">%1$s gönderine yorum yaptı.</string>
+    <string name="notification_mentioned">%1$s seni bir gönderide etiketledi.</string>
+    <string name="tag_empty_title">Bu etikette gönderi yok</string>
+    <string name="tag_empty_body">Görebildiğin gönderilerde bu etiket henüz kullanılmamış.</string>
+    <string name="mention_not_found_title">Bu kullanıcı bulunamadı</string>
+    <string name="mention_failed_title">Profil açılamadı</string>
+    <string name="search_popular_tags">Bu haftanın popüler etiketleri</string>
+    <string name="search_tag_chip">#%1$s · %2$d</string>
+    <string name="search_open_tag">#%1$s etiketine git</string>
+    <string name="notification_verification_approved">Öğrenci doğrulaman onaylandı.</string>
+    <string name="notification_verification_rejected">Öğrenci belgen onaylanmadı. Nedenini profil durumunda görebilirsin.</string>
+    <string name="push_permission_denied">Bildirim izni kapalı. Mesaj ve yorum bildirimlerini almak için Android ayarlarından KampüsAğı bildirim iznini ver.</string>
+    <!-- Premium -->
+    <string name="premium_title">Premium</string>
+    <string name="premium_load_failed">Premium bilgileri yüklenemedi</string>
+    <string name="premium_status_free">Ücretsiz plan</string>
+    <string name="premium_status_active">%1$s aktif</string>
+    <string name="premium_renews_or_ends">Geçerlilik: %1$s</string>
+    <string name="premium_limits">En fazla %1$d aktif ilan</string>
+    <string name="premium_no_plans">Premium şu an sunulmuyor.</string>
+    <string name="premium_store_unavailable">Google Play\'e ulaşılamadı; fiyatlar ve satın alma şu an kullanılamıyor.</string>
+    <string name="premium_product_unavailable">Bu plan Google Play\'de şu an satın alınamıyor.</string>
+    <string name="premium_current_plan">Mevcut planın</string>
+    <string name="action_subscribe">Abone ol</string>
+    <string name="action_restore_purchases">Satın alımları geri yükle</string>
+    <string name="premium_legal_note">Abonelik Google Play üzerinden yönetilir ve iptal edilene kadar otomatik yenilenir. İptal için Google Play → Ödemeler ve abonelikler.</string>
+    <string name="premium_activated">Premium etkinleştirildi.</string>
+    <string name="premium_pending">Ödemen onay bekliyor. Onaylandığında Premium etkinleşecek.</string>
+    <string name="premium_nothing_to_restore">Bu Google Play hesabında aktif abonelik bulunamadı.</string>
+
+    <!-- Moderation -->
+    <string name="cd_more_actions">Diğer işlemler</string>
+    <string name="report_post">Gönderiyi şikayet et</string>
+    <string name="report_comment">Yorumu şikayet et</string>
+    <string name="report_user">Kullanıcıyı şikayet et</string>
+    <string name="report_message">Mesajı şikayet et</string>
+    <string name="report_body">Şikayetin yöneticilere iletilir. Kimin şikayet ettiği karşı tarafa gösterilmez.</string>
+    <string name="report_details">Açıklama (isteğe bağlı)</string>
+    <string name="report_reason_spam">Spam veya reklam</string>
+    <string name="report_reason_harassment">Taciz veya zorbalık</string>
+    <string name="report_reason_inappropriate">Uygunsuz içerik</string>
+    <string name="report_reason_fake_profile">Sahte profil</string>
+    <string name="report_reason_other">Diğer</string>
+    <string name="action_send_report">Şikayet et</string>
+    <string name="report_sent">Şikayetin alındı. Yöneticiler inceleyecek.</string>
+    <string name="action_block_user">Kullanıcıyı engelle</string>
+    <string name="action_block">Engelle</string>
+    <string name="action_unblock">Engeli kaldır</string>
+    <string name="block_title">%1$s engellensin mi?</string>
+    <string name="block_body">Birbirinizin gönderilerini, yorumlarını, ilanlarını ve mesajlarını artık görmezsiniz; birbirinize mesaj gönderemezsiniz. Karşı tarafa bildirim gitmez. Engeli Ayarlar\'dan kaldırabilirsin.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_blocked_title">Engellenen kullanıcılar</string>
+    <string name="settings_blocked_empty">Kimseyi engellemedin.</string>
+    <string name="settings_privacy_title">Gizlilik ve KVKK</string>
+    <string name="settings_appearance_title">Görünüm</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="delete_account_title">Hesabı sil</string>
+    <string name="delete_account_summary">Hesabın ve ona bağlı tüm veriler (profil, belge, gönderiler, yorumlar, ilanlar, mesajlar, bildirimler) kalıcı olarak silinir.</string>
+    <string name="action_delete_account">Hesabımı sil</string>
+    <string name="delete_account_confirm_title">Hesabının silinmesini istiyor musun?</string>
+    <string name="delete_account_confirm_body">Hesabın 30 gün sonra kalıcı olarak silinecek; o güne kadar giriş yapıp vazgeçebilirsin. Premium aboneliğin varsa Google Play tarafından faturalandırılmaya devam eder; Google Play → Ödemeler ve abonelikler bölümünden ayrıca iptal etmelisin.</string>
+
+    <!-- Admin reports -->
+    <string name="action_confirm">Onayla</string>
+    <string name="category_all">Tümü</string>
+    <string name="post_category_general">Genel</string>
+    <string name="post_category_question">Soru</string>
+    <string name="post_category_study">Ders &amp; Sınav</string>
+    <string name="post_category_event">Etkinlik</string>
+    <string name="post_category_announcement">Duyuru</string>
+    <string name="post_category_marketplace">Al-Sat</string>
+    <string name="post_category_housing">Ev &amp; Yurt</string>
+    <string name="post_category_lost_found">Kayıp &amp; Buluntu</string>
+    <string name="post_category_career">Staj &amp; Kariyer</string>
+    <string name="post_category_sports">Spor</string>
+    <string name="create_post_category">Kategori</string>
+    <string name="create_post_audience">Kimler görsün?</string>
+    <string name="feed_empty_category">Bu kategoride henüz gönderi yok.</string>
+    <string name="error_image_unreadable">Fotoğraf açılamadı. Başka bir fotoğraf seç.</string>
+    <string name="tab_matches">Eşleşmeler</string>
+    <string name="my_matches_title">Eşleştiklerim</string>
+    <string name="my_matches_failed">Eşleşmeler yüklenemedi</string>
+    <string name="my_matches_for">“%1$s” için</string>
+    <string name="my_matches_count">%1$d eşleşme</string>
+    <string name="my_matches_no_requirements_title">Henüz aktif ihtiyacın yok</string>
+    <string name="my_matches_no_requirements_body">Bir ihtiyaç paylaş; sana uyan öğrenciler burada listelenir.</string>
+    <string name="my_matches_empty_title">Henüz eşleşme yok</string>
+    <string name="my_matches_empty_body">Benzer ihtiyacı olan öğrenciler paylaşım yaptıkça burada görünür. Aşağı çekerek yenileyebilirsin.</string>
+    <string name="profile_stat_posts">Gönderi</string>
+    <string name="profile_stat_requirements">İhtiyaç</string>
+    <string name="profile_stat_chats">Sohbet</string>
+    <string name="profile_edit">Profili düzenle</string>
+    <string name="profile_add_bio">+ Biyografi ekle</string>
+    <string name="profile_bio">Biyografi</string>
+    <string name="profile_bio_placeholder">Kendinden kısaca bahset: bölümün, ilgi alanların…</string>
+    <string name="profile_bio_saved">Biyografi kaydedildi.</string>
+    <string name="profile_add_photo">Fotoğraf ekle</string>
+    <string name="profile_change_photo">Fotoğrafı değiştir</string>
+    <string name="profile_remove_photo">Kaldır</string>
+    <string name="profile_photo_hint">Fotoğrafın yalnızca doğrulanmış öğrencilere görünür. Fotoğraf eklemezsen adının baş harfleri gösterilir.</string>
+    <string name="action_save">Kaydet</string>
+
+    <!-- Photos, polls, events, listings -->
+    <string name="cd_post_photo">Gönderi fotoğrafı</string>
+    <string name="photo_load_failed">Fotoğraf yüklenemedi, yeniden denemek için dokun</string>
+    <string name="poll_your_vote">Senin oyun</string>
+    <plurals name="poll_votes">
+        <item quantity="one">%d oy</item>
+        <item quantity="other">%d oy</item>
+    </plurals>
+    <string name="poll_closed">Anket kapandı</string>
+    <string name="poll_closes_at">Kapanış: %1$s</string>
+    <string name="poll_withdraw">Oyumu geri çek</string>
+    <plurals name="event_attendees">
+        <item quantity="one">%d kişi katılıyor</item>
+        <item quantity="other">%d kişi katılıyor</item>
+    </plurals>
+    <string name="event_attend">Katılıyorum</string>
+    <string name="event_attending">Katılıyorsun</string>
+    <string name="listing_sold">Satıldı</string>
+    <string name="listing_free">Ücretsiz</string>
+    <string name="listing_mark_sold">Satıldı olarak işaretle</string>
+    <string name="listing_mark_available">Satışa geri aç</string>
+    <string name="listing_message_seller">Satıcıya yaz</string>
+    <string name="cd_save">Kaydet</string>
+    <string name="cd_unsave">Kaydedilenlerden çıkar</string>
+
+    <!-- Saved, events, search -->
+    <string name="saved_title">Kaydedilenler</string>
+    <string name="saved_empty_title">Henüz kaydettiğin gönderi yok</string>
+    <string name="saved_empty_body">Bir gönderideki yer imi simgesine dokunarak onu buraya kaydedebilirsin.</string>
+    <string name="events_title">Etkinlikler</string>
+    <string name="events_empty_title">Yaklaşan etkinlik yok</string>
+    <string name="events_empty_body">Etkinlik kategorisinde tarih ekleyerek paylaşılan etkinlikler burada listelenir.</string>
+    <string name="search_title">Ara</string>
+    <string name="search_hint">Gönderi veya kişi ara</string>
+    <string name="search_clear">Aramayı temizle</string>
+    <string name="search_tab_posts">Gönderiler</string>
+    <string name="search_tab_people">Kişiler</string>
+    <string name="search_start">Aramak için en az 2 harf yaz. Türkçe karakterler fark etmez.</string>
+    <string name="search_no_results">Sonuç bulunamadı</string>
+    <string name="search_no_posts">Bu kelimeyi içeren bir gönderi yok.</string>
+    <string name="search_no_people">Bu isimde doğrulanmış bir öğrenci bulunamadı.</string>
+    <string name="search_failed">Arama yapılamadı</string>
+
+    <!-- Other people's profiles -->
+    <string name="user_profile_not_found">Profil bulunamadı</string>
+    <string name="user_profile_load_failed">Profil yüklenemedi</string>
+    <string name="user_profile_no_posts">Henüz görebileceğin bir gönderisi yok.</string>
+    <plurals name="user_profile_posts">
+        <item quantity="one">%d gönderi</item>
+        <item quantity="other">%d gönderi</item>
+    </plurals>
+    <string name="user_profile_message">Mesaj gönder</string>
+    <string name="profile_my_posts">Gönderilerim</string>
+    <string name="action_load_more">Daha fazla yükle</string>
+    <string name="action_ok">Tamam</string>
+
+    <!-- Creating posts -->
+    <string name="create_post_add_photos">Fotoğraf ekle (%1$d/%2$d)</string>
+    <string name="create_post_preparing_photos">Fotoğraflar hazırlanıyor…</string>
+    <string name="create_post_remove_photo">Fotoğrafı kaldır</string>
+    <string name="create_post_price">Fiyat</string>
+    <string name="create_post_price_hint">Boş bırakırsan fiyat gösterilmez. Ücretsiz için 0 yaz.</string>
+    <string name="create_post_price_invalid">Geçerli bir tutar yaz (ör. 250 veya 99,90).</string>
+    <string name="create_post_add_poll">Anket ekle</string>
+    <string name="create_post_poll_option">Seçenek %1$d</string>
+    <string name="create_post_poll_add_option">Seçenek ekle</string>
+    <string name="create_post_poll_remove_option">Seçeneği kaldır</string>
+    <string name="create_post_poll_invalid">2–4 farklı ve dolu seçenek gir.</string>
+    <string name="create_post_poll_duration">Anket süresi</string>
+    <string name="poll_duration_open">Süresiz</string>
+    <string name="poll_duration_day">1 gün</string>
+    <string name="poll_duration_three_days">3 gün</string>
+    <string name="poll_duration_week">1 hafta</string>
+    <string name="create_post_event_details">Etkinlik bilgileri</string>
+    <string name="create_post_event_date">Tarih seç</string>
+    <string name="create_post_event_time">Saat seç</string>
+    <string name="create_post_event_time_needed">Tarih seçtiysen saati de seç.</string>
+    <string name="create_post_event_location">Yer (isteğe bağlı)</string>
+
+    <string name="error_poll_closed">Bu anket kapandı.</string>
+    <string name="error_event_ended">Bu etkinlik sona erdi.</string>
+    <string name="error_too_many_saved">En fazla 1000 gönderi kaydedebilirsin.</string>
+
+    <!-- Channels and study groups -->
+    <string name="inbox_messages">Mesajlar</string>
+    <string name="inbox_groups">Gruplar</string>
+    <string name="inbox_channels">Kanallar</string>
+    <string name="groups_intro">Aynı dersi alan öğrencilerle çalışma grubu kur veya katıl.</string>
+    <string name="channels_intro">Kanallarda yöneticiler duyuru, fotoğraf ve anket paylaşır; takipçiler okur ve oy verir.</string>
+    <string name="groups_discover">Keşfet</string>
+    <string name="groups_load_failed">Gruplar yüklenemedi</string>
+    <string name="groups_empty_title">Henüz bir çalışma grubunda değilsin</string>
+    <string name="groups_empty_body">Keşfet ile üniversitendeki grupları bul ya da yeni bir grup kur.</string>
+    <string name="channels_empty_title">Henüz bir kanalı takip etmiyorsun</string>
+    <string name="channels_empty_body">Keşfet ile kanalları bul. Kanal açmak Premium üyelere özeldir.</string>
+    <string name="groups_discover_title">Çalışma gruplarını keşfet</string>
+    <string name="channels_discover_title">Kanalları keşfet</string>
+    <string name="groups_search_hint">Grup adı veya ders kodu</string>
+    <string name="channels_search_hint">Kanal adı</string>
+    <string name="groups_discover_empty">Katılabileceğin bir grup bulunamadı.</string>
+    <string name="channels_discover_empty">Takip edebileceğin bir kanal bulunamadı.</string>
+    <string name="group_create">Grup kur</string>
+    <string name="channel_create">Kanal aç</string>
+    <string name="group_create_intro">Çalışma grupları ücretsizdir ve yalnızca üniversitendeki öğrencilere görünür. Her üye mesaj yazabilir.</string>
+    <string name="channel_create_intro">Kanalında yalnızca sen ve seçtiğin yöneticiler paylaşım yapar: metin, fotoğraf ve anket. Takipçiler okur, beğenir ve oy verir.</string>
+    <string name="group_name">Ad</string>
+    <string name="group_description">Açıklama (isteğe bağlı)</string>
+    <string name="group_course_code">Ders kodu</string>
+    <string name="group_course_code_hint">Örn. BLM101 (boşluk ve küçük harf olabilir)</string>
+    <string name="channel_university_only">Yalnızca üniversitem</string>
+    <string name="channel_scope_university_hint">Kanalı yalnızca senin üniversitendeki öğrenciler görür.</string>
+    <string name="channel_scope_all_hint">Kanalı tüm üniversitelerdeki doğrulanmış öğrenciler görür.</string>
+    <string name="channel_scope_university">Üniversiteme özel</string>
+    <string name="channel_scope_all">Tüm üniversiteler</string>
+    <string name="action_create">Oluştur</string>
+    <string name="action_send">Gönder</string>
+    <string name="channel_premium_title">Kanal açmak Premium\'a özel</string>
+    <string name="channel_premium_body">Premium üyeler kendi kanalını açar, kanal fotoğrafı ekler ve anket paylaşır. Kanallara katılmak herkes için ücretsizdir.</string>
+    <string name="channel_premium_action">Premium\'u incele</string>
+    <plurals name="group_members">
+        <item quantity="one">%d üye</item>
+        <item quantity="other">%d üye</item>
+    </plurals>
+    <string name="group_join">Katıl</string>
+    <string name="channel_follow">Takip et</string>
+    <string name="group_join_body">Mesajları görmek ve yazmak için gruba katıl.</string>
+    <string name="channel_join_body">Paylaşımları görmek için kanalı takip et.</string>
+    <string name="group_not_found">Grup bulunamadı</string>
+    <string name="group_info_title">Bilgi</string>
+    <string name="group_no_messages_title">Henüz mesaj yok</string>
+    <string name="group_no_messages_body">İlk mesajı sen yaz.</string>
+    <string name="channel_no_messages_body">Kanal yöneticileri paylaşım yaptığında burada görünür.</string>
+    <string name="group_photo_message">Fotoğraf</string>
+    <string name="group_pin">Sabitle</string>
+    <string name="group_unpin">Sabitlemeyi kaldır</string>
+    <string name="group_delete_message">Mesajı sil</string>
+    <string name="report_group_message">Mesajı şikayet et</string>
+    <string name="report_group">Grubu şikayet et</string>
+    <string name="report_note">Notu şikayet et</string>
+    <string name="channel_read_only">Bu kanalda yalnızca yöneticiler paylaşım yapar.</string>
+    <string name="channel_premium_lapsed_owner">Premium üyeliğin sona erdiği için kanalında şu an paylaşım yapılamıyor. Takipçiler eski paylaşımları görmeye devam eder.</string>
+    <string name="channel_premium_lapsed_admin">Kanal sahibinin Premium üyeliği sona erdiği için şu an paylaşım yapılamıyor.</string>
+    <string name="group_attach_photo">Fotoğraf ekle</string>
+    <string name="group_poll_hint">Anket: soruyu mesaj alanına yaz, 2–4 seçenek gir.</string>
+    <string name="group_poll_question">Anket sorusu</string>
+    <string name="group_poll_remove">Anketi kaldır</string>
+    <string name="channel_message_hint">Takipçilerine bir şey paylaş</string>
+    <string name="channel_photo_premium">Kanal fotoğrafı Premium özelliğidir.</string>
+    <string name="group_owner">Kurucu: %1$s</string>
+    <string name="group_edit">Düzenle</string>
+    <string name="group_members_title">Üyeler</string>
+    <string name="group_role_owner">Kurucu</string>
+    <string name="group_role_admin">Yönetici</string>
+    <string name="group_make_admin">Yönetici yap</string>
+    <string name="group_make_member">Yöneticilikten al</string>
+    <string name="group_remove_member">Gruptan çıkar</string>
+    <string name="group_leave">Gruptan ayrıl</string>
+    <string name="channel_unfollow">Takibi bırak</string>
+    <string name="group_delete">Grubu sil</string>
+    <string name="channel_delete">Kanalı sil</string>
+    <string name="group_leave_confirm">Ayrılmak istediğine emin misin? İstersen yeniden katılabilirsin.</string>
+    <string name="group_delete_confirm">Silinen grup herkes için kaybolur ve geri alınamaz. Emin misin?</string>
+
+    <!-- Course notes -->
+    <string name="notes_title">Ders notları</string>
+    <string name="notes_search_hint">Not, ders adı veya kodu ara</string>
+    <string name="notes_load_failed">Notlar yüklenemedi</string>
+    <string name="notes_empty_title">Henüz not yok</string>
+    <string name="notes_empty_body">Üniversitende paylaşılan ders notları burada görünür. İlk notu sen yükle.</string>
+    <string name="notes_upload">Not yükle</string>
+    <string name="notes_upload_intro">PDF notun yalnızca üniversitendeki doğrulanmış öğrencilere görünür. En fazla 20 MB. Başkasına ait telif hakkı olan materyal yükleme.</string>
+    <string name="notes_pick_pdf">PDF seç</string>
+    <string name="notes_reading_pdf">PDF okunuyor…</string>
+    <string name="notes_pdf_selected">PDF seçildi (%1$s)</string>
+    <string name="notes_course_name">Ders adı</string>
+    <string name="notes_note_title">Not başlığı</string>
+    <string name="notes_opening">Açılıyor…</string>
+    <string name="notes_delete">Notu sil</string>
+    <string name="notes_delete_confirm">Bu notu silmek istediğine emin misin?</string>
+    <plurals name="notes_opens">
+        <item quantity="one">%d açılma</item>
+        <item quantity="other">%d açılma</item>
+    </plurals>
+
+    <!-- Badges and Premium -->
+    <string name="reputation_points">%1$d puan</string>
+    <string name="badge_premium">Premium</string>
+    <string name="badge_channel_owner">Kanal sahibi</string>
+    <string name="badge_helpful">Yardımsever</string>
+    <string name="badge_note_sharer">Not paylaşımcısı</string>
+    <string name="badge_popular">Popüler</string>
+    <string name="badge_event_organizer">Etkinlik düzenleyici</string>
+    <string name="badge_active_member">Aktif üye</string>
+    <string name="premium_perks_title">Premium ile</string>
+    <string name="premium_perk_channels">Kendi kanalını aç (en fazla 5)</string>
+    <string name="premium_perk_channel_photo">Kanal fotoğrafı ve sabitlenen duyurular</string>
+    <string name="premium_perk_channel_polls">Kanalda anket paylaş</string>
+    <string name="premium_perk_badge">Profilinde Premium rozeti</string>
+    <string name="premium_perk_requirements">Daha fazla aktif ihtiyaç ilanı</string>
+
+    <string name="error_premium_required">Bu özellik Premium üyelere özel.</string>
+    <string name="error_too_many_groups">Grup veya kanal sınırına ulaştın.</string>
+    <string name="error_group_full">Bu grup dolu.</string>
+    <string name="error_owner_cannot_leave">Kurucu gruptan ayrılamaz; istersen grubu silebilirsin.</string>
+    <string name="error_group_not_allowed">Bu işlem için yetkin yok.</string>
+
+    <!-- Announcements and promo codes -->
+    <string name="announcement_dismiss">Duyuruyu kapat</string>
+    <string name="premium_promo_title">Promosyon kodun var mı?</string>
+    <string name="premium_promo_hint">Kod</string>
+    <string name="premium_promo_action">Kodu kullan</string>
+    <string name="premium_promo_redeemed">Kod kullanıldı, Premium açıldı.</string>
+    <string name="premium_status_gift">Premium (hediye): %1$s</string>
+    <string name="error_promo_code_invalid">Bu kod geçerli değil ya da süresi dolmuş.</string>
+    <string name="error_promo_code_used">Bu kodu daha önce kullandın.</string>
+    <string name="error_promo_code_exhausted">Bu kodun kullanım hakkı dolmuş.</string>
+
+    <!-- Sign-up consent -->
+    <string name="terms_of_use">Kullanım koşulları</string>
+    <string name="privacy_policy">Gizlilik politikası</string>
+    <!-- KVKK: report categories -->
+    <string name="report_reason_hate_speech">Nefret söylemi / ayrımcılık</string>
+    <string name="report_reason_personal_data">Kişisel veri ifşası (numaram, adresim, belgem…)</string>
+    <string name="report_reason_personality_rights">Kişilik hakkı ihlali (hakaret, iftira)</string>
+    <string name="report_reason_sexual">Cinsel içerik</string>
+    <string name="report_reason_copyright">Telif ihlali</string>
+    <!-- KVKK: errors -->
+    <string name="error_sensitive_tag">Etiketler din, mezhep, etnik köken, siyasi görüş, sağlık, cinsel yönelim gibi özel nitelikli bilgileri içeremez. Bu etiketi kaldır.</string>
+    <string name="error_rights_declaration_required">Notu yüklemek için hak sahibi olduğunu ya da paylaşma iznin olduğunu onaylaman gerekiyor.</string>
+    <string name="error_appeal_exists">Bu karara zaten itiraz ettin; sonucu bildirimlerde göreceksin.</string>
+    <string name="input_birth_date_required">Doğum tarihini seç.</string>
+    <string name="input_underage">KampüsAğı yalnızca 18 yaşını doldurmuş kişiler içindir; bu yüzden hesap açılamıyor.</string>
+    <string name="input_notice_not_read">Devam etmek için Aydınlatma Metni\'ni okuduğunu işaretle.</string>
+    <string name="input_terms_not_accepted">Devam etmek için Kullanım Koşulları\'nı ve Topluluk Kuralları\'nı kabul etmelisin.</string>
+    <!-- KVKK: personal data warning -->
+    <string name="personal_data_warning_title">Kişisel verilerini paylaşmak üzeresin</string>
+    <string name="personal_data_warning_body">Yazdığın metinde %1$s var gibi görünüyor. Bu bilgiler karşı tarafça kaydedilebilir ve kötüye kullanılabilir. Yine de göndermek istiyor musun?</string>
+    <string name="personal_data_tc">T.C. kimlik numarası</string>
+    <string name="personal_data_iban">IBAN</string>
+    <string name="personal_data_phone">telefon numarası</string>
+    <string name="action_send_anyway">Yine de gönder</string>
+    <string name="action_edit">Düzenle</string>
+    <!-- KVKK: legal texts -->
+    <string name="legal_loading_title">Hukuki metin</string>
+    <string name="legal_load_failed">Metin yüklenemedi</string>
+    <string name="legal_version_footer">Sürüm %1$d · SHA-256: %2$s</string>
+    <!-- KVKK: sign-up and sign-in -->
+    <string name="sign_in_log_notice_fallback">Giriş yaparak güvenlik amacıyla işlem kayıtlarının (log) tutulduğunu kabul edersin.</string>
+    <string name="privacy_notice">Aydınlatma Metni</string>
+    <string name="community_rules">Topluluk Kuralları</string>
+    <string name="action_read">Oku</string>
+    <string name="sign_up_birth_date_pick">Doğum tarihin (%1$d yaş kontrolü için, saklanmaz)</string>
+    <string name="sign_up_birth_date_value">Doğum tarihi: %1$s (saklanmaz)</string>
+    <string name="sign_up_notice_read">Aydınlatma Metni\'ni okudum. (Bu bir onay değil, bilgilendirildiğinin kaydıdır.)</string>
+    <string name="sign_up_terms_accept">%1$d yaşını doldurduğumu beyan eder, Kullanım Koşulları\'nı ve Topluluk Kuralları\'nı kabul ederim.</string>
+    <string name="sign_up_optional_consents">İsteğe bağlı izinler (vermesen de uygulamanın tamamını kullanabilirsin)</string>
+    <!-- KVKK: notifications -->
+    <string name="notification_content_removed">İçeriğin Topluluk Kuralları\'na aykırı bulunduğu için kaldırıldı. Gerekçesini görmek ve itiraz etmek için dokun.</string>
+    <string name="notification_account_suspended">Hesabın askıya alındı. Gerekçesini görmek ve itiraz etmek için dokun.</string>
+    <string name="notification_appeal_decided">İtirazın sonuçlandı. Sonucu görmek için dokun.</string>
+    <string name="notification_dsr_answered">KVKK başvurun yanıtlandı. Yanıtı görmek için dokun.</string>
+    <string name="notification_permission_title">Bildirimlere izin verir misin?</string>
+    <string name="notification_permission_body">Yeni mesaj, yorum ve belge onayı gibi hesabınla ilgili gelişmeleri telefonuna bildirim olarak gönderebilmemiz için izin gerekiyor. Kampanya bildirimleri ayrıca açık rızana bağlıdır ve varsayılan olarak kapalıdır. İzni istediğin zaman telefonunun ayarlarından değiştirebilirsin.</string>
+    <string name="action_allow">İzin ver</string>
+    <string name="action_not_now">Şimdi değil</string>
+    <string name="notification_channel_marketing">Kampanyalar ve duyurular</string>
+    <string name="notification_channel_marketing_description">Yalnızca kampanya bildirimine izin verdiysen gelir. İzni Ayarlar → Gizlilik ve KVKK → Rızalarım bölümünden geri alabilirsin.</string>
+    <!-- KVKK: privacy screen -->
+    <string name="privacy_title">Gizlilik ve KVKK</string>
+    <string name="privacy_consents_title">Rızalarım</string>
+    <string name="privacy_consents_hint">Açık rızaların isteğe bağlıdır; vermesen de uygulamanın tamamını kullanabilirsin. Geri alman anında geçerli olur.</string>
+    <string name="privacy_consent_given_at">Verildi: %1$s</string>
+    <string name="privacy_consent_off_since">Kapalı: %1$s</string>
+    <string name="privacy_history_show">Onay geçmişini göster</string>
+    <string name="privacy_history_hide">Gizle</string>
+    <string name="privacy_history_row">%1$s · %2$s v%3$d · %4$s</string>
+    <string name="consent_action_accepted">kabul edildi</string>
+    <string name="consent_action_declined">reddedildi</string>
+    <string name="consent_action_withdrawn">geri alındı</string>
+    <string name="consent_action_informed">okundu</string>
+    <string name="privacy_show_full_name">Soyadımı diğer öğrencilere göster</string>
+    <string name="privacy_show_full_name_hint">Kapalıyken diğer öğrenciler adını “Ayşe Y.” biçiminde görür. E-posta adresin hiçbir zaman gösterilmez.</string>
+    <string name="privacy_export_title">Verilerimi indir</string>
+    <string name="privacy_export_hint">Profilin, paylaşımların, mesajların, ders notların, onay geçmişin ve giriş kayıtların okunabilir (HTML) ve makine tarafından okunabilir (JSON) dosya olarak hazırlanır. 24 saatte en fazla 3 kez.</string>
+    <string name="privacy_export_action">Verilerimi hazırla</string>
+    <string name="privacy_export_ready">Hazır. Bağlantılar %1$s tarihine kadar geçerli.</string>
+    <string name="privacy_export_open_html">Okunabilir sürümü aç</string>
+    <string name="privacy_export_open_json">JSON dosyası</string>
+    <string name="privacy_access_title">Giriş kayıtlarım</string>
+    <string name="privacy_access_hint">5651 sayılı Kanun gereği giriş, çıkış ve başarısız giriş kayıtların IP adresi ve cihaz bilgisiyle tutulur.</string>
+    <string name="privacy_access_show">Son kayıtları göster</string>
+    <string name="privacy_access_empty">Kayıt yok.</string>
+    <string name="privacy_access_row">%1$s · %2$s · %3$s · %4$s</string>
+    <string name="access_event_login">giriş</string>
+    <string name="access_event_logout">çıkış</string>
+    <string name="access_event_failed">başarısız giriş</string>
+    <string name="access_event_recovery">şifre sıfırlama</string>
+    <string name="access_event_signup">kayıt</string>
+    <string name="access_event_other">işlem</string>
+    <string name="privacy_request_title">KVKK başvurusu</string>
+    <string name="privacy_request_hint">KVKK md.11 kapsamındaki haklarını kullanmak için başvur. En geç 30 gün içinde ücretsiz yanıtlanır. Üniversite gibi doğrulanmış bilgilerinin düzeltilmesi için “Düzeltme”yi seç.</string>
+    <string name="privacy_request_details">Talebin</string>
+    <string name="privacy_request_send">Başvuruyu gönder</string>
+    <string name="privacy_request_sent">Başvurun alındı. Başvuru numaran: %1$s</string>
+    <string name="privacy_request_row">%1$s · %2$s · %3$s</string>
+    <string name="privacy_request_dates">Alındı: %1$s · Son yanıt tarihi: %2$s</string>
+    <string name="privacy_request_answer">Yanıt: %1$s</string>
+    <string name="dsr_type_access">Bilgi talebi</string>
+    <string name="dsr_type_purpose">İşleme amacı</string>
+    <string name="dsr_type_third_parties">Aktarılan taraflar</string>
+    <string name="dsr_type_rectification">Düzeltme</string>
+    <string name="dsr_type_erasure">Silme</string>
+    <string name="dsr_type_notify">Üçüncü kişilere bildirim</string>
+    <string name="dsr_type_objection">Otomatik analize itiraz</string>
+    <string name="dsr_type_compensation">Zararın giderilmesi</string>
+    <string name="dsr_type_other">Diğer</string>
+    <string name="dsr_status_received">Alındı</string>
+    <string name="dsr_status_in_progress">İşlemde</string>
+    <string name="dsr_status_answered">Yanıtlandı</string>
+    <string name="dsr_status_rejected">Reddedildi</string>
+    <string name="privacy_decisions_title">Hakkımdaki moderasyon kararları</string>
+    <string name="privacy_decisions_empty">Hakkında bir karar yok.</string>
+    <string name="privacy_decision_removed">İçeriğin kaldırıldı. Gerekçe: %1$s</string>
+    <string name="privacy_decision_suspended">Hesabın askıya alındı. Gerekçe: %1$s</string>
+    <string name="action_appeal">İtiraz et</string>
+    <string name="privacy_appeal_title">Karara itiraz</string>
+    <string name="privacy_appeal_hint">Neden yanlış olduğunu açıkla (en az 10 karakter)</string>
+    <string name="privacy_appeal_open">İtirazın inceleniyor.</string>
+    <string name="privacy_appeal_reversed">İtirazın kabul edildi: %1$s</string>
+    <string name="privacy_appeal_upheld">İtirazın reddedildi: %1$s</string>
+    <string name="privacy_documents_title">Hukuki metinler</string>
+    <string name="privacy_document_row">%1$s (sürüm %2$d)</string>
+    <string name="settings_privacy_summary">Rızaların, verilerini indirme, KVKK başvurusu, giriş kayıtların, hakkındaki moderasyon kararları ve hesabını silme.</string>
+    <string name="delete_account_summary_grace">Silme talebinden sonra 30 gün içinde giriş yapıp vazgeçebilirsin. Süre dolunca hesabın ve içeriklerin kalıcı olarak silinir; grup ve kanallardaki mesajların “Silinmiş kullanıcı” olarak kalır. Yasal saklama zorunluluğu olan giriş ve onay kayıtları profilinden ayrılarak yalnızca yasal süre boyunca saklanır.</string>
+    <!-- KVKK: updated texts and deletion -->
+    <string name="legal_update_title">Metinlerimiz güncellendi</string>
+    <string name="legal_update_body">Devam etmeden önce güncellenen metinleri oku. Kullanım Koşulları ve Topluluk Kuralları\'ndaki değişiklikleri kabul etmen gerekiyor; aydınlatma metni gibi bilgilendirme metinlerinde yalnızca okuduğun kaydedilir.</string>
+    <string name="legal_update_accept">%1$s (sürüm %2$d) metnini okudum ve kabul ediyorum.</string>
+    <string name="legal_update_read">%1$s (sürüm %2$d) metnini okudum.</string>
+    <string name="legal_update_decline_hint">Değişiklikleri kabul etmek istemiyorsan çıkış yapabilir ve hesabını silebilirsin (web sitemizdeki hesap silme sayfasından).</string>
+    <string name="action_continue">Devam et</string>
+    <string name="deletion_pending_title">Hesabın silinecek</string>
+    <string name="deletion_pending_body">Hesabın ve verilerin %1$s tarihinde kalıcı olarak silinecek. Vazgeçersen hesabın olduğu gibi kalır.</string>
+    <string name="action_cancel_deletion">Vazgeç, hesabımı koru</string>
+    <string name="gate_error_title">Hesap bilgileri yüklenemedi</string>
+    <string name="document_upload_notice_fallback">Öğrenci belgen yalnızca öğrenciliğini doğrulamak için alınır ve yalnızca yetkili doğrulama personeli tarafından görülür. Karar verildikten sonra kalıcı olarak silinir.</string>
+    <string name="notes_rights_declaration">Bu içeriğin hak sahibiyim veya paylaşma iznim var. Hocalara ait sınav sorularını ya da telifli kitap sayfalarını izinsiz paylaşmayacağım.</string>
+    <!-- KVKK: automated matching -->
+    <string name="match_why">Bu eşleşme neden önerildi?</string>
+    <string name="match_why_rules">Eşleşmeler yapay zekâ kullanmadan, kurallarla otomatik hesaplanır: yalnızca aynı üniversitedeki aynı kategorideki ilanlar; ortak etiketler %50, ortak kelimeler %25, zaman yakınlığı %15, yer benzerliği %10 ağırlıkla. Bu bir öneridir, kimse hakkında bir değerlendirme değildir.</string>
+    <string name="match_why_tags">Ortak etiketleriniz: %1$s.</string>
+    <string name="match_why_words">İlan başlıklarınızda ve açıklamalarınızda ortak kelimeler var.</string>
+    <string name="match_why_time">Tarihler birbirine yakın (7 gün içindeki yakınlık puanı artırır).</string>
+    <string name="match_why_place">Yer bilgisi benzer olabilir (biri diğerini içeriyorsa puan artar).</string>
+    <string name="match_why_score">Toplam puan: %1$d / 100.</string>
+    <string name="match_object">İtiraz et, bunu gösterme</string>
+    <string name="match_object_body">KVKK md.11/1-g kapsamında otomatik analiz sonucuna itiraz edebilirsin. Bu eşleşme sana bir daha gösterilmez ve itirazın kayıt altına alınır.</string>
+    <string name="match_object_reason">Nedeni (isteğe bağlı)</string>
+    <string name="match_object_confirm">İtiraz et</string>
+    <!-- KVKK / 6502: Premium purchase -->
+    <string name="premium_pre_info_title">Satın almadan önce</string>
+    <string name="premium_pre_info_summary">Fiyat, vergiler dahil olarak Google Play ödeme penceresinde gösterilir. Abonelik aylıktır ve iptal edilmedikçe her dönem sonunda otomatik yenilenir. Google Play → Abonelikler bölümünden istediğin zaman iptal edebilirsin; iptal dönem sonunda geçerli olur.</string>
+    <string name="premium_accept_contract">Ön Bilgilendirme Formu\'nu ve Mesafeli Sözleşme\'yi okudum, kabul ediyorum.</string>
+    <string name="premium_waive_withdrawal">Premium haklarının satın alma onaylanır onaylanmaz hesabıma tanımlanmasını (ifaya hemen başlanmasını) onaylıyorum; bu nedenle cayma hakkımı kaybedeceğimi biliyorum.</string>
+    <string name="premium_manage_subscription">Aboneliği yönet / iptal et (Google Play)</string>
+    <string name="requirement_sensitive_warning">İlanında özel nitelikli bir bilgi geçiyor (%1$s). Din, mezhep, etnik köken, siyasi görüş, sağlık veya cinsel yönelime göre ayrım yapmak Topluluk Kuralları\'na aykırıdır ve bu tür etiketler kabul edilmez. Lütfen bu ifadeleri çıkar; böyle bir ilanı görürsen şikâyet edebilirsin.</string>
+</resources>

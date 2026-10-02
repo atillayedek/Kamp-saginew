@@ -1,0 +1,64 @@
+package com.kampusagi.android.domain.model
+
+/**
+ * Errors the UI knows how to explain in plain language. Raw exceptions,
+ * HTTP codes and SQL errors never leave the data layer.
+ */
+enum class AppError {
+    NETWORK,
+    INVALID_CREDENTIALS,
+    EMAIL_NOT_CONFIRMED,
+    EMAIL_IN_USE,
+    WEAK_PASSWORD,
+    SAME_PASSWORD,
+    RATE_LIMITED,
+    SESSION_EXPIRED,
+    NOT_CONFIGURED,
+    USERNAME_TAKEN,
+    UNIVERSITY_NOT_FOUND,
+    PROFILE_LOCKED,
+    INVALID_INPUT,
+    DOCUMENT_TOO_LARGE,
+    DOCUMENT_NOT_PDF,
+    DOCUMENT_UNREADABLE,
+    IMAGE_UNREADABLE,
+    VERIFICATION_NOT_ALLOWED,
+    ADMIN_REQUIRED,
+    REJECTION_REASON_REQUIRED,
+    VERIFICATION_NOT_PENDING,
+    ACCOUNT_NOT_APPROVED,
+    TOO_MANY_ACTIVE_REQUIREMENTS,
+    REQUIREMENT_DAILY_LIMIT,
+    PUSH_NOT_CONFIGURED,
+    RECIPIENT_NOT_AVAILABLE,
+    BILLING_UNAVAILABLE,
+    BILLING_NOT_CONFIGURED,
+    PLAN_NOT_AVAILABLE,
+    PURCHASE_NOT_ACTIVE,
+    PURCHASE_NOT_FOR_ACCOUNT,
+    PURCHASE_CANCELLED,
+    POLL_CLOSED,
+    EVENT_ENDED,
+    TOO_MANY_SAVED,
+    PREMIUM_REQUIRED,
+    PROMO_CODE_INVALID,
+    PROMO_CODE_USED,
+    PROMO_CODE_EXHAUSTED,
+    TOO_MANY_GROUPS,
+    GROUP_FULL,
+    OWNER_CANNOT_LEAVE,
+    GROUP_NOT_ALLOWED,
+    /** A requirement tag names a special category of personal data (religion, health…; KVKK md.6). */
+    SENSITIVE_TAG,
+    /** A course note needs the uploader's rights declaration (FSEK). */
+    RIGHTS_DECLARATION_REQUIRED,
+    APPEAL_EXISTS,
+    NOT_FOUND,
+    SERVER,
+    UNKNOWN,
+}
+
+sealed interface AppResult<out T> {
+    data class Success<T>(val value: T) : AppResult<T>
+    data class Failure(val error: AppError) : AppResult<Nothing>
+}

@@ -1,0 +1,84 @@
+name: iOS
+
+on:
+  push:
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: iOS unit tests, simulator app, unsigned device build
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tools
+        run: |
+          brew install xcodegen
+          xcodebuild -version
+
+      - name: Backend configuration (presence only, never the values)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          WEBSITE_URL: ${{ vars.WEBSITE_URL }}
+          KAMPUSAGI_BUILD_NUMBER: ${{ github.run_number }}
+        run: ./scripts/write-secrets.sh
+
+      - name: Generate the Xcode project
+        run: xcodegen generate
+
+      - name: Resolve Swift packages
+        run: xcodebuild -resolvePackageDependencies -project KampusAgi.xcodeproj -scheme KampusAgi
+
+      - name: Unit tests (simulator)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          DEVICE=$(xcrun simctl list devices available | grep -m1 -oE "iPhone 1[5-7][^(]*" | sed 's/ *$//')
+          echo "Simulator: $DEVICE"
+          xcodebuild test -project KampusAgi.xcodeproj -scheme KampusAgi \
+            -destination "platform=iOS Simulator,name=$DEVICE" \
+            -derivedDataPath build/test CODE_SIGNING_ALLOWED=NO | tee build/test.log | grep -E "error:|warning: .*KampusAgi|Test Case|Executed|BUILD|\*\*" || true
+          grep -q "\*\* TEST SUCCEEDED \*\*" build/test.log
+
+      - name: Simulator app
+        run: |
+          set -o pipefail
+          xcodebuild build -project KampusAgi.xcodeproj -scheme KampusAgi -configuration Debug \
+            -sdk iphonesimulator -derivedDataPath build/sim CODE_SIGNING_ALLOWED=NO -quiet
+          cd build/sim/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/ios/build/KampusAgi-simulator.zip" KampusAgi.app
+
+      - name: Unsigned device build
+        run: |
+          set -o pipefail
+          xcodebuild archive -project KampusAgi.xcodeproj -scheme KampusAgi -configuration Release \
+            -sdk iphoneos -archivePath build/KampusAgi.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" -quiet
+          mkdir -p build/Payload
+          cp -R build/KampusAgi.xcarchive/Products/Applications/KampusAgi.app build/Payload/
+          cd build && zip -qry KampusAgi-unsigned.ipa Payload
+          echo "Signed builds need an Apple Developer account (certificate + provisioning profile); this one is unsigned."
+
+      - name: Upload builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-builds
+          path: |
+            ios/build/KampusAgi-simulator.zip
+            ios/build/KampusAgi-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14

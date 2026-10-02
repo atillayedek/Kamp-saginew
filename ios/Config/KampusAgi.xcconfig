@@ -1,0 +1,8 @@
+// Shared build settings. Client-safe values come from Secrets.xcconfig, which CI writes from
+// repository secrets (scripts: ios/scripts/write-secrets.sh) and which is never committed.
+// Without it the app builds and shows the "setup required" screen.
+SUPABASE_URL =
+SUPABASE_ANON_KEY =
+WEBSITE_URL =
+KAMPUSAGI_BUILD_NUMBER = 1
+#include? "Secrets.xcconfig"
