@@ -124,6 +124,9 @@ struct ProfileService {
     func load(userId: String) async throws -> Profile {
         do {
             let client = try backend.requireClient()
+            // The client sends requests without a token when it has no usable session; fail as
+            // "session expired" instead of reading the profile as an anonymous visitor.
+            _ = try await client.auth.session
             let response = try await client.from("profiles").select(ProfileDTO.columns).eq("id", value: userId).single().execute()
             let dto = try JSONCoding.decoder.decode(ProfileDTO.self, from: response.data)
             guard let status = AccountStatus(rawValue: dto.accountStatus) else { throw AppError.server }

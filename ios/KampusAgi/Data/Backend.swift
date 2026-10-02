@@ -15,7 +15,9 @@ final class Backend {
         client = SupabaseClient(
             supabaseURL: url,
             supabaseKey: AppConfig.supabaseAnonKey,
-            options: SupabaseClientOptions(auth: .init(redirectToURL: AppConfig.authRedirectURL, flowType: .pkce))
+            options: SupabaseClientOptions(auth: .init(
+                storage: SessionStorage(), redirectToURL: AppConfig.authRedirectURL, flowType: .pkce
+            ))
         )
     }
 

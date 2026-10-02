@@ -139,3 +139,22 @@ final class DataTests: XCTestCase {
         XCTAssertTrue(Listing(priceKurus: 125_000, sold: false).priceText.contains("1.250"))
     }
 }
+
+final class SessionStorageTests: XCTestCase {
+    /// A Keychain without access, as in a build without a code signature.
+    private struct UnavailableKeychain: SessionBackingStore {
+        struct Denied: Error {}
+        func store(key: String, value: Data) throws { throw Denied() }
+        func retrieve(key: String) throws -> Data? { throw Denied() }
+        func remove(key: String) throws { throw Denied() }
+    }
+
+    func testSessionSurvivesAKeychainThatCannotBeUsed() throws {
+        let storage = SessionStorage(persistent: UnavailableKeychain())
+        XCTAssertNil(try storage.retrieve(key: "session"))
+        try storage.store(key: "session", value: Data("token".utf8))
+        XCTAssertEqual(try storage.retrieve(key: "session"), Data("token".utf8))
+        try storage.remove(key: "session")
+        XCTAssertNil(try storage.retrieve(key: "session"))
+    }
+}
