@@ -2,6 +2,8 @@
 
 **Yayın kararı: BLOCKED — production-ready onayı verilmedi.**
 
+9 Ekim ek çalışması: Kullanıcının talebiyle 13 kaynak hukuki metin düzenlendi ve taslak başlıkları kaldırıldı. Gerçek işletmeci/altyapı bilgileri eksik alanlar olarak korunuyor; canlı metinler değiştirilmedi. Kalan alanlar ve yayın yöntemi `docs/kvkk/metin-yayin-bilgileri.md` içindedir. Aşağıdaki canlı inceleme sonuçları önceki yayın durumunu gösterir.
+
 Depo önce indirildi; Android/Kotlin/Compose istemcisi, Supabase Auth/Postgres/RLS/Storage/Edge Functions, Next.js yönetim ve yasal sayfaları, mevcut kararlar ve yayın iş akışı incelendi. iOS bu Play Store incelemesinin derleme kapsamına alınmadı. İnceleme mutlak hatasızlık garantisi değildir.
 
 ## Düzeltilen bulgular

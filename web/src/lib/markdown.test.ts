@@ -47,8 +47,8 @@ devamı.
   });
 });
 
-describe("published drafts", () => {
-  it("every text in docs/legal has a title, the draft banner and no stray table rows", async () => {
+describe("legal source documents", () => {
+  it("every text in docs/legal has a title, a revision date and no stray table rows", async () => {
     const { readdirSync, readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
     const dir = join(__dirname, "..", "..", "..", "docs", "legal");
@@ -57,7 +57,7 @@ describe("published drafts", () => {
     for (const file of files) {
       const blocks = parseMarkdown(readFileSync(join(dir, file), "utf8"));
       expect(blocks[0], file).toMatchObject({ kind: "heading", level: 1 });
-      expect(JSON.stringify(blocks[1]), file).toContain("TASLAK — AVUKAT ONAYI GEREKLİ");
+      expect(JSON.stringify(blocks[1]), file).toContain("Metin tarihi:");
       for (const block of blocks) {
         if (block.kind === "paragraph") expect(block.text.map((t) => t.text).join(""), file).not.toMatch(/^\|/);
       }

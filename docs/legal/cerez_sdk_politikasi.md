@@ -1,6 +1,6 @@
 # Çerez ve Üçüncü Taraf SDK Politikası
 
-> **TASLAK — AVUKAT ONAYI GEREKLİ.**
+Metin tarihi: 9 Ekim 2026.
 
 ## Mobil uygulamadaki üçüncü taraf yazılım bileşenleri (SDK)
 
@@ -11,7 +11,7 @@
 | Google Play Billing | Google LLC | Premium abonelik satın alma | Satın alma bilgileri | Gerekmez (sözleşmenin ifası) |
 | AndroidX / Jetpack, Kotlin Coroutines, Hilt, Ktor | Google, JetBrains | Uygulama altyapısı | Kişisel veri toplamaz | — |
 
-**Kullanılmayanlar:** Firebase Analytics, Google Analytics, Crashlytics, reklam SDK'ları ve reklam kimliği. Çökme raporları kendi sunucumuza, kişisel veri içermeden (ad, e-posta, mesaj içeriği yok; yalnızca anonim kullanıcı kimliği, cihaz modeli, sürüm ve hata yığını) gönderilir. İleride analitik bir araç eklenirse varsayılan olarak kapalı olacak ve yalnızca ayrı açık rızanla açılacaktır.
+**Kullanılmayanlar:** Firebase Analytics, Google Analytics, Crashlytics, reklam SDK'ları ve reklam kimliği. Çökme raporları kendi backend'imize hesap kimliği, cihaz modeli, sürüm ve hata sınıfı/çağrı yığını ile gönderilir. Hesap kimliği kişisel veridir; bu kayıtlar anonim değildir. Ad, e-posta, mesaj içeriği ve ham hata mesajları rapora eklenmez. Yeni veri işleme amaçları veya SDK'lar eklenirse ilgili metinler güncellenir; gerekli durumlarda işleme başlamadan ayrı rıza alınır.
 
 ## Web sitesi
 

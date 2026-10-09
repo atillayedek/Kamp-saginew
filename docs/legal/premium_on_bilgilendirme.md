@@ -1,6 +1,6 @@
 # Premium Abonelik Ön Bilgilendirme Formu
 
-> **TASLAK — AVUKAT ONAYI GEREKLİ.**
+Metin tarihi: 9 Ekim 2026.
 
 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca, Premium aboneliği satın almadan önce aşağıdaki bilgileri okumalısın.
 
@@ -9,7 +9,8 @@
 - Unvan: [VERİ SORUMLUSU UNVANI]
 - Adres: [ADRES]
 - MERSİS / Vergi No: [MERSİS NO] / [VERGİ DAİRESİ VE NO]
-- E-posta: [İLETİŞİM E-POSTASI] · KEP: [KEP]
+- E-posta: iletisim@tsdmrdigitalstudio.com.tr · KEP: [KEP]
+- Telefon: [İLETİŞİM TELEFONU]
 
 ## 2. Hizmetin temel nitelikleri
 
@@ -17,12 +18,12 @@ KampüsAğı Premium; Premium kanal açma (en fazla 5), kanal fotoğrafı, kanal
 
 ## 3. Fiyat ve ödeme
 
-- Fiyat, vergiler dahil olarak satın alma ekranında ve Google Play ödeme penceresinde gösterilir. Gösterilen fiyat esastır.
+- Seçilen ürün, abonelik dönemi, vergiler dahil toplam bedel ve varsa teklif şartları satın alma ekranında ve Google Play ödeme penceresinde gösterilir. Siparişi onaylamadan önce bu bilgileri kontrol et. Ürün veya fiyat bilgisi yüklenmezse satın alma başlatılmaz. Platform ayrıca teslimat ücreti almaz; internet/operatör ücretleri kendi sağlayıcının tarifesine tabidir.
 - Ödeme **yalnızca Google Play faturalandırma sistemi** ile alınır. Kart veya ödeme bilgilerin KampüsAğı ile paylaşılmaz.
 
 ## 4. Süre ve otomatik yenileme
 
-- Abonelik aylık dönemler hâlinde sunulur ve **iptal edilmedikçe her dönem sonunda otomatik olarak yenilenir**; yenileme bedeli Google Play hesabına bağlı ödeme yönteminden tahsil edilir.
+- Abonelik dönemi seçilen ürünün satın alma ekranında gösterilir. Otomatik yenilenen ürün **iptal edilmedikçe her dönem sonunda yenilenir**; yenileme bedeli Google Play hesabına bağlı ödeme yönteminden tahsil edilir. Deneme veya indirimli teklif varsa başlangıç/son tarihleri ve sonrasındaki ücret Google Play ekranında açıklanır.
 - Fiyat değişikliği olursa Google Play seni önceden bilgilendirir ve gerekli durumlarda onayını ister.
 
 ## 5. İptal
@@ -33,8 +34,10 @@ KampüsAğı Premium; Premium kanal açma (en fazla 5), kanal fotoğrafı, kanal
 
 ## 6. Cayma hakkı
 
-Mesafeli Sözleşmeler Yönetmeliği md.15/1-ğ uyarınca, **elektronik ortamda anında ifa edilen hizmetler ve tüketiciye anında teslim edilen gayrimaddi mallarda cayma hakkı kullanılamaz.** Premium haklar satın alma onaylandığı anda hesabına tanımlandığından, satın almadan önce **ifaya hemen başlanmasını açıkça onayladığını ve bu nedenle cayma hakkını kaybedeceğini kabul ettiğini** beyan etmen istenir. Bu onay verilmeden satın alma başlatılmaz. Google Play'in kendi iade politikası kapsamındaki hakların saklıdır.
+Mesafeli hizmet sözleşmelerinde kural olarak sözleşmenin kurulduğu tarihten itibaren 14 gün içinde gerekçe göstermeden cayma hakkı bulunur. Yönetmelikteki istisnalar, elektronik ortamda anında ifa edilen hizmetleri ve cayma süresi bitmeden tüketicinin onayıyla ifasına başlanan hizmetleri kapsar. Satın alma öncesinde Premium hizmetinin hemen başlaması için ayrı onay istenir; uygulanabilir istisna şartları oluşursa cayma hakkı kullanılamayabilir. Satın alma onayı bütün tüketici haklarından vazgeçme anlamına gelmez. Ayıplı veya sunulmayan hizmete ilişkin hakların ile Google Play'in uygulanabilir iade hakların saklıdır.
+
+Cayma, iade veya hizmetin sunulmaması talebini iletişim e-postasına iletebilirsin. Hesap e-postası, satın alma tarihi, ürün ve sipariş numarası yeterlidir; kart bilgisi veya Google şifresi gönderme. Google Play'den yapılan ödemelerde iade işlemi ilgili ödeme sistemi üzerinden yürütülür. Kabul edilen yasal cayma taleplerinde bedel, mevzuattaki süre ve yöntemle iade edilir.
 
 ## 7. Şikâyet ve başvuru
 
-Şikâyetlerini [İLETİŞİM E-POSTASI] adresine iletebilirsin. Ticaret Bakanlığı'nca her yıl ilan edilen parasal sınırlar dahilinde tüketici hakem heyetlerine, aşan durumlarda tüketici mahkemelerine başvurabilirsin.
+Şikâyetlerini iletisim@tsdmrdigitalstudio.com.tr adresine iletebilirsin. Ticaret Bakanlığı'nca her yıl ilan edilen parasal sınırlar dahilinde tüketici hakem heyetlerine, aşan durumlarda tüketici mahkemelerine başvurabilirsin.

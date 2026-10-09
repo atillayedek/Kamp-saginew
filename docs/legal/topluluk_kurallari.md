@@ -1,6 +1,6 @@
 # KampüsAğı Topluluk Kuralları
 
-> **TASLAK — AVUKAT ONAYI GEREKLİ.**
+Metin tarihi: 9 Ekim 2026.
 
 KampüsAğı, öğrencilerin birbirine güvenle ulaşabildiği bir topluluktur. Bu kurallar Kullanım Koşulları'nın parçasıdır; ihlali içeriğin kaldırılmasına, hesabın askıya alınmasına veya kapatılmasına yol açar.
 
@@ -26,4 +26,4 @@ Her gönderi, yorum, mesaj, grup, kanal, ders notu ve profil için **Şikâyet e
 
 ## Kararlar ve itiraz
 
-İçeriğin kaldırılırsa veya hesabın askıya alınırsa gerekçesi sana bildirilir. Karara uygulama içinden veya [İLETİŞİM E-POSTASI] adresine yazarak itiraz edebilirsin. Her moderasyon kararı gerekçesiyle kayıt altına alınır.
+İçeriğin kaldırılırsa veya hesabın askıya alınırsa gerekçesi sana bildirilir. Karara uygulama içinden veya iletisim@tsdmrdigitalstudio.com.tr adresine yazarak itiraz edebilirsin. İtirazında ilgili içerik, karar ve başvuru numarasını belirt; başkasının özel bilgilerini yeniden yayımlama. Kararlar ve itiraz incelemeleri gerekçesiyle kayıt altına alınır. Şikâyet eden kişiye yönelik misilleme, baskı veya tehdit ayrıca ihlaldir.
