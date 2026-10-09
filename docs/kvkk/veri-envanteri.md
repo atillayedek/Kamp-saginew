@@ -114,7 +114,7 @@ yazılır). Her satır `prev_hash` + `hash` (SHA-256 zinciri) taşır; panelde "
 
 | Alan | Yer | Amaç | Hukuki sebep | Saklama | Erişim |
 |---|---|---|---|---|---|
-| Play satın alma jetonu, plan, bitiş | `entitlements` | Premium | md.5/2-c | Hesapla | Servis, S |
+| Play satın alma jetonu, plan, bitiş, son RTDN olay zamanı | `entitlements` | Premium ve yenileme/iade durumunun güncellenmesi | md.5/2-c | Hesapla | Servis, S |
 | Sipariş no, fiyat, para birimi, dönem | `purchase_events` | Muhasebe, tüketici mevzuatı | md.5/2-ç | 10 yıl; hesap silinince `user_id` boşaltılır (kişisiz) | S |
 | Hediye/promosyon kayıtları | `premium_grants`, `promo_redemptions` | Premium | md.5/2-c | Hesapla | S |
 | Ön bilgilendirme/mesafeli sözleşme onayı | `consent_logs` (`channel=purchase`) | 6502 ispatı | md.5/2-ç | 3650 g | U/S |

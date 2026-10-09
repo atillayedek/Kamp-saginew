@@ -1,6 +1,6 @@
 # KampüsAğı Kişisel Verilerin İşlenmesine İlişkin Aydınlatma Metni
 
-> **TASLAK — AVUKAT ONAYI GEREKLİ.** Köşeli parantez içindeki alanlar veri sorumlusu tarafından doldurulmadan bu metin yürürlüğe girmez.
+Metin tarihi: 9 Ekim 2026.
 
 Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun ("KVKK") 10. maddesi ve Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ uyarınca, KampüsAğı mobil uygulaması ve kampusagi web sitesi ("Platform") kullanıcılarını bilgilendirmek için hazırlanmıştır.
 
@@ -10,7 +10,7 @@ Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun ("KVKK") 10. ma
 - Adres: [ADRES]
 - MERSİS / Vergi No: [MERSİS NO] / [VERGİ DAİRESİ VE NO]
 - KEP adresi: [KEP]
-- E-posta: [İLETİŞİM E-POSTASI]
+- E-posta: iletisim@tsdmrdigitalstudio.com.tr
 - VERBİS kayıt numarası (varsa): [VERBİS KAYIT NO]
 
 ## 2. Hangi kişisel verileri, hangi amaçla ve hangi hukuki sebeple işliyoruz?
@@ -31,7 +31,7 @@ Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun ("KVKK") 10. ma
 | Pazarlama tercihleri | E-posta ve bildirim izinleri ve geçmişi | Kampanya ve duyuru iletileri | Açık rıza (md.5/1) | Uygulama ayarları |
 | Başvuru ve talepler | Veri sahibi başvuruları, telif bildirimleri, yanıtlar | Başvuruların yanıtlanması | Hukuki yükümlülük (md.5/2-ç), hakkın tesisi ve korunması (md.5/2-e) | Uygulama, web formu, e-posta |
 
-Din, mezhep, etnik köken, siyasi görüş, sağlık, cinsel hayat, sendika üyeliği, biyometrik veri gibi özel nitelikli kişisel verileri (KVKK md.6) **istemiyoruz ve işlemiyoruz**. Bu tür bilgileri gönderilerine, etiketlerine veya mesajlarına yazmamanı rica ederiz. Öğrenci belgende bulunabilecek T.C. kimlik numarası, fotoğraf veya adres gibi bilgiler ayrıca kaydedilmez, okunmaz (OCR yapılmaz) ve belge en geç doğrulama kararından 30 gün sonra silinir.
+Din, mezhep, etnik köken, siyasi görüş, sağlık, cinsel hayat, sendika üyeliği ve biyometrik veri gibi özel nitelikli kişisel veriler için profil alanı istemiyoruz. Bu bilgileri gönderi, etiket veya mesajlarına eklememeni rica ederiz; kendin eklediğin bilgiler paylaştığın içerikle birlikte saklanabilir ve görünürlük kuralları kapsamında başkalarına gösterilebilir. Öğrenci belgesi insan tarafından incelenir; belgede görünen T.C. kimlik numarası, fotoğraf ve adres gibi bilgiler bu inceleme sırasında yetkili personele görünür. Belgeye OCR uygulanmaz ve bu alanlar ayrıca veri tabanı alanlarına aktarılmaz. Gereksiz bilgileri belge yüklemeden önce, öğrencilik doğrulamasını engellemeyecek şekilde maskeleyebilirsin. Belge en geç doğrulama kararından 30 gün sonra silinir.
 
 Konum izni (GPS) istemiyoruz. Yer bilgisi yalnızca senin elle yazdığın semt, kampüs veya ilçedir.
 
@@ -47,9 +47,9 @@ Konum izni (GPS) istemiyoruz. Yer bilgisi yalnızca senin elle yazdığın semt,
 | Cloudflare Inc. | E-posta yönlendirmede iletişim adresine yazılan e-postalar | Alan adı ve e-posta yönlendirme | Küresel |
 | Yetkili kamu kurum ve kuruluşları, yargı mercileri | Talep edilen kayıtlar | Kanuni yükümlülükler (5651 sayılı Kanun dahil) | Türkiye |
 
-Yurt dışına aktarım, KVKK md.9 uyarınca standart sözleşme (veya ilgili mevzuatta öngörülen diğer uygun güvenceler) ile yapılır; standart sözleşmeler imzalandıktan sonra 5 iş günü içinde Kişisel Verileri Koruma Kurumu'na bildirilir. Ayrıntı: Gizlilik Politikası.
+Yurt dışına aktarım için kullanılan hukuki güvence ve kapsamı: [YURT DIŞI AKTARIM DAYANAĞI]. KVKK md.9 kapsamında standart sözleşmeye dayanılması hâlinde imzaların tamamlanmasından itibaren beş iş günü içinde Kuruma bildirim gerekir. Bu metin bir sözleşmenin imzalandığı veya bildirimin yapıldığına ilişkin kanıt yerine geçmez. Ayrıntılar ve ilgili aktarım hakkında bilgi talepleri iletişim adresimize iletilebilir.
 
-Diğer kullanıcılar senin profilini, gönderilerini ve sana yazdıklarını Platform kuralları çerçevesinde görür. E-posta adresin diğer kullanıcılara hiçbir zaman gösterilmez; soyadın ise yalnızca ayarlardan izin verirsen gösterilir.
+Diğer kullanıcılar profilini ve paylaşımlarını görünürlük ve üyelik kuralları kapsamında görür. Birebir mesajları sohbet katılımcıları, grup/kanal mesajlarını üyeleri görür. Hesabındaki e-posta alanı diğer kullanıcılara gösterilmez; kendin içeriğe yazdığın e-posta bu korumaya dahil değildir. Soyadın varsayılan olarak baş harfiyle gösterilir; tam soyadını ayarlardan görünür yapabilirsin.
 
 ## 4. Otomatik analiz (eşleşme)
 
@@ -57,7 +57,7 @@ Diğer kullanıcılar senin profilini, gönderilerini ve sana yazdıklarını Pl
 
 ## 5. Saklama süreleri
 
-Kişisel veriler, Kişisel Veri Saklama ve İmha Politikası'nda yazan sürelerce saklanır ve süre dolunca otomatik olarak silinir veya anonim hale getirilir. Özetle: öğrenci belgesi karardan sonra en geç 30 gün; hesap silme talebinde 30 günlük geri alma süresinden sonra hesap verileri; 5651 kapsamındaki trafik kayıtları 2 yıl; onay kayıtları ve yönetici işlem kayıtları ispat amacıyla 10 yıl.
+Kişisel veriler Kişisel Veri Saklama ve İmha Politikası'nda belirtilen sürelerle ve amaçlarla saklanır. Mevcut uygulama ayarları öğrenci belgesi için karardan sonra 30 gün, hesap silme talebi için 30 günlük geri alma süresi, erişim kayıtları için 730 gün, onay ve yönetici kayıtları için 3650 gün, çökme raporları için 180 gün, hazırlanan dışa aktarma dosyası için 7 gündür. Hesap bağlantısının kaldırılması içerikteki kişisel verilerin tamamen anonimleştiği anlamına gelmez. Sağlayıcı yedekleri ayrıca değerlendirilir. Bir hakkın korunması veya kanuni yükümlülük için gereken kayıtlar yalnız bu amaçlarla ve yetki sınırlarıyla tutulur.
 
 ## 6. KVKK md.11 kapsamındaki hakların
 
@@ -75,7 +75,7 @@ Veri sorumlusuna başvurarak:
 
 haklarına sahipsin.
 
-Başvurunu uygulamadaki **Ayarlar → Gizlilik ve KVKK → Başvuru oluştur** bölümünden, [İLETİŞİM E-POSTASI] adresine kayıtlı e-posta adresinden, [KEP] adresine KEP ile veya [ADRES] adresine yazılı olarak yapabilirsin. Başvurular en geç 30 gün içinde ücretsiz yanıtlanır (Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ). Verilerini **Verilerimi indir** ile kendin indirebilir, **Hesabımı sil** ile hesabını silebilirsin.
+Başvurunu uygulamadaki **Ayarlar → Gizlilik ve KVKK → Başvuru oluştur** bölümünden, iletisim@tsdmrdigitalstudio.com.tr adresine kayıtlı e-posta adresinden, [KEP] adresine KEP ile veya [ADRES] adresine yazılı olarak yapabilirsin. Başvurular en geç 30 gün içinde ücretsiz yanıtlanır (Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ). Verilerini **Verilerimi indir** ile kendin indirebilir, **Hesabımı sil** ile hesabını silebilirsin.
 
 ## 7. Log (işlem kaydı) bilgilendirmesi
 

@@ -43,7 +43,7 @@ class GroupsViewModel @Inject constructor(
         load()
         viewModelScope.launch {
             repository.changes(groupId = null)
-                .catch { Log.w(TAG, "Group realtime stopped; lists still load when opened", it) }
+                .catch { Log.w(TAG, "Group realtime stopped; lists still load when opened") }
                 .collect { load() }
         }
     }

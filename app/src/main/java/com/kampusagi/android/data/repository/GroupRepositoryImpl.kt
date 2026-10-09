@@ -239,7 +239,7 @@ class GroupRepositoryImpl @Inject constructor(
         } finally {
             withContext(NonCancellable) {
                 safeCall { client.realtime.removeChannel(channel) }
-                    .onFailure { Log.w(TAG, "Realtime channel could not be removed", it) }
+                    .onFailure { Log.w(TAG, "Realtime channel could not be removed") }
             }
         }
     }
@@ -261,7 +261,7 @@ class GroupRepositoryImpl @Inject constructor(
     /** A photo that was uploaded but not attached would never be shown; removing it only saves storage. */
     private suspend fun deleteQuietly(client: SupabaseClient, path: String) {
         safeCall { client.storage.from(AppConfig.GROUP_MEDIA_BUCKET).delete(path) }
-            .onFailure { Log.w(TAG, "Unused group photo could not be deleted", it) }
+            .onFailure { Log.w(TAG, "Unused group photo could not be deleted") }
     }
 
     private fun PostgresAction.groupId(): String? {

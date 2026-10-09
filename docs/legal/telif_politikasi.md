@@ -1,8 +1,8 @@
 # Telif Hakkı ve İçerik Kaldırma Politikası
 
-> **TASLAK — AVUKAT ONAYI GEREKLİ.**
+Metin tarihi: 9 Ekim 2026.
 
-KampüsAğı, 5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) ve 5651 sayılı Kanun kapsamında yer sağlayıcı olarak, kullanıcıların paylaştığı içeriği önceden denetlemez; hukuka aykırı içerikten haberdar edildiğinde kaldırır.
+KampüsAğı kullanıcıların paylaştığı ders notları, görseller ve diğer içeriklerle ilgili telif bildirimlerini bu süreçle değerlendirir. Bir içeriğin internette bulunması, ücretsiz olması veya eğitim amacıyla kullanılması tek başına paylaşma izni anlamına gelmez. Hak sahibi veya yetkili temsilci bildirim yapabilir; yargı ve yetkili merci kararları mevzuata uygun şekilde uygulanır.
 
 ## Kullanıcının beyanı
 
@@ -17,7 +17,7 @@ Beyan, tarih ve saatiyle içerikle birlikte kaydedilir. Gerçeğe aykırı beyan
 Eserinizin izinsiz paylaşıldığını düşünüyorsanız:
 
 1. **Giriş gerektirmeyen web formu:** web sitemizdeki **Telif bildirimi** sayfası.
-2. E-posta: [İLETİŞİM E-POSTASI] · KEP: [KEP] · Posta: [ADRES]
+2. E-posta: iletisim@tsdmrdigitalstudio.com.tr · KEP: [KEP] · Posta: [ADRES]
 
 Bildirimde şunlar bulunmalıdır: adınız soyadınız (veya temsil ettiğiniz kurum), iletişim bilginiz, hak sahibi olduğunuz eser, ihlal edildiğini düşündüğünüz içeriğin uygulamadaki yeri (ders kodu, not başlığı, paylaşan kullanıcı adı veya bağlantı) ve bildirimin doğru olduğuna ve hak sahibi ya da yetkili temsilci olduğunuza dair beyanınız.
 

@@ -36,4 +36,13 @@ class NoPersonalDataInLogsTest {
             .toList()
         assertEquals("Log calls with personal data:\n" + offenders.joinToString("\n"), emptyList<String>(), offenders)
     }
+
+    @Test
+    fun `log calls never attach raw exceptions`() {
+        val root = generateSequence(File("").absoluteFile) { it.parentFile }
+            .map { File(it, "app/src/main/java") }.first { it.isDirectory }
+        val rawException = Regex("""Log\.[vdiwe]\([^\n]*,\s*(e|error|it)\s*\)""")
+        val offenders = root.walkTopDown().filter { it.extension == "kt" }.filter { rawException.containsMatchIn(it.readText()) }.toList()
+        assertEquals("Raw exception messages can contain personal data", emptyList<File>(), offenders)
+    }
 }

@@ -83,7 +83,7 @@ class ProfileMediaRepositoryImpl @Inject constructor(
     /** The old photo is no longer referenced; if deleting it fails it only costs storage. */
     private suspend fun deleteQuietly(client: SupabaseClient, path: String) {
         safeCall { client.storage.from(AppConfig.AVATARS_BUCKET).delete(path) }
-            .onFailure { Log.w(TAG, "Previous profile photo could not be deleted", it) }
+            .onFailure { Log.w(TAG, "Previous profile photo could not be deleted") }
     }
 
     private suspend fun <T> call(block: suspend (SupabaseClient) -> T): AppResult<T> {

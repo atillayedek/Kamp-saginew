@@ -34,13 +34,13 @@ class ContentResolverImageEncoder @Inject constructor(
             scaled.compress(Bitmap.CompressFormat.JPEG, QUALITY, output)
             AppResult.Success(output.toByteArray())
         } catch (e: IOException) {
-            Log.w(TAG, "Picked image could not be read", e)
+            Log.w(TAG, "Picked image could not be read")
             AppResult.Failure(AppError.IMAGE_UNREADABLE)
         } catch (e: SecurityException) {
-            Log.w(TAG, "No permission to read the picked image", e)
+            Log.w(TAG, "No permission to read the picked image")
             AppResult.Failure(AppError.IMAGE_UNREADABLE)
         } catch (e: IllegalArgumentException) {
-            Log.w(TAG, "Picked image has an unsupported format", e)
+            Log.w(TAG, "Picked image has an unsupported format")
             AppResult.Failure(AppError.IMAGE_UNREADABLE)
         }
     }
@@ -59,13 +59,13 @@ class ContentResolverImageEncoder @Inject constructor(
             scaled.compress(Bitmap.CompressFormat.JPEG, POST_QUALITY, output)
             AppResult.Success(output.toByteArray())
         } catch (e: IOException) {
-            Log.w(TAG, "Picked image could not be read", e)
+            Log.w(TAG, "Picked image could not be read")
             AppResult.Failure(AppError.IMAGE_UNREADABLE)
         } catch (e: SecurityException) {
-            Log.w(TAG, "No permission to read the picked image", e)
+            Log.w(TAG, "No permission to read the picked image")
             AppResult.Failure(AppError.IMAGE_UNREADABLE)
         } catch (e: IllegalArgumentException) {
-            Log.w(TAG, "Picked image has an unsupported format", e)
+            Log.w(TAG, "Picked image has an unsupported format")
             AppResult.Failure(AppError.IMAGE_UNREADABLE)
         }
     }

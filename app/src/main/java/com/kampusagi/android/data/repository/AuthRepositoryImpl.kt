@@ -139,7 +139,7 @@ class AuthRepositoryImpl @Inject constructor(
             onFailure = { error ->
                 // The server could not be told (offline or the session is already gone). The refresh
                 // token expires on its own; signing out on this device must still succeed.
-                Log.w(TAG, "Remote sign-out failed, clearing the local session", error)
+                Log.w(TAG, "Remote sign-out failed, clearing the local session")
                 safeCall { client.auth.clearSession() }.fold(
                     onSuccess = { AppResult.Success(Unit) },
                     onFailure = { AppResult.Failure(it.toAppError()) },

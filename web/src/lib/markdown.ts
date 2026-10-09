@@ -78,6 +78,9 @@ export function parseMarkdown(source: string): Block[] {
       continue;
     }
     const parts: string[] = [];
+    // A pipe without a table separator is ordinary text. Always consume the
+    // first line so malformed published Markdown cannot trap the render loop.
+    parts.push(lines[i++].trim());
     while (
       i < lines.length && lines[i].trim() !== "" && !/^#{1,3}\s/.test(lines[i]) && !lines[i].trimStart().startsWith(">")
       && !lines[i].trimStart().startsWith("|") && !LIST_ITEM.exec(lines[i])

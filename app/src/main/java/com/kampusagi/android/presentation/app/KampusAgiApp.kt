@@ -52,7 +52,7 @@ fun KampusAgiApp(state: AppUiState, viewModel: RootViewModel) {
             try {
                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             } catch (e: ActivityNotFoundException) {
-                Log.w("App", "No browser for the admin panel", e)
+                Log.w("App", "No browser for the admin panel")
             }
         }
     }
@@ -162,7 +162,7 @@ private fun deletionDate(iso: String?): String {
         OffsetDateTime.parse(iso).atZoneSameInstant(ZoneId.systemDefault())
             .format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("tr")))
     } catch (e: java.time.format.DateTimeParseException) {
-        Log.w("App", "Unreadable deletion date", e)
+        Log.w("App", "Unreadable deletion date")
         iso
     }
 }

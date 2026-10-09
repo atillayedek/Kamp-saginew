@@ -75,6 +75,15 @@ Firebase projesi: `kampusaginew`, Android uygulaması `com.kampusagi.android`.
 5. Billing yalnızca Play'den (iç test kanalı dahil) kurulan sürümde çalışır.
 6. Aktif bir plan satırı olmadan admin panelindeki Premium hediye ve promosyon kodu da çalışmaz (plan limitleri bu satırdan gelir). Hediye/kod Play'den bağımsızdır, ücret alınmaz.
 
+### Google Play gerçek zamanlı abonelik durumu (RTDN)
+
+- `20261009100000_billing_reconciliation.sql` migration'ını uygula ve `play-rtdn` fonksiyonunu deploy et.
+- Google Cloud Pub/Sub topic oluştur; `google-play-developer-notifications@system.gserviceaccount.com` hesabına bu topic üzerinde Publisher izni ver. Play Console para kazanma ayarlarında topic adını tanımla.
+- Topic için kimliği doğrulanmış push subscription oluştur: adres `https://<proje>.supabase.co/functions/v1/play-rtdn`, OIDC service account ve audience aynı tam adres.
+- Supabase Secrets: `PLAY_RTDN_AUDIENCE` (tam adres), `PLAY_RTDN_SERVICE_ACCOUNT_EMAIL` (push subscription'daki OIDC hesap e-postası). Mevcut `GOOGLE_PLAY_SERVICE_ACCOUNT` ve `ANDROID_PACKAGE_NAME` kullanılır. Pub/Sub servis ajanına OIDC hesabı için token oluşturma yetkisini Google dokümantasyonuna göre ver.
+- Play Console'dan test bildirimi gönder; ardından iç test satın alması, yenileme, iptal, ödeme bekletme ve iade/iptal akışlarını doğrula. İptalde ödenmiş süre korunur; iade ile geri alınan erişim kaldırılır. Kimliksiz/yanlış audience/gönderen isteği reddedilir.
+- RTDN yeni bir kullanıcıya Premium vermez; satın alma önce `verify-purchase` ile hesaba bağlanır. Geçici API/DB hatalarında Pub/Sub yeniden dener. Aynı/eski olay entitlement'ı yeniden değiştirmez.
+
 ### Hesap silme ve gizlilik (Google Play zorunlulukları)
 
 1. `delete-account` Edge Function'ı deploy edilmiş olmalı (yukarıda). Ek secret gerekmez; `SUPABASE_SERVICE_ROLE_KEY` Supabase tarafından sağlanır.

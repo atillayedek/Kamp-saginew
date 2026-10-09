@@ -35,10 +35,10 @@ class ContentResolverDocumentReader @Inject constructor(
                 AppResult.Success(output.toByteArray())
             }
         } catch (e: IOException) {
-            Log.w(TAG, "Picked document could not be read", e)
+            Log.w(TAG, "Picked document could not be read")
             AppResult.Failure(AppError.DOCUMENT_UNREADABLE)
         } catch (e: SecurityException) {
-            Log.w(TAG, "No permission to read the picked document", e)
+            Log.w(TAG, "No permission to read the picked document")
             AppResult.Failure(AppError.DOCUMENT_UNREADABLE)
         }
     }

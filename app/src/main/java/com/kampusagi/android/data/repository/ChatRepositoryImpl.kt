@@ -104,7 +104,7 @@ class ChatRepositoryImpl @Inject constructor(
         } finally {
             withContext(NonCancellable) {
                 safeCall { client.realtime.removeChannel(channel) }
-                    .onFailure { Log.w(TAG, "Realtime channel could not be removed", it) }
+                    .onFailure { Log.w(TAG, "Realtime channel could not be removed") }
             }
         }
     }

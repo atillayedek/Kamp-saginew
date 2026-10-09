@@ -102,7 +102,7 @@ class ProfileRepositoryImpl @Inject constructor(
         }.fold(
             onSuccess = { state.value = ProfileState.Loaded(it) },
             onFailure = { error ->
-                Log.w(TAG, "Profile could not be loaded", error)
+                Log.w(TAG, "Profile could not be loaded")
                 // Keep showing the last known profile when a background refresh fails.
                 if (state.value !is ProfileState.Loaded) state.value = ProfileState.Failed(error.toAppError())
             },

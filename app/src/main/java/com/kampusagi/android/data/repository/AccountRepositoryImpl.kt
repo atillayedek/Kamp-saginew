@@ -39,7 +39,7 @@ class AccountRepositoryImpl @Inject constructor(
         }.fold(
             onSuccess = { AppResult.Success(it) },
             onFailure = {
-                Log.w(TAG, "Account deletion request failed", it)
+                Log.w(TAG, "Account deletion request failed")
                 AppResult.Failure(if (it is DeletionFailure) it.error else it.toAppError())
             },
         )

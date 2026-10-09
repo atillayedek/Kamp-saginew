@@ -29,10 +29,23 @@ data class CrashReport(
             androidSdk = androidSdk,
             deviceModel = deviceModel,
             exceptionType = error.javaClass.name,
-            message = error.message?.take(MAX_MESSAGE),
-            stacktrace = error.stackTraceToString().take(MAX_STACKTRACE),
+            // Exception messages can contain HTTP tokens, document paths and
+            // user input. Retain only class names and stack frames.
+            message = null,
+            stacktrace = safeStacktrace(error).take(MAX_STACKTRACE),
             occurredAt = now.toString(),
         )
+
+        private fun safeStacktrace(error: Throwable): String = buildString {
+            val seen = java.util.Collections.newSetFromMap(java.util.IdentityHashMap<Throwable, Boolean>())
+            var current: Throwable? = error
+            while (current != null && seen.add(current) && length < MAX_STACKTRACE) {
+                if (isNotEmpty()) append("Caused by: ")
+                append(current.javaClass.name).append('\n')
+                current.stackTrace.take(100).forEach { append("\tat ").append(it).append('\n') }
+                current = current.cause
+            }
+        }
     }
 }
 
@@ -52,17 +65,24 @@ class CrashStore(private val directory: File) {
     /** Oldest first. Files that cannot be read are removed: they can never be sent. */
     fun pending(): List<Pair<File, CrashReport>> = files().mapNotNull { file ->
         try {
-            file to json.decodeFromString<CrashReport>(file.readText())
+            val report = json.decodeFromString<CrashReport>(file.readText())
+            // Reports saved by older versions also pass through the privacy
+            // boundary before any upload.
+            file to report.copy(message = null, stacktrace = buildString {
+                append(report.exceptionType).append('\n')
+                report.stacktrace.lineSequence().filter { it.trimStart().startsWith("at ") }
+                    .forEach { append(it).append('\n') }
+            }.take(CrashReport.MAX_STACKTRACE))
         } catch (e: IOException) {
-            Log.w(TAG, "Unreadable crash report removed", e)
+            Log.w(TAG, "Unreadable crash report removed")
             file.delete()
             null
         } catch (e: SerializationException) {
-            Log.w(TAG, "Malformed crash report removed", e)
+            Log.w(TAG, "Malformed crash report removed")
             file.delete()
             null
         } catch (e: IllegalArgumentException) {
-            Log.w(TAG, "Malformed crash report removed", e)
+            Log.w(TAG, "Malformed crash report removed")
             file.delete()
             null
         }

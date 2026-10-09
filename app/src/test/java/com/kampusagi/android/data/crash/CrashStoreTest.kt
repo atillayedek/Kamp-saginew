@@ -55,9 +55,19 @@ class CrashStoreTest {
         val error = IllegalStateException("x".repeat(CrashReport.MAX_MESSAGE + 50))
         val built = CrashReport.from(error, "1.0.0 (7)", 34, "Pixel 8", Instant.parse("2026-09-26T12:00:00Z"))
         assertEquals("java.lang.IllegalStateException", built.exceptionType)
-        assertEquals(CrashReport.MAX_MESSAGE, built.message?.length)
+        assertEquals(null, built.message)
         assertTrue(built.stacktrace.length <= CrashReport.MAX_STACKTRACE)
         assertTrue(built.stacktrace.startsWith("java.lang.IllegalStateException"))
         assertEquals("2026-09-26T12:00:00Z", built.occurredAt)
+    }
+
+    @Test
+    fun `exception and cause messages never enter crash reports`() {
+        val secret = "Bearer secret-token person@example.com private/document.pdf"
+        val error = IllegalStateException(secret, IllegalArgumentException(secret))
+        val built = CrashReport.from(error, "1", 34, "Pixel", Instant.EPOCH)
+        assertEquals(null, built.message)
+        assertTrue(!built.stacktrace.contains(secret))
+        assertTrue(built.stacktrace.contains("Caused by: java.lang.IllegalArgumentException"))
     }
 }

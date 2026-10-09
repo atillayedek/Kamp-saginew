@@ -1,15 +1,15 @@
 # KampüsAğı Kullanım Koşulları ve Üyelik Sözleşmesi
 
-> **TASLAK — AVUKAT ONAYI GEREKLİ.**
+Metin tarihi: 9 Ekim 2026.
 
 Bu sözleşme, [VERİ SORUMLUSU UNVANI] ("KampüsAğı", "biz") ile KampüsAğı mobil uygulamasına ve web sitesine ("Platform") üye olan kullanıcı ("sen") arasındadır. Kayıt olurken bu koşulları kabul etmeden üyelik oluşmaz. Kişisel verilerinin nasıl işlendiği Aydınlatma Metni'nde ve Gizlilik Politikası'nda anlatılır.
 
-İletişim: [İLETİŞİM E-POSTASI] · [ADRES] · [KEP]
+İletişim: iletisim@tsdmrdigitalstudio.com.tr · [ADRES] · [KEP]
 
 ## 1. Üyelik şartları
 
 1. **18 yaşını doldurmuş olmalısın.** Kayıt sırasında doğum tarihin yalnızca bu kontrol için alınır ve saklanmaz. 18 yaşından küçükler üye olamaz.
-2. Platform, Türkiye'deki yükseköğretim kurumlarında öğrenim gören kişiler içindir. Topluluk özelliklerini kullanmak için öğrenci belgenin yetkili personelce onaylanması gerekir.
+2. Platform, desteklenen Türkiye ve KKTC yükseköğretim kurumlarında öğrenim gören kişiler içindir. Topluluk özelliklerini kullanmak için öğrenci belgenin yetkili personelce onaylanması gerekir. Yaş beyanı öğrenci belgesiyle otomatik doğrulanmaz; yanlış beyan veya sahte belge hesap kısıtlamasına neden olabilir.
 3. **Gerçek kimliğinle** kayıt olmalısın. Başkası adına, sahte veya yanıltıcı bilgiyle hesap açmak yasaktır. Her kişi tek hesap açabilir.
 4. Hesabının ve şifrenin güvenliğinden sen sorumlusun; hesabının yetkisiz kullanıldığını fark edersen bize hemen bildir.
 
@@ -24,7 +24,7 @@ Topluluk Kuralları bu sözleşmenin ayrılmaz parçasıdır. Özetle; taciz, te
 ## 4. Paylaştığın içerik
 
 1. Paylaştığın içeriğin hukuki sorumluluğu sana aittir; içeriğin sahibi olmalı veya paylaşma iznine sahip olmalısın.
-2. İçeriğini Platform'da gösterebilmemiz için bize sınırlı, ücretsiz, münhasır olmayan ve devredilemez bir kullanım izni verirsin. İçeriği silmen veya hesabını kapatman hâlinde bu izin sona erer (yasal saklama yükümlülükleri saklıdır).
+2. İçeriğin üzerindeki hakların sende kalır. Bize yalnız Platform hizmetini sunmak için gerekli kapsamda içeriği barındırma, teknik olarak çoğaltma ve seçtiğin görünürlük kurallarıyla gösterme izni verirsin. Bu izin içeriğini satma veya ayrı reklam materyali olarak kullanma hakkı vermez. Hizmet sağlayıcılar yalnız hizmeti sunmak için gereken teknik işlemleri yapabilir. İçeriğin silinmesi, grup/kanal mesajları, geri alma süresi, delil ve yedeklerin saklanması Gizlilik ve Saklama Politikaları'na tabidir.
 3. Ders notu yüklerken, içeriğin hak sahibi olduğunu veya paylaşım iznin bulunduğunu beyan edersin. Hocalara ait sınav sorularını veya telifli kitap sayfalarını izinsiz paylaşamazsın. Ayrıntılar: Telif Hakkı ve İçerik Kaldırma Politikası.
 
 ## 5. Aracılık hizmeti olmadığı
@@ -48,7 +48,7 @@ Premium abonelik yalnızca Google Play üzerinden satın alınır. Fiyat, süre,
 
 ## 9. Hesabın kapatılması
 
-Hesabını istediğin an uygulamadan (**Ayarlar → Gizlilik ve KVKK → Hesabımı sil**) veya web sitesindeki hesap silme sayfasından silebilirsin. Talepten sonra 30 gün boyunca giriş yapıp silmeden vazgeçebilirsin; süre sonunda hesabın ve içeriklerin kalıcı olarak silinir, grup sohbetlerindeki mesajların "Silinmiş kullanıcı" olarak anonimleştirilir. Yasal olarak saklanması zorunlu kayıtlar (5651 trafik kayıtları, onay kayıtları) profilinden ayrılarak yalnızca yasal süre boyunca saklanır.
+Uygulamadan (**Ayarlar → Gizlilik ve KVKK → Hesabımı sil**) veya web sitesindeki hesap silme sayfasından talep oluşturabilirsin. 30 gün içinde silmeden vazgeçebilirsin; bu sırada hesap kullanımı geri alma işlemiyle sınırlıdır, mevcut içeriklerin görünmeye devam edebilir. Süre sonunda hesap ve bağlı veriler imha işlemine alınır. Birebir sohbetler karşı taraf için de silinir. Grup/kanal mesajlarının hesap bağlantısı kaldırılır; mesaj metnindeki kişisel bilgiler kendiliğinden temizlenmez, ayrıca talep edebilirsin. Ayrı saklama gerekçesine tabi kayıtlar ve yedekler Saklama ve İmha Politikası'na göre yönetilir. Hesap silme Google Play aboneliğini iptal etmez.
 
 ## 10. Sorumluluğun sınırı
 

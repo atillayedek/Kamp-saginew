@@ -36,7 +36,7 @@ class NotificationsViewModel @Inject constructor(
         load()
         viewModelScope.launch {
             repository.changes()
-                .catch { Log.w(TAG, "Notification realtime stopped; the list still loads on open", it) }
+                .catch { Log.w(TAG, "Notification realtime stopped; the list still loads on open") }
                 .collect { load() }
         }
     }

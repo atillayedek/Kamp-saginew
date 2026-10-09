@@ -65,6 +65,17 @@ Deno.test("everything else is refused", () => {
   assertEquals(evaluateSubscription(null, "kampusagi.plus", USER, now), { ok: false, code: "purchase_not_for_account" });
 });
 
+Deno.test("cancellation preserves paid access until expiry", () => {
+  const canceled = { ...active, subscriptionState: "SUBSCRIPTION_STATE_CANCELED" };
+  assertEquals(evaluateSubscription(canceled, "kampusagi.plus", USER, now).ok, true);
+  assertEquals(evaluateSubscription(canceled, "kampusagi.plus", USER, new Date("2026-10-26T12:00:00Z")),
+    { ok: false, code: "purchase_not_active" });
+  for (const subscriptionState of ["SUBSCRIPTION_STATE_ON_HOLD", "SUBSCRIPTION_STATE_PAUSED", "SUBSCRIPTION_STATE_EXPIRED"]) {
+    assertEquals(evaluateSubscription({ ...active, subscriptionState }, "kampusagi.plus", USER, now),
+      { ok: false, code: "purchase_not_active" });
+  }
+});
+
 /** Test double for fetch. */
 function scriptedFetch(status: number, body: string) {
   const calls: { url: string; init: RequestInit }[] = [];

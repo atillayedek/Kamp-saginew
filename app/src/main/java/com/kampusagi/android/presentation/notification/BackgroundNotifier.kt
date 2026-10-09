@@ -59,7 +59,7 @@ class BackgroundNotifier @Inject constructor(
             }
             val announcer = NotificationAnnouncer(baseline)
             repository.changes()
-                .catch { Log.w(TAG, "Notification realtime stopped; the list still loads when the app is opened", it) }
+                .catch { Log.w(TAG, "Notification realtime stopped; the list still loads when the app is opened") }
                 .collect {
                     when (val result = repository.notifications()) {
                         is AppResult.Success -> {
@@ -105,7 +105,7 @@ class BackgroundNotifier @Inject constructor(
         try {
             manager.notify(notification.id.hashCode(), built)
         } catch (e: SecurityException) {
-            Log.w(TAG, "Notification permission was revoked", e)
+            Log.w(TAG, "Notification permission was revoked")
         }
     }
 

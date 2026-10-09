@@ -79,7 +79,7 @@ class ChatViewModel @Inject constructor(
         refresh(markRead = true)
         viewModelScope.launch {
             repository.changes(route.conversationId)
-                .catch { Log.w(TAG, "Chat realtime stopped; messages still load on open and send", it) }
+                .catch { Log.w(TAG, "Chat realtime stopped; messages still load on open and send") }
                 .collect { refresh(markRead = true) }
         }
     }

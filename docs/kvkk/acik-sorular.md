@@ -9,8 +9,7 @@ Kod tarafında karar verilemeyen, uydurulmaması gereken her şey. Her madde kod
   web sitesinde gösterilen ad olarak verildi; tüzel kişi mi, şahıs işletmesi mi ve tam unvanı nedir? İletişim adresi
   olarak `iletisim@tsdmrdigitalstudio.com.tr` verildi; metinlere avukat onayıyla yazılmalı. Doldurulmuş metinler yönetim
   paneli → KVKK ve Uyum → Hukuki metinler'den **yeni sürüm** olarak yayımlanır (eski sürümler ispat için kalır).
-- **S0b — "TASLAK — AVUKAT ONAYI GEREKLİ" ibaresi** şu an yayındaki metinlerde görünür (Play Store gizlilik politikası
-  URL'si dahil). Avukat onayından sonra ibaresiz yeni sürüm yayımlanmalı.
+- **S0b — Kaynak/canlı metin ayrımı.** 9 Ekim 2026 kullanıcı talebiyle `docs/legal/` kaynak metinlerinden taslak başlığı kaldırıldı ve içerikler düzeltildi. Canlı veritabanındaki eski sürümler değiştirilmedi; işletmeci ve aktarım bilgileri tamamlanınca yeni sürüm yayımlanmalı. Eksikler `metin-yayin-bilgileri.md` içindedir. Başlığın kaldırılması hukuki inceleme veya canlı yayın yapıldığı anlamına gelmez.
 - **S0c — Saklama süreleri** (`compliance_settings`): rıza ve yönetici kayıtları için 10 yıl (TBK md.146 genel
   zamanaşımı) seçildi; 5651 trafik kayıtları için 2 yıl (yer sağlayıcı yükümlülüğü 1–2 yıl, üst sınır alındı); belge 30 gün;
   silme geri alma 30 gün; hareketsiz hesap 2 yıl + 30 gün; çökme raporu 180 gün; dışa aktarma 7 gün. Onaylanmalı. Ayar

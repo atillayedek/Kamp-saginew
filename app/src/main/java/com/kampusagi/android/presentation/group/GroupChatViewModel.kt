@@ -97,7 +97,7 @@ class GroupChatViewModel @Inject constructor(
         load()
         viewModelScope.launch {
             repository.changes(groupId)
-                .catch { Log.w(TAG, "Group realtime stopped; messages still load on open and send", it) }
+                .catch { Log.w(TAG, "Group realtime stopped; messages still load on open and send") }
                 .collect { refreshMessages() }
         }
     }

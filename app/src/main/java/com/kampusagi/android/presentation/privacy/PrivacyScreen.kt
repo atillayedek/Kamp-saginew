@@ -73,7 +73,7 @@ fun PrivacyScreen(
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: ActivityNotFoundException) {
-            Log.w("Privacy", "No browser for the data export link", e)
+            Log.w("Privacy", "No browser for the data export link")
         }
     }
 
@@ -345,7 +345,7 @@ private val DATE_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yy
 private fun date(iso: String): String = try {
     OffsetDateTime.parse(iso).atZoneSameInstant(ZoneId.systemDefault()).format(DATE_TIME)
 } catch (e: java.time.format.DateTimeParseException) {
-    Log.w("Privacy", "Unreadable timestamp", e)
+    Log.w("Privacy", "Unreadable timestamp")
     iso
 }
 

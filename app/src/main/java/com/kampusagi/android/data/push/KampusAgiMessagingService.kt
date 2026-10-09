@@ -68,7 +68,7 @@ class KampusAgiMessagingService : FirebaseMessagingService() {
         try {
             manager.notify(message.messageId?.hashCode() ?: System.currentTimeMillis().toInt(), built)
         } catch (e: SecurityException) {
-            Log.w(TAG, "Notification permission was revoked", e)
+            Log.w(TAG, "Notification permission was revoked")
         }
     }
 
