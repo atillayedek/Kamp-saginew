@@ -125,7 +125,7 @@ class NoteRepositoryImpl @Inject constructor(
             }.fold(
                 onSuccess = { AppResult.Success(it) },
                 onFailure = {
-                    Log.w(TAG, "Note could not be written to the cache", it)
+                    Log.w(TAG, "Note could not be written to the cache")
                     AppResult.Failure(AppError.DOCUMENT_UNREADABLE)
                 },
             )

@@ -85,6 +85,7 @@ Deno.serve(async (request) => {
       await acknowledgeSubscription(fetch, token, packageName, productId, purchaseToken);
     } catch (error) {
       console.error("Acknowledge failed; the next verification retries it", error instanceof Error ? error.message : String(error));
+      return errorResponse("billing_unavailable", 502);
     }
   }
   return json({ expires_at: check.expiresAt });

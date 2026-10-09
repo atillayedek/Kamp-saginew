@@ -1,9 +1,13 @@
 package com.kampusagi.android.domain.model
 
+import androidx.annotation.Keep
+
 /** Mirrors `public.group_kind`: a Premium broadcast channel or a free study group. */
+@Keep
 enum class GroupKind { STUDY_GROUP, CHANNEL }
 
 /** Mirrors `public.group_role`. */
+@Keep
 enum class GroupRole { OWNER, ADMIN, MEMBER }
 
 /** A group in a list: the person's own groups (with unread count) or ones to discover. */

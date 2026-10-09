@@ -49,7 +49,7 @@ class PushRepositoryImpl @Inject constructor(
         if (!isConfigured) return AppResult.Failure(AppError.PUSH_NOT_CONFIGURED)
         val token = safeCall { FirebaseMessaging.getInstance().token.await() }
             .getOrElse {
-                Log.w(TAG, "FCM token unavailable", it)
+                Log.w(TAG, "FCM token unavailable")
                 return AppResult.Failure(AppError.NETWORK)
             }
         return registerToken(token)

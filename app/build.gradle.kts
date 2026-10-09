@@ -2,6 +2,7 @@ import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import java.util.Base64
 import java.util.Properties
+import java.net.URI
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -102,6 +103,29 @@ val firebase = firebaseClient("com.kampusagi.android")
 
 val releaseStoreFile = config("KAMPUSAGI_KEYSTORE_FILE", keystoreProperties)
 val hasReleaseSigning = releaseStoreFile.isNotEmpty() && rootProject.file(releaseStoreFile).exists()
+
+// CI may compile unconfigured diagnostic builds. Store-bound builds must
+// explicitly opt into this gate and cannot quietly produce an unusable AAB.
+if (config("KAMPUSAGI_REQUIRE_PRODUCTION") == "true") {
+    fun requireHttps(name: String, value: String) {
+        val uri = runCatching { URI(value) }.getOrNull()
+        if (uri?.scheme != "https" || uri.host.isNullOrBlank() || uri.userInfo != null) {
+            throw GradleException("$name must be a valid HTTPS URL for a production build.")
+        }
+    }
+    requireHttps("SUPABASE_URL", supabaseUrl)
+    if (!isClientKey(supabaseAnonKey)) throw GradleException("A client-safe SUPABASE_ANON_KEY is required for production.")
+    requireHttps("WEBSITE_URL", websiteUrl)
+    requireHttps("PRIVACY_POLICY_URL", privacyPolicyUrl)
+    if (firebase == null) throw GradleException("Firebase client configuration is required for production push notifications.")
+    if (!hasReleaseSigning || listOf("KAMPUSAGI_KEYSTORE_PASSWORD", "KAMPUSAGI_KEY_ALIAS", "KAMPUSAGI_KEY_PASSWORD")
+            .any { config(it, keystoreProperties).isBlank() }) {
+        throw GradleException("The release upload keystore and all signing credentials are required for production.")
+    }
+    if ((config("KAMPUSAGI_VERSION_CODE").toIntOrNull() ?: 0) <= 0) {
+        throw GradleException("Set an explicit positive KAMPUSAGI_VERSION_CODE for the production release.")
+    }
+}
 
 android {
     namespace = "com.kampusagi.android"

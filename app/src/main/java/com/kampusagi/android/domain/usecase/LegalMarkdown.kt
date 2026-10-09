@@ -93,6 +93,8 @@ object LegalMarkdown {
                 continue
             }
             val parts = mutableListOf<String>()
+            // Pipe lines without a table separator are text; consume them too.
+            parts += lines[i++].trim()
             while (
                 i < lines.size && lines[i].isNotBlank() && HEADING.matchEntire(lines[i]) == null &&
                 !lines[i].trimStart().startsWith(">") && !lines[i].trimStart().startsWith("|") &&

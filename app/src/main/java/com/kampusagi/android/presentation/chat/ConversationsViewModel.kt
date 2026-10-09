@@ -40,7 +40,7 @@ class ConversationsViewModel @Inject constructor(
         load()
         viewModelScope.launch {
             repository.changes(conversationId = null)
-                .catch { Log.w(TAG, "Inbox realtime stopped; pull-to-refresh still works", it) }
+                .catch { Log.w(TAG, "Inbox realtime stopped; pull-to-refresh still works") }
                 .collect { load() }
         }
     }

@@ -45,7 +45,7 @@ class AnnouncementsViewModel @Inject constructor(
         load()
         viewModelScope.launch {
             repository.changes()
-                .catch { Log.w(TAG, "Announcement realtime stopped; they still load when the app opens", it) }
+                .catch { Log.w(TAG, "Announcement realtime stopped; they still load when the app opens") }
                 .collect { load() }
         }
     }

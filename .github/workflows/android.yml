@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      production:
+        description: Require production configuration and upload signing
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -159,8 +164,17 @@ jobs:
             echo "::warning::KAMPUSAGI_KEYSTORE_BASE64 missing: the release AAB is unsigned and cannot be uploaded to Google Play."
           fi
 
+      - name: Verify production legal pages
+        if: github.event_name == 'workflow_dispatch' && inputs.production
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          WEBSITE_URL: ${{ vars.WEBSITE_URL }}
+        run: python3 scripts/verify-production.py
+
       - name: Build and verify
         env:
+          KAMPUSAGI_REQUIRE_PRODUCTION: ${{ github.event_name == 'workflow_dispatch' && inputs.production && 'true' || 'false' }}
           KAMPUSAGI_KEYSTORE_PASSWORD: ${{ secrets.KAMPUSAGI_KEYSTORE_PASSWORD }}
           KAMPUSAGI_KEY_ALIAS: ${{ secrets.KAMPUSAGI_KEY_ALIAS }}
           KAMPUSAGI_KEY_PASSWORD: ${{ secrets.KAMPUSAGI_KEY_PASSWORD }}
@@ -203,8 +217,8 @@ jobs:
   # The release AAB stays an artifact: it is for Google Play, not for phones.
   publish-apk:
     name: Publish test APK as a GitHub release
-    needs: android
-    if: github.event_name != 'pull_request'
+    needs: [android, database, secret-scan, edge-functions, web, live-smoke]
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     permissions:
       contents: write

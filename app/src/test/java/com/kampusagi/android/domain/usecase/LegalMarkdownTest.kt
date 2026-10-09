@@ -10,6 +10,15 @@ import org.junit.Test
 
 class LegalMarkdownTest {
 
+    @Test(timeout = 1000)
+    fun `pipe lines without table rules do not stall the parser`() {
+        assertEquals(listOf(Block.Paragraph(listOf(Span(Style.TEXT, "|")))), LegalMarkdown.parse("|"))
+        assertEquals(
+            listOf(Block.Paragraph(listOf(Span(Style.TEXT, "| stray row |"))), Block.Paragraph(listOf(Span(Style.TEXT, "Next")))),
+            LegalMarkdown.parse("| stray row |\n\nNext"),
+        )
+    }
+
     @Test
     fun `reads the structures the legal texts use`() {
         val blocks = LegalMarkdown.parse(

@@ -2,6 +2,13 @@ import { describe, expect, it } from "vitest";
 import { parseInline, parseMarkdown } from "./markdown";
 
 describe("legal markdown", () => {
+  it("treats a pipe line without a table separator as text", () => {
+    expect(parseMarkdown("| stray row |\n\nNext paragraph")).toEqual([
+      { kind: "paragraph", text: [{ kind: "text", text: "| stray row |" }] },
+      { kind: "paragraph", text: [{ kind: "text", text: "Next paragraph" }] },
+    ]);
+    expect(parseMarkdown("|")).toEqual([{ kind: "paragraph", text: [{ kind: "text", text: "|" }] }]);
+  });
   it("reads the structures the legal texts use", () => {
     const blocks = parseMarkdown(`# Başlık
 

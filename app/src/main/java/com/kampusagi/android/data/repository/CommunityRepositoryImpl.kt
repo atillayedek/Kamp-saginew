@@ -118,7 +118,7 @@ class CommunityRepositoryImpl @Inject constructor(
         } catch (e: Throwable) {
             // Photos uploaded for a post that was not created would never be shown; remove them.
             if (paths.isNotEmpty()) {
-                safeCall { bucket.delete(paths) }.onFailure { Log.w(TAG, "Unused post photos could not be deleted", it) }
+                safeCall { bucket.delete(paths) }.onFailure { Log.w(TAG, "Unused post photos could not be deleted") }
             }
             throw e
         }

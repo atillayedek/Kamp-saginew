@@ -1,6 +1,6 @@
 package com.kampusagi.android.presentation.common.avatar
 
-import android.graphics.BitmapFactory
+import com.kampusagi.android.data.image.BoundedImageDecoder
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.ImageBitmap
@@ -30,12 +30,15 @@ class AvatarLoader @Inject constructor(
     private val images = mutableStateMapOf<String, ImageBitmap>()
     private val requested = HashSet<String>()
     private val pending = Channel<String>(Channel.UNLIMITED)
+    private var generation = 0
 
     init {
         scope.launch(Dispatchers.Main) {
             while (true) {
                 val batch = mutableSetOf(pending.receive())
+                val batchGeneration = generation
                 delay(BATCH_WINDOW_MS)
+                if (batchGeneration != generation) continue
                 while (true) batch += pending.tryReceive().getOrNull() ?: break
                 load(batch)
             }
@@ -58,28 +61,42 @@ class AvatarLoader @Inject constructor(
 
     /** On sign-out, so the next person starts clean. */
     fun clear() {
+        generation++
         images.clear()
         requested.clear()
+        while (pending.tryReceive().isSuccess) { /* Drop requests from the previous session. */ }
     }
 
     private suspend fun load(userIds: Set<String>) {
+        val requestedGeneration = generation
         val paths = when (val result = repository.avatarPaths(userIds)) {
             is AppResult.Success -> result.value
             is AppResult.Failure -> {
+                if (requestedGeneration != generation) return
                 Log.w(TAG, "Avatar paths could not be loaded: ${result.error}")
                 requested.removeAll(userIds) // a later screen asks again
                 return
             }
         }
+        if (requestedGeneration != generation) return
         for ((userId, path) in paths) {
             when (val bytes = repository.downloadAvatar(path)) {
                 is AppResult.Success -> {
                     val bitmap = withContext(Dispatchers.Default) {
-                        BitmapFactory.decodeByteArray(bytes.value, 0, bytes.value.size)?.asImageBitmap()
+                        BoundedImageDecoder.decode(bytes.value, 512)?.asImageBitmap()
                     }
-                    if (bitmap != null) images[userId] = bitmap else Log.w(TAG, "An avatar is not a valid image")
+                    if (requestedGeneration != generation) return
+                    if (bitmap != null) {
+                        images[userId] = bitmap
+                        while (images.size > 128) {
+                            val oldest = images.keys.first()
+                            images.remove(oldest)
+                            requested.remove(oldest)
+                        }
+                    } else Log.w(TAG, "An avatar is not a valid image")
                 }
                 is AppResult.Failure -> {
+                    if (requestedGeneration != generation) return
                     Log.w(TAG, "Avatar could not be downloaded: ${bytes.error}")
                     requested.remove(userId)
                 }

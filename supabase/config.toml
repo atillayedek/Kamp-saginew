@@ -22,6 +22,9 @@ verify_jwt = true
 [functions.verify-purchase]
 verify_jwt = true
 
+[functions.play-rtdn]
+verify_jwt = false
+
 [functions.delete-account]
 verify_jwt = true
 

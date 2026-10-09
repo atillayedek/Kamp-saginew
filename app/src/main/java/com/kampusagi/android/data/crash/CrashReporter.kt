@@ -51,7 +51,7 @@ class CrashReporter @Inject constructor(
                 )
             } catch (e: Throwable) {
                 // The process is dying; the crash itself is still passed on below.
-                Log.e(TAG, "Crash report could not be written", e)
+                Log.e(TAG, "Crash report could not be written")
             }
             previous?.uncaughtException(thread, error)
         }

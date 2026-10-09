@@ -1,9 +1,12 @@
 package com.kampusagi.android.domain.model
 
+import androidx.annotation.Keep
+
 /** Mirrors `public.post_scope`. */
 enum class PostScope { GENERAL, UNIVERSITY }
 
 /** Mirrors `public.post_category`; the author picks one when sharing. */
+@Keep
 enum class PostCategory { GENERAL, QUESTION, STUDY, EVENT, ANNOUNCEMENT, MARKETPLACE, HOUSING, LOST_FOUND, CAREER, SPORTS }
 
 data class Author(

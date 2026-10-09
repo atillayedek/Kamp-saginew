@@ -1,6 +1,6 @@
 package com.kampusagi.android.presentation.common.media
 
-import android.graphics.BitmapFactory
+import com.kampusagi.android.data.image.BoundedImageDecoder
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.ImageBitmap
@@ -38,6 +38,7 @@ class PostPhotoLoader @Inject constructor(
     private val states = mutableStateMapOf<String, PhotoState>()
     private val loadedOrder = ArrayDeque<String>()
     private var loadedBytes = 0L
+    private var generation = 0
 
     /** Loading until [request] finishes. Must be called on the main thread. */
     fun state(source: PhotoSource, path: String): PhotoState = states[cacheKey(source, path)] ?: PhotoState.Loading
@@ -46,7 +47,8 @@ class PostPhotoLoader @Inject constructor(
         val key = cacheKey(source, path)
         if (states[key] != null) return
         states[key] = PhotoState.Loading
-        scope.launch(Dispatchers.Main) { load(source, path, key) }
+        val requestedGeneration = generation
+        scope.launch(Dispatchers.Main) { load(source, path, key, requestedGeneration) }
     }
 
     fun retry(source: PhotoSource, path: String) {
@@ -61,21 +63,24 @@ class PostPhotoLoader @Inject constructor(
 
     /** On sign-out, so the next person starts clean. */
     fun clear() {
+        generation++
         states.clear()
         loadedOrder.clear()
         loadedBytes = 0
     }
 
-    private suspend fun load(source: PhotoSource, path: String, key: String) {
+    private suspend fun load(source: PhotoSource, path: String, key: String, requestedGeneration: Int) {
         val download = when (source) {
             PhotoSource.POST -> posts.downloadPhoto(path)
             PhotoSource.GROUP -> groups.downloadPhoto(path)
         }
+        if (requestedGeneration != generation) return
         when (val result = download) {
             is AppResult.Success -> {
                 val image = withContext(Dispatchers.Default) {
-                    BitmapFactory.decodeByteArray(result.value, 0, result.value.size)?.asImageBitmap()
+                    BoundedImageDecoder.decode(result.value, 1440)?.asImageBitmap()
                 }
+                if (requestedGeneration != generation) return
                 if (image == null) {
                     Log.w(TAG, "A post photo is not a valid image")
                     states[key] = PhotoState.Failed

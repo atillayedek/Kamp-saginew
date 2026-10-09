@@ -217,7 +217,7 @@ fun NotesScreen(
             try {
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                Log.w("Notes", "No PDF viewer installed", e)
+                Log.w("Notes", "No PDF viewer installed")
                 viewModel.onViewerMissing()
             }
         }

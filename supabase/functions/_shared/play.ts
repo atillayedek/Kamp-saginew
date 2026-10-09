@@ -39,7 +39,9 @@ export function evaluateSubscription(data: unknown, productId: string, userId: s
   if (sub.externalAccountIdentifiers?.obfuscatedExternalAccountId !== userId) {
     return { ok: false, code: "purchase_not_for_account" };
   }
-  if (sub.subscriptionState !== "SUBSCRIPTION_STATE_ACTIVE" && sub.subscriptionState !== "SUBSCRIPTION_STATE_IN_GRACE_PERIOD") {
+  // Turning off renewal does not revoke the already-paid billing period.
+  // The expiry check below still rejects expired cancellations and revocations.
+  if (!["SUBSCRIPTION_STATE_ACTIVE", "SUBSCRIPTION_STATE_IN_GRACE_PERIOD", "SUBSCRIPTION_STATE_CANCELED"].includes(sub.subscriptionState ?? "")) {
     return { ok: false, code: "purchase_not_active" };
   }
   const item = (sub.lineItems ?? []).find((line) => line.productId === productId);

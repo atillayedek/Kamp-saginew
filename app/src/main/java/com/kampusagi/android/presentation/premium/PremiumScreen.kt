@@ -241,7 +241,7 @@ private fun ManageSubscriptionLink(productId: String?) {
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: ActivityNotFoundException) {
-            Log.w("Premium", "No app to manage subscriptions", e)
+            Log.w("Premium", "No app to manage subscriptions")
         }
     })
 }
