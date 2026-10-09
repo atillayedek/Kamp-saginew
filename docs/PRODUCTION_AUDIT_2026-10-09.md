@@ -12,7 +12,7 @@ Depo önce indirildi; Android/Kotlin/Compose istemcisi, Supabase Auth/Postgres/R
 | Yenileme, iade ve ödeme bekletme durumu sunucuda otomatik güncellenmiyordu | Yeni `play-rtdn` fonksiyonu Google OIDC imza/issuer/audience/expiry/e-posta denetiminden sonra Play API'den güncel durumu okur. Yalnızca mevcut hesaba bağlı token güncellenir; eski/tekrarlanan olaylar yok sayılır | RSA imza, yanlış audience/gönderen/süre, abonelik durumu ve SQL yetki/idempotency testleri |
 | Acknowledge hatası satın alma başarısı gibi dönüyordu | `verify-purchase` 502 döner; RTDN bağlı satın almalar için acknowledge işlemini de yeniden dener | Edge Functions tür kontrolü; mevcut acknowledge API testleri. Gerçek Play testi henüz yapılmadı |
 | Hatalı Markdown pipe satırı sonsuz döngü yaratabiliyordu | Android ve web okuyucuları satırı normal metin olarak tüketir | İki platformda regresyon testi |
-| Release lint üç enum serializer için R8 obfuscation riski bildirdi | `PostCategory`, `GroupKind`, `GroupRole` `@Keep` ile korundu | Son release lint ve küçültülmüş derleme ile doğrulanır |
+| Release lint üç enum serializer için R8 obfuscation riski bildirdi | `PostCategory`, `GroupKind`, `GroupRole` `@Keep` ile korundu | Son commit için GitHub CI release lint ve küçültülmüş derleme PASS |
 | Exception mesajları Logcat ve çökme raporlarına hassas bilgi taşıyabiliyordu | 39 Logcat çağrısından ham exception çıkarıldı; raporlarda mesaj yerine sınıf ve stack frame tutulur; eski raporlar da yüklemeden önce temizlenir | Gizlilik taraması ve çökme raporu testleri |
 | Küçük sıkıştırılmış görseller büyük bitmap bellek tahsisi yaratabiliyordu | Profil ve gönderi fotoğraflarında çözünürlük önceden okunur ve örnekleme uygulanır | Büyük/taşma sınırına yakın boyutlar için örnekleme testi |
 | Çıkıştan sonra tamamlanan görsel indirmeleri önbelleği geri doldurabiliyordu | Oturum nesli değişince eski sonuçlar atılır; avatar önbelleği 128 görselle sınırlanır | Kod incelemesi; cihazda hesap değiştirme testi bekliyor |
@@ -32,12 +32,14 @@ Depo önce indirildi; Android/Kotlin/Compose istemcisi, Supabase Auth/Postgres/R
 | Dosya ve Git geçmişi sır taraması | PASS — 0 bulgu |
 | Canlı Supabase `scripts/live-smoke.sh` | PASS — istemci anahtarı, e-posta onayı, anonim/RPC erişimi, fonksiyon kimlik denetimi, sahte abonelikten çıkma, özel log tabloları |
 | Canlı dört yasal/hesap silme sayfası | HTTP 200; hesap silme sayfası kurulu. Gizlilik/koşullar/çocuk güvenliği metinleri taslak |
-| Canlı production yasal metin kontrolü | FAIL — 13 aktif metin taslak/yer tutucu içeriyor |
-| Android test/lint/APK/AAB | 97 birim testi PASS, lint 0 error/fatal; enum koruma düzeltmesinden sonra son derleme/CI sonucu bekleniyor |
+| Canlı production kontrolü | FAIL — 13 aktif metin taslak/yer tutucu içeriyor; RTDN endpoint deployment/server yapılandırması hazır değil |
+| Android test/lint/APK/AAB | 97 yerel birim testi PASS, lint 0 error/fatal; son enum koruma düzeltmesi dahil GitHub CI test/lint/APK/R8 AAB PASS |
+| Production yapılandırma negatif testi | PASS — yerelde eksik Firebase yapılandırması derlemeyi durdurdu |
+| Yerel AAB arm64 native ELF hizalaması | PASS — iki kütüphanenin PT_LOAD hizalaması en az 16 KB; cihazda 16 KB çalışma testi yapılmadı |
 | Telefon/emülatör testi | NOT RUN — bağlı telefon yok; mevcut AVD Windows hardware acceleration hatasıyla açılmadı |
 | Gerçek Play Billing/push/hesap silme uçtan uca | NOT RUN — gerçek cihaz/hesap/Play iç test gerekir |
 
-Mevcut GitHub CI run `36946623953` başarılıdır fakat **önceki commit** için çalışmıştır; logunda `jar is unsigned` yazmaktadır. Yeni değişikliklerin CI sonucu ayrıca doğrulanmalıdır.
+Kod commit'i `afbe0ad36d5d302e8c755d6585bb5fb776c628d3` için [CI 37881624591](https://github.com/atillayedek/Kamp-saginew/actions/runs/37881624591) ve [CI 37881614345](https://github.com/atillayedek/Kamp-saginew/actions/runs/37881614345) başarılı tamamlandı. Altı kontrol grubu geçti. Android build 6m 26s sürdü; signature kontrolü `jar is unsigned` bildirdi. Bu başarılı tanı CI sonucu imzalı production build onayı değildir. Değişiklikler [taslak PR #2](https://github.com/atillayedek/Kamp-saginew/pull/2) içinde; birleştirme veya canlı deployment yapılmadı.
 
 ## Yayın öncesi tamamlanması gerekenler
 
